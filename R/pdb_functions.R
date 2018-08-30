@@ -2165,7 +2165,7 @@ color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', 
 
 
   #need to load this as part of the package
-  pymol_color_table <- read.csv('~/Downloads/pymol_colors.csv')
+  #pymol_color_table <- read.csv('~/Downloads/pymol_colors.csv')
 
   pymol_hexcode_list <- c()
   #freq_list <- c()
@@ -9873,9 +9873,18 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 
 } #end function rbd.menuDBSearch
 
+#'PyMol Colors
+#'
+#'Data on PyMol colors
+#'
+#'@docType data
+#'
+#'@usage data(pymol_color_table)
+#'
+"pymol_color_table"
 
 
 #setwd('/Users/emmagail/Documents/monash/project.functions')
 #setwd('/Users/emmagail/Documents/crisscrosslinker')
 
-#roxygen2::roxygenise()
+roxygen2::roxygenise()
