@@ -1,306 +1,31 @@
-library(ggplot2)
-library(bio3d)
-library(Biostrings)
-library(seqinr)
-library(RColorBrewer)
-library(prodlim)
-library(openxlsx)
-library(stringr)
-library(httr)
-library(jsonlite)
-library(xml2)
-library(grDevices)
-library(svglite)
-
-#----Make PDB menu options 2-----
-
-#'Make PDB Menu Options
-#'
-#'This function creates a menu from a pdb_hit_table that is retreived by bio3d's blast.pdb function
-#'
-#'@param pdb_hit_table Hit table retrieved from bio3d::blast.pdb()
-#'@param pdb If it searches BLAST PDB. Defaults to true
-#'@export
-
-#need to make it so that the FASTA file name is included in the menu
-blast.menuOptions <- function(pdb_hit_table, database = 'pdb'){
-
-  pdb_menu_mega_list <- list()
-  #booleans as part of list to indicate whether or not the list needs
-  #a statement saying to go back and forth through the menu options
-
-  pdb <- TRUE
-  #if(datbase == 'pdb')
-
-  num_rows <- nrow(pdb_hit_table)
-  #if num_rows <= 10 should take away option to have line in list that
-  #will give you the option to show next
-  #option in case list is less than
-
-  more_than_ten_rows <- TRUE
-  if(num_rows <= 10){
-    more_than_ten_rows <- FALSE
-  }
-  #make menu for if there is less than 10 rows
-
-
-  row_num <- 0
-  for(first_row in seq(1,num_rows,10)){
-    row_num <- row_num + 1
-
-    if(first_row+10 <= num_rows){
-
-      rows_range <- first_row:(first_row+9)
-      sub_hit_table <- pdb_hit_table[rows_range,]
-
-      if(pdb == TRUE){
-        hit_id <- sub_hit_table$subjectids
-
-      } else {
-        hit_id <- strsplit(sub_hit_table$subject_ids[row_num],'_NA')[[1]]
-      }
-
-      identity_ht <- sub_hit_table$identity
-      alignment_length <- sub_hit_table$alignmentlength
-      positives <- sub_hit_table$positives
-
-      menu_options_list <- c()
-      for(num in 1:length(hit_id)){
-
-        menu_option <- paste(hit_id[num],
-                             "|",
-                             identity_ht[num],
-                             "|",
-                             alignment_length[num],
-                             "|",
-                             positives[num])
-
-      menu_options_list <- c(menu_options_list,menu_option)
-      }
-
-      #can customize the next page option for PDB or NCBI hits
-      if(more_than_ten_rows == TRUE){
-        next_page_option <- "Go to next page of hits"
-        menu_options_list <- c(menu_options_list,next_page_option)
-      }
-
-      if(first_row != 1){
-        previous_page_option <- "Go back to previous page of hits"
-        menu_options_list <- c(menu_options_list,previous_page_option)
-      }
-
-      #should there be a function to go back one page?
-      #if first_row != 1 --> add option to go to previous page of hits
-
-      if(pdb == TRUE){
-        make_2d_option <- "More options"
-        menu_options_list <- c(menu_options_list,make_2d_option)
-      }
-
-      #first index in mega list is list of booleans that correspond to
-      #?
-
-      #do something similar to num_row_range
-      #add to pdb_menu_mega_list
-      #iterating through mega list should be in the main script
-
-      pdb_menu_mega_list[[row_num]] <- menu_options_list
-
-    } else {
-      #if the +10 will cause it go outside of the indeces of the hit table
-
-      #need for loop that will be contained within
-      #first_row and length(pdb_hit_table)
-      sub_hit_table <- pdb_hit_table[first_row:num_rows,]
-
-      if(pdb == TRUE){
-        hit_id <- sub_hit_table$subjectids
-
-      } else {
-        hit_id <- strsplit(sub_hit_table$pdb.id[num],'_NA')[[1]]
-      }
-
-      alignment_length <- sub_hit_table$alignmentlength
-      positives <- sub_hit_table$positives
-
-      menu_options_list <- c()
-      for(num in 1:length(hit_id)){
-
-        menu_option <- paste(hit_id[num],
-                             "|",
-                             alignment_length[num],
-                             "|",
-                             positives[num])
-
-        menu_options_list <- c(menu_options_list,menu_option)
-      }
-
-      #option to go to the first
-      if(more_than_ten_rows == TRUE){
-        next_page_option <- "Go back to first page of hits"
-        menu_options_list <- c(menu_options_list,next_page_option)
-        previous_page_option <- "Go back to previous page of hits"
-        menu_options_list <- c(menu_options_list,previous_page_option)
-      }
-
-
-
-      if(pdb == TRUE){
-        make_2d_option <- "More options"
-        menu_options_list <- c(menu_options_list,make_2d_option)
-      }
-
-      pdb_menu_mega_list[[row_num]] <- menu_options_list
-
-    }
-  }
-
-  return(pdb_menu_mega_list)
-
-} #end function
-
-
-#----Make PDB menu options-----
-
-#'Make PDB Menu Options
-#'
-#'This function makes the PDB menu options
-#'
-#'@param pdb_hit_table Hit table from blast.pdb()
-#'@param pdb Boolean. If TRUE, uses pdb databases.
-#'@export
-
-make_pdb_menu_options <- function(pdb_hit_table, pdb = TRUE){
-
-  pdb_menu_mega_list <- list()
-
-  #add booleans to tell if menu should show the next 10 results
-  #go back option that will take you back to previous menu?
-  #should previous menu then be saved in another variable?
-  #all menus be saved in a master list and users are simply scrolling
-  #between mega list of menus?
-  #unnamed indices of list so they can be retrieved by index + 1 and
-  #index - 1
-
-
-
-
-  num_rows <- nrow(pdb_hit_table)
-
-
-  for(first_row in seq(1,num_rows,10)){
-
-    first_row <- 1
-    if(first_row+10 <= num_rows){
-
-      rows_range <- first_row:(first_row+9)
-      sub_hit_table <- pdb_hit_table[rows_range,]
-
-
-
-      #do something similar to num_row_range
-      #add to pdb_menu_mega_list
-      #iterating through mega list should be in the main script
-
-    } else {
-      #if the +10 will cause it go outside of the indeces of the hit table
-
-    }
-  }
-  #need to make condition for last row which may be less than 10
-
-
-  more_rows_option <- FALSE
-  num_row_range <- 1:num_rows
-
-  #add number of hits as part of results
-  #one output
-
-  # if(num_rows > 10){
-  #   num_row_range <- 1:10
-  #   more_rows_option <- TRUE
-  # } else {
-  #   num_row_range <- 1:num_rows
-  #   more_rows_option <- FALSE
-  # }
-
-  blasted_pdb_menu_options <- c()
-
-
-    for(num in num_row_range){
-
-      if(pdb == TRUE){
-        hit_id <- pdb_hit_table$pdb.id[num]
-
-      } else {
-        hit_id <- strsplit(pdb_hit_table$pdb.id[num],'_NA')[[1]]
-      }
-
-
-      menu_option <- paste(hit_id,
-                           "|",
-                           pdb_hit_table$alignmentlength[num],
-                           "|",
-                           pdb_hit_table$positives[num])
-
-      blasted_pdb_menu_options <- c(blasted_pdb_menu_options,menu_option)
-    }
-
-  #accounting for row number for more options?
-  #make menu options part of a list where there are booleans that will
-  #trigger certain options
-
-  if(more_rows_option == TRUE){
-    more_rows_choice <- "See more PDB matches"
-    blasted_pdb_menu_options <- c(blasted_pdb_menu_options,more_rows_choice)
-
-  }
-
-  #c() with strings? pdb pdb pdb pdb more_rows make_2d
-  if(pdb == TRUE){
-    twod_option <- "Do not use any PDB structure -- generate 2D structure from sequence"
-    blasted_pdb_menu_options <- c(blasted_pdb_menu_options,twod_option)
-  }
-
-  #manually input PDB ID and chain?
-
-
-
-  return(blasted_pdb_menu_options)
-
-}
-
-#-----Get PDB info based on menu selection-----
-
-#'Get PDB Info
-#'
-#'Get information about PDB selection from menu selection
-#'
-#'@param menu_selection Numerical selection that has been selected corresponding to the row number of pdb_hit_table
-#'@param pdb_hit_table Hit table from bio3d::blast.pdb() function
-#'@export
-
-get_pdb_info <- function(menu_selection,pdb_hit_table){
-
-  query_start <- pdb_hit_table$q.start[menu_selection]
-  query_end <- pdb_hit_table$q.end[menu_selection]
-  sequence_start <- pdb_hit_table$s.start[menu_selection]
-  sequence_end <- pdb_hit_table$s.end[menu_selection]
-
-  split_hit <- strsplit(pdb_hit_table$subjectids[menu_selection],'_')[[1]]
-  pdb_id <- split_hit[1]
-  chain <- split_hit[2]
-
-  pdb_info <- list(query_start=query_start,
-                   query_end=query_end,
-                   sequence_start=sequence_start,
-                   sequence_end=sequence_end,
-                   pdb_id=pdb_id,
-                   chain=chain)
-
-  return(pdb_info)
-
-}
+# library(ggplot2)
+# library(bio3d)
+# library(Biostrings)
+# library(seqinr)
+# library(RColorBrewer)
+# library(prodlim)
+# library(openxlsx)
+# library(stringr)
+# library(httr)
+# library(jsonlite)
+# library(xml2)
+# library(grDevices)
+# library(svglite)
+
+
+#' @import ggplot2
+#' @import bio3d
+#' @import Biostrings
+#' @import seqinr
+#' @import RColorBrewer
+#' @importFrom prodlim row.match
+#' @importFrom openxlsx read.xlsx
+#' @import stringr
+#' @import httr
+#' @import jsonlite
+#' @import xml2
+#' @import grDevices
+#' @import svglite
 
 
 
@@ -2165,7 +1890,8 @@ color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', 
 
 
   #need to load this as part of the package
-  #pymol_color_table <- read.csv('~/Downloads/pymol_colors.csv')
+  pymol_color_table <- read.csv('~/Downloads/pymol_colors.csv')
+  #devtools::use_data(pymol_color_table,crisscrosslinker)
 
   pymol_hexcode_list <- c()
   #freq_list <- c()
@@ -3856,117 +3582,6 @@ find_and_generate_missing_aa_2d_structure_all <- function(fasta_file,
 } #end all function
 
 
-#----BS3 Align to PDB----
-
-
-#does this need boolean?
-ppi.alignPDB <- function(fasta_file){
-
-  pdb_vector_match_mega <- list()
-
-  for(protein_name in names(fasta_file)){
-
-    pdb_info <- display_preferred_pdb_structure_menu(protein_name,fasta_file)
-
-    chain <- pdb_info$chain
-    pdb_file <- check_download_read_pdb(pdb_info$pdb_id)
-
-    pwa_results <- quick_pwa_from_pdb(fasta_file[[protein_name]],pdb_file,chain,
-                                      use_resid_and_resno = TRUE)
-
-    pwa_results <- quick_pwa_from_pdb(fasta_file[[protein_name]],pdb_file,chain,
-                                      use_resid_and_resno = FALSE)
-
-    #add additional option to use all chains for the menu
-
-    pdb_file$seqres[names(pdb_file$seqres) == chain]
-
-    for(chain in unique(names(pdb_file$seqres))){
-
-      paste0(a(firstup(pdb_file$seqres[names(pdb_file$seqres) == chain])),collapse='')
-      #check to see if any chains == each other
-      #if they do == each other, add the chain to the identifier?
-      #add to list of the seqres sequences
-      #pairwise align the resid to the seqres
-
-
-
-
-    }
-
-    #could then create a vector corresponding to the chain it's on
-    #would need 3 vectors --> 1 for the chains, (can have - if no match), 1 for fasta sequence,
-    #1 for the numbering of the chain
-
-    #SUZ12 is split between multiple sequences --> option to combine sequences
-    #together??
-    #quality control --> lots of single amino acids not easily combined
-
-
-    pwa_ranges <- get_pwa_ranges(pwa_results = pwa_results)
-    pwa_strings <- get_pwa_strings(pwa_results = pwa_results)
-    #resno_and_resid <- quick_resno_and_resid(pdb_file,chain)
-
-    pat_str_list <- paste0(pwa_strings$pattern_string,collapse='')
-    pat_str_split <- strsplit(pat_str_list,'-')[[1]]
-    pat_str_split <- pat_str_split[pat_str_split != '']
-    #measure the length instead
-    length(pat_str_split[nchar(pat_str_split) == 1])
-
-
-    pwa_strings
-
-    fasta_vector <- c()
-    pdb_vector <- c()
-
-    #go through the list
-    for(pat_str in pat_str_split){
-
-      #matching the numbering to the fasta file
-      fasta_se <- str_locate_all(toupper(paste0(fasta_file[[protein_name]],collapse='')),pat_str)[[1]]
-      pat_se <- str_locate_all(paste0(resno_and_resid$resid,collapse=''),pat_str)[[1]]
-      nrow(pat_se) #check if > 1 --> more than 1 match
-      #can also check the nrow of fasta_se
-      #can go to the next one numerically?
-
-
-      #what to do if there is more than 1 match?
-      pat_start <- pat_se[1]
-      pat_end <- pat_se[2]
-
-      #get the numbering from resno from pat_se
-      resno_start <- pdb_info$resno[pat_start]
-      resno_end <- pdb_info$resno[pat_end]
-
-      fasta_vector <- c(fasta_vector,fasta_se[1]:fasta_se[2])
-      pdb_vector <- c(pdb_vector,resno_start:resno_end)
-
-      #add to vector
-
-      #use the original numbering from fasta_se and make into a vector
-      #both vectors should be the same length --> should do a QC at the end of the loop
-
-    } #end for(pat_str in pat_str_split)
-
-    length(fasta_vector) == length(pdb_vector)
-
-    pdb_vector_match <- list(fasta_vector=fasta_vector,
-                             pdb_vector=pdb_vector)
-
-
-    pdb_vector_match_mega[[protein_name]] <- pdb_vector_match
-
-  }  #end for(protein_name in names(fasta_file))
-
-
-
-  #output should be the same/similar to the original function
-  #need to find a way to handle missing points on the PDB file
-  #can then be used for input for AP code
-
-
-  return(pdb_vector_match_mega)
-} #end function ppi.alignPDB
 
 
 
@@ -7136,7 +6751,7 @@ renumber_binding_site_df_from_uniprot_fasta <- function(binding_site_df,protein_
 rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
                                  protein_name = NULL,database_name = NULL,
                                  database_id = NULL, cleave_offset=0,last_aa = NULL,
-                                 include_ambiguous = FALSE){
+                                 include_ambiguous = FALSE, proteolytic_fragments = FALSE){
 
   if(length(str_locate_all(sequence_for_alignment,ms_sequence)[[1]]) == 0){
     warning("Input sequence not found in the sequence for alignment")
@@ -7369,6 +6984,42 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
       binding_site_start_in_pdb <- resno_ms2_start_pattern
       binding_site_end_in_pdb <- resno_ms2_end_pattern
     }
+  }
+
+
+  if(proteolytic_fragments == TRUE){ #should the include_ambiguous be included in proteloytic fragments anyway??
+
+    if(resno_ms2_start_pattern > binding_site_start_in_pdb){
+      #if the tryptic peptide is after the binding site
+      binding_sequence <- as.character(paste0(as.character(binding_sequence), as.character(ms_sequence)))
+      #need to change the binding start and/or end
+      binding_site_end_in_pdb <- resno_ms2_end_pattern
+
+    } else if(resno_ms2_start_pattern < binding_site_start_in_pdb){
+      binding_sequence <- as.character(paste0(as.character(ms_sequence), as.character(binding_sequence)))
+      binding_site_start_in_pdb <- resno_ms2_start_pattern
+
+
+    } else if(resno_ms2_start_pattern == binding_site_start_in_pdb){
+      #the two are equal
+      if(include_ambiguous == TRUE){
+        #the two are equal so just ignore it
+
+      } else {
+        #error?
+        warning('Potential error --> Danger!\n')
+      }
+
+      #check if it's include_ambiguous?
+      #if not --> there may be an error
+
+    }
+
+    #get the start and end positions
+    #get the order of the tryptic and binding peptides
+    #exclude binding of the include_ambiguous fragments
+    #
+
   }
 
 
@@ -9884,7 +9535,11 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 "pymol_color_table"
 
 
+#save(pymol_color_table,file='data/pymol_color_table.RData')
+
 #setwd('/Users/emmagail/Documents/monash/project.functions')
 #setwd('/Users/emmagail/Documents/crisscrosslinker')
 
-roxygen2::roxygenise()
+#roxygen2::roxygenise()
+#requireNamespace("crisscrosslinker")
+
