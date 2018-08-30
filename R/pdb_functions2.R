@@ -14,19 +14,31 @@
 
 
 #' @import ggplot2
+NULL
 #' @import bio3d
+NULL
 #' @import Biostrings
+NULL
 #' @import seqinr
+NULL
 #' @import RColorBrewer
+NULL
 #' @importFrom prodlim row.match
+NULL
 #' @importFrom openxlsx read.xlsx
+NULL
 #' @import stringr
+NULL
 #' @import httr
+NULL
 #' @import jsonlite
+NULL
 #' @import xml2
+NULL
 #' @import grDevices
+NULL
 #' @import svglite
-
+NULL
 
 
 #-----Generate 2D PDB file-----
