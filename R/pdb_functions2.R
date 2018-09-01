@@ -12,14 +12,15 @@
 # library(grDevices)
 # library(svglite)
 
-
+#need to do importFrom for these packages so that only certain ones are taken out of the
+#packages --> no name conflicts
 #' @import ggplot2
 NULL
 #' @import bio3d
 NULL
 #' @import Biostrings
 NULL
-#' @import seqinr
+#' @importFrom seqinr read.fasta
 NULL
 #' @import RColorBrewer
 NULL
@@ -8875,7 +8876,8 @@ ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_
 rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
                       colors = NULL, file.name = 'rbd_pymol.pml',
                       write.file = TRUE, experiment.dir = NULL,
-                      gray0 = FALSE, heatmap = TRUE){
+                      gray0 = FALSE, heatmap = TRUE, assembly=0,
+                      fetch=TRUE){
 
   #what is color_by is frequency?
 
@@ -8896,9 +8898,17 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
   split_pdbs <- unlist(strsplit(as.character(bs_output$db_id),'_'))
   unique_pdbs <- unique(split_pdbs[nchar(split_pdbs) == 4])
 
+  py_line <- paste0('set assembly, ', assembly)
+  pymol_lines <- c(pymol_lines,py_line)
+
   for(u_pdb in unique_pdbs){
     #py_line <- paste('fetch',u_pdb)
-    py_line <- paste0('load ',experiment.dir,'/',u_pdb,'.pdb')
+    if(fetch == TRUE){
+      py_line <- paste0('fetch ',u_pdb,', async=0')
+    } else {
+      py_line <- paste0('load ',experiment.dir,'/',u_pdb,'.pdb')
+    }
+
     pymol_lines <- c(pymol_lines,py_line)
   }
 
@@ -9545,6 +9555,12 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'@usage data(pymol_color_table)
 #'
 "pymol_color_table"
+#add in pymol wiki info, etc. for the sake of documentation
+
+#first save the data to
+#need to also include rbdmap data and protein-protein interaction data
+#will the code be able to handle pre-loaded data? --> should do this for the getSeqHitList function as well
+#may need a different code
 
 
 #save(pymol_color_table,file='data/pymol_color_table.RData')

@@ -6,7 +6,7 @@
 \usage{
 rbd.pymol(bs_output, color_by = "binding_sequence", colors = NULL,
   file.name = "rbd_pymol.pml", write.file = TRUE, experiment.dir = NULL,
-  gray0 = FALSE, heatmap = TRUE)
+  gray0 = FALSE, heatmap = TRUE, assembly = 0, fetch = TRUE)
 }
 \arguments{
 \item{bs_output}{Output from rbd.getBindingSeq()}
