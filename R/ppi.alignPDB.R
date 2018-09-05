@@ -294,7 +294,10 @@ ppi.alignPDB <- function(fasta_file){
 
             #uniprot_seq_alignment_vector
             pdb_alignment_vector[uniprot_start_index:uniprot_end_index] <- pdb_line_start:pdb_line_end
-            chain_alignment_vector[uniprot_start_index:uniprot_end_index] <- rep(pdb_line_chain,length(uniprot_line_start:uniprot_line_end))
+
+            pdb_line_fullid <- paste0(pdb_info$pdb_id,'_',pdb_line_chain)
+            #
+            chain_alignment_vector[uniprot_start_index:uniprot_end_index] <- rep(pdb_line_fullid,length(uniprot_line_start:uniprot_line_end))
 
             #source("https://bioconductor.org/biocLite.R")
             #biocLite('bio3d','Biostrings')
@@ -412,11 +415,24 @@ ppi.alignPDB <- function(fasta_file){
 } #end function ppi.alignPDB
 
 
-pdb_vector_match <- ppi.alignPDB(fasta_file = fasta_file)
+
 #use the pdb_vector_match to t
 
-for(protein_name in names(pdb_vector_match)){
-
-  pdb_vector_match[[protein_name]]
-
-}
+# setwd('~/Downloads')
+# fasta_file <- seqinr::read.fasta('PRC2_units_5m.fasta')
+# pdb_vector_match <- ppi.alignPDB(fasta_file = fasta_file)
+#
+# #for every line in the loaded data
+#
+# xlink_list
+#
+# for(xlink_index in 1:length(xlink_list)){
+#
+#   #xlink_list[[xlink_index]]
+#
+#   seq_xlink <- xlink_list[[xlink_index]]$sequence_xlink
+#
+#   #get the
+#
+# }
+#
