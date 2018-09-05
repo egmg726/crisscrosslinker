@@ -18,18 +18,25 @@
 NULL
 #' @import bio3d
 NULL
-#' @import Biostrings
+#which functions have been imported from bio3d?
+#read.pdb
+#write.pdb??
+#can also just import entire function for now
+#' @importFrom Biostrings pairwiseAlignment
+#import only pairwiseAlignment?
 NULL
-#' @importFrom seqinr read.fasta
+#' @importFrom seqinr read.fasta a aaa
 NULL
+#is that notation correct?
 #' @import RColorBrewer
 NULL
 #' @importFrom prodlim row.match
 NULL
 #' @importFrom openxlsx read.xlsx
 NULL
-#' @import stringr
+#' @importFrom stringr str_locate_all
 NULL
+#str_locate_all?
 #' @import httr
 NULL
 #' @import jsonlite
@@ -38,8 +45,9 @@ NULL
 NULL
 #' @import grDevices
 NULL
-#' @import svglite
+#' @importFrom svglite svglite
 NULL
+#only import the svg function into the final version
 
 
 #-----Generate 2D PDB file-----
@@ -990,6 +998,7 @@ rbd.makeIEPlot <- function(input_eluate_table,
   nudge_variable <- (max(combined_output_df$input)-min(combined_output_df$input))/50
 
 
+  #change to svg?
   png(pipeline_generated_plot_title, width = 480, height = 480)
 
   if(secondary_prefix == TRUE){
@@ -1903,7 +1912,7 @@ color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', 
 
 
   #need to load this as part of the package
-  pymol_color_table <- read.csv('~/Downloads/pymol_colors.csv')
+  #pymol_color_table <- read.csv('~/Downloads/pymol_colors.csv')
   #devtools::use_data(pymol_color_table,crisscrosslinker)
 
   pymol_hexcode_list <- c()
@@ -4203,9 +4212,10 @@ ppi.analyze <- function(list_of_files,fasta_file,
         #   next
         # }
 
+
+
         otps_list <- c()
         xyz_coord_list <- list()
-
 
         #keep these in lists for next part of analysis?
         #if yes --> make into a function so better condense the information
@@ -4352,11 +4362,38 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
 
           #does this eject a NULL when there is an error?
-          on_this_pdb_structure <- get_pdb_structure_from_protein_pos(protein_name,
-                                                                      protein_pos,
-                                                                      list_of_all_pdb_files,
-                                                                      list_of_start_and_end_pdbs)
+          #can skip over this if pdb_numbering is TRUE
+          if(pdb_numbering == TRUE){
 
+            protein_pos_match <- match(protein_pos,pdb_match_vector[[protein_name]]$fasta)
+
+            #how to keep track of the new protein position within the
+            pdb_protein_pos <- as.numeric(pdb_match_vector[[protein_name]]$pdb[protein_pos_match])
+            #pdb_match_vector[[protein_name]]$chain[protein_pos_match]
+
+            protein_split_list[[index_num]] <- pdb_protein_pos
+
+
+            #on_this_pdb_structure
+            #otps_list <- c(otps_list,on_this_pdb_structure)
+
+
+
+          } else {
+
+
+            on_this_pdb_structure <- get_pdb_structure_from_protein_pos(protein_name,
+                                                                        protein_pos,
+                                                                        list_of_all_pdb_files,
+                                                                        list_of_start_and_end_pdbs)
+
+
+            if(!is.null(on_this_pdb_structure)){
+              otps_list <- c(otps_list,on_this_pdb_structure)
+            } #end if(!is.null(on_this_pdb_structure)){
+
+
+          } #end else to if(pdb_numbering == TRUE){
 
           #return(list(all_pdb=list_of_all_pdb_files,start_and_end=list_of_start_and_end_pdbs))
 
@@ -4365,9 +4402,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
           #cat('On this PDB Structure\n')
           #print(on_this_pdb_structure)
 
-          if(!is.null(on_this_pdb_structure)){
-            otps_list <- c(otps_list,on_this_pdb_structure)
-          }
+
 
         } #end for(index_num in 1:length(sequence_xlink_list))
 
@@ -4384,7 +4419,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
           #not_included_xl_sites <- c(not_included_xl_sites,seq_xlink2)
 
-        }
+        } #end if(length(otps_list) != 2)
 
         #cat('OTPS List')
         #print(otps_list)
@@ -5283,6 +5318,16 @@ match_sequence_to_pdb_and_chain <- function(protein_name,
 #will need multiple options for what will happen with the PDB info
 #need to create a scenario that will accept pdb_info for plink analysis
 
+#'Display Preferred PDB Structure Menu
+#'
+#'This function creates a menu interface for preferred PDB structure
+#'
+#'@param protein_name Protein name that corresponds to name in fasta_file to extract sequence
+#'@param fasta_file FASTA file as read by seqinr::read.fasta()
+#'@param pwa_score_threshold Minimum score to determine a match using Biostrings::pairwiseAlignment()
+#'@param peptide_sequence An optional peptide sequence to use for recommendations if trying to match a peptide to a structure. Defaults to NULL
+#'@export
+
 display_preferred_pdb_structure_menu <- function(protein_name, fasta_file, pwa_score_threshold = 500,
                                                  peptide_sequence = NULL){
 
@@ -5370,6 +5415,11 @@ display_preferred_pdb_structure_menu <- function(protein_name, fasta_file, pwa_s
 
 
 #----Generate PDB Lists from CSV with PDB Info----
+
+#'Generate PDB Lists from PDB CSV
+#'
+#'@param csv_file_name String containing path to csv file
+#'@export
 
 generate_pdb_lists_from_pdb_csv <- function(csv_file_name){
 
@@ -8871,6 +8921,7 @@ ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_
 #'@param write.file Boolean. If TRUE, will output file with name of file.name. If FALSE, will return file as list.
 #'@param experiment.dir Directory of experiment, where PDB files are. If left as NULL, will use current directory.
 #'@param gray0 Boolean. If TRUE, will shift color scheme for frequency analysis and label 0s as "gray" in PyMOL.
+#'@param assembly Assembly number for PyMOL output that corresponds to RCSB database. Works for PyMOL 1.8 and above.
 #'@export
 
 rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
