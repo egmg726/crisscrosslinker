@@ -28,7 +28,7 @@ rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
     rbd_row <- rbd.df[row_num,]
     trypticPeptide <- as.character(rbd_row$trypticPeptide)
     enzyme <- as.character(rbd_row$enzyme)
-    protID <- as.character(rbd_row$protID)
+    protID <- as.character(rbd_row$ProtID)
 
     if(!is.null(fasta)){
 
@@ -37,10 +37,12 @@ rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
         fasta <- seqinr::read.fasta(fasta)
       } #end if(typeof(fasta) == 'character'){
 
-      sourceSequence <- toupper(paste0(fasta[[protID]],collapse = ''))
-      if(sourceSequence == ''){
+      if(protID %in% names(fasta)){
+        sourceSequence <- toupper(paste0(fasta[[protID]],collapse = ''))
+      } else {
         sourceSequence <- toupper(paste0(fasta[[1]],collapse = ''))
       }
+
 
     } else {#end if(!is.null(fasta)){
       sourceSequence <- uniprot.fasta(uniprot_id = protID)
