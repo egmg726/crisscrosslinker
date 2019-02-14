@@ -12,9 +12,9 @@ color.pymol(vars, colors = NULL, png.name = "pymol_legend\%03d.svg",
 
 \item{colors}{List of either PyMol colors, hexcodes, or standard colors in R. Will also accept color palette names from RColorBrewer and viridis. If left as NULL, will use standard PyMOL tint colors.}
 
-\item{gray0}{If TRUE, will shift color palette and replace 1st color as gray (corresponds 0 if using frequency). Defaults to FALSE.}
+\item{png.name}{Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.}
 
-\item{jpeg.name}{Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.}
+\item{gray0}{If TRUE, will shift color palette and replace 1st color as gray (corresponds 0 if using frequency). Defaults to FALSE.}
 }
 \description{
 Generate colors to be used when generating a PyMol script

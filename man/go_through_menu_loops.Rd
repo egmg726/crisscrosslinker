@@ -4,12 +4,15 @@
 \alias{go_through_menu_loops}
 \title{BLAST sequence and go through menu loops}
 \usage{
-go_through_menu_loops(fasta_sequence_vector, database = "pdb")
+go_through_menu_loops(fasta_sequence_vector, database = "pdb",
+  time_out = NULL)
 }
 \arguments{
 \item{fasta_sequence_vector}{Sequence as a vector to be used to BLAST against}
 
-\item{pdb}{Menu selected. FALSE uses the 'nr' library. Defaults to TRUE ('pdb' library)}
+\item{database}{Menu selected for blast.pdb(). Options: "pdb","nr", or "swissprot". Defaults to "pdb".}
+
+\item{time_out}{Integer indicating time in seconds the blast.pdb() will search before time out occurs. Defaults to}
 }
 \description{
 This function will BLAST the given sequence and give the user an interactive menu to select the best option.

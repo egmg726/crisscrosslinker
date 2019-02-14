@@ -1,6 +1,5 @@
 #----BS3 Align to PDB----
 
-
 #does this need boolean?
 #should also accept protein_dict --> but will need to account for the multiple chains
 #user should also be able to just put in the PDB ID with no chain --> will have to do a grepl check to see if '_' exists in string
@@ -18,11 +17,12 @@ ppi.alignPDB <- function(fasta_file){
 
     chain <- pdb_info$chain
     #pdb_file <- check_download_read_pdb(pdb_info$pdb_id)
-    pdb_file <- read.pdb(pdb_info$pdb_id)
+    pdb_file <- read.pdb2(pdb_info$pdb_id)
 
     pdb_anno <- pdb.annotate(pdb_info$pdb_id)
     uniprot_id <- pdb_anno[pdb_anno$chainId == chain,"db_id"]
-    uniprot_sequence <-uniprot(uniprot_id)$sequence
+    #uniprot_sequence <-uniprot(uniprot_id)$sequence #taking a really long time?
+    uniprot_sequence <- uniprot.fasta(uniprot_id = uniprot_id)
 
     chain_matches <- pdb_anno[pdb_anno$db_id == uniprot_id,"chainId"]
 
@@ -279,6 +279,9 @@ ppi.alignPDB <- function(fasta_file){
             uniprot_line_start <- as.numeric(uniprot_line[names(pdb_line) == "start"])
             uniprot_line_end <- as.numeric(uniprot_line[names(pdb_line) == "end"])
 
+            #do a QC check here possibly --> check if end is > the
+
+
 
             #put the PDB start and end in the positions where the uniprot_line is
 
@@ -290,7 +293,9 @@ ppi.alignPDB <- function(fasta_file){
             uniprot_start_index <- match(uniprot_line_start,uniprot_seq_alignment_vector)
             uniprot_end_index <- match(uniprot_line_end,uniprot_seq_alignment_vector)
 
-
+            if(uniprot_line_end > max(uniprot_seq_alignment_vector)){
+              uniprot_end_index <- max(uniprot_seq_alignment_vector)
+            }
 
             #uniprot_seq_alignment_vector
             pdb_alignment_vector[uniprot_start_index:uniprot_end_index] <- pdb_line_start:pdb_line_end
@@ -424,15 +429,71 @@ ppi.alignPDB <- function(fasta_file){
 #
 # #for every line in the loaded data
 #
+#
+#
 # xlink_list
 #
 # for(xlink_index in 1:length(xlink_list)){
 #
+#
+#   #xlink_index <- 94
 #   #xlink_list[[xlink_index]]
 #
 #   seq_xlink <- xlink_list[[xlink_index]]$sequence_xlink
+#   pro_xlink <- xlink_list[[xlink_index]]$proteins_xlink
+#   pro_xlink <- pro_xlink[1]
 #
-#   #get the
+#   #need to do the check up here first to make sure the protein names are real
+#
+#   #rename this function?
+#   protein_split_list <- extract_protein_name_and_peptide_num(pro_xlink,names(fasta_file))
+#
+#   #within the main function can make it so that if pdb_numbering == TRUE
+#   #do some of the rest of the loop
+#   #after the intiial checks
+#
+#
+#   #have boolean to keep track of the proteins?
+#
+#   for(pro_index in  1:length(protein_split_list)){
+#
+#     pro_name <- protein_split_list[[pro_index]][1]
+#     pro_seq_index <- protein_split_list[[pro_index]][2]
+#
+#     pdb_vector_pro <- pdb_vector_match[[pro_name]] #need to make sure that this is not NULL?
+#     pro_seq_index2 <- match(pro_seq_index,pdb_vector_pro$fasta)
+#
+#     pdb_index <- as.numeric(pdb_vector_pro$pdb[pro_seq_index2])
+#     chain_index <- pdb_vector_pro$chain[pro_seq_index2]
+#
+#     chain_split <- strsplit(chain_index,'_')[[1]]
+#
+#     #read.fasta.pdb #look into this further
+#     pdb_file <- read.pdb(chain_split[1]) #store the pdb file so that it doesn't need to be re-downloaded every time?
+#     pdb_resno_bool <- pdb_file$atom[pdb_file$atom$chain == chain_split[2],'resno'] == pdb_index
+#     pdb_resid <- unique(a(firstup(pdb_file$atom[pdb_file$atom$chain == chain_split[2],'resid']))[pdb_resno_bool])
+#     #check the index of the seq_xlink?
+#     #first check to make sure the length == 1, throw an error if not
+#     #will also need to check to make sure that it is not NULL or NA (if the match is not real)
+#
+#
+#     #should double-check the actual index within
+#
+#
+#     #as.numeric('-') #made into NA by coercion
+#     #will need to check if is.na()?
+#     #if cannot be made into a number --> can make NA for pdb_id
+#
+#     #does a second check need to happen to make sure the index exists with the
+#
+#   }
+#
+#   #get the protein name and match it to the right name within the pdb_vector_match
+#   #then get the protein position and then match it within the $fasta list
+#   #use match() to get the index
+#   #use the index for the $pdb list
+#   #use the same index for the $chain list to get the name of the PDB file that will be used for pdb1/2
+#
 #
 # }
 #

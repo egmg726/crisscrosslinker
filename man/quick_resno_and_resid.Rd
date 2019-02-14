@@ -7,7 +7,7 @@
 quick_resno_and_resid(pdb_read, chain)
 }
 \arguments{
-\item{pdb_read}{PDB file as loaded by bio3d::read.pdb()}
+\item{pdb_read}{PDB file as loaded by bio3d::read.pdb2()}
 
 \item{chain}{Character indicating the chain on the PDB file}
 }

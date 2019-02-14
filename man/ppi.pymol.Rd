@@ -7,7 +7,8 @@
 ppi.pymol(xlink_mega_df, list_of_start_and_end_pdbs = NULL,
   show_only_real_structures = NULL, write_file = FALSE,
   custom.color = FALSE, colors = NULL, color_by = "freq",
-  write.df = FALSE)
+  write.df = FALSE, experiment_directory = NULL,
+  pdb_numbering = FALSE)
 }
 \arguments{
 \item{xlink_mega_df}{xlink_mega_df}
@@ -27,5 +28,5 @@ ppi.pymol(xlink_mega_df, list_of_start_and_end_pdbs = NULL,
 \item{write.df}{write.df}
 }
 \description{
-ppi.pymol
+ppi.pymol description
 }

@@ -5,8 +5,9 @@
 \title{Write PyMol file for RBDmap Data}
 \usage{
 rbd.pymol(bs_output, color_by = "binding_sequence", colors = NULL,
-  file.name = "rbd_pymol.pml", write.file = TRUE, experiment.dir = NULL,
-  gray0 = FALSE, heatmap = TRUE, assembly = 0, fetch = TRUE)
+  file.name = "rbd_pymol.pml", write.file = TRUE,
+  experiment.dir = NULL, gray0 = FALSE, heatmap = TRUE,
+  assembly = 0, fetch = TRUE)
 }
 \arguments{
 \item{bs_output}{Output from rbd.getBindingSeq()}
@@ -22,6 +23,8 @@ rbd.pymol(bs_output, color_by = "binding_sequence", colors = NULL,
 \item{experiment.dir}{Directory of experiment, where PDB files are. If left as NULL, will use current directory.}
 
 \item{gray0}{Boolean. If TRUE, will shift color scheme for frequency analysis and label 0s as "gray" in PyMOL.}
+
+\item{assembly}{Assembly number for PyMOL output that corresponds to RCSB database. Works for PyMOL 1.8 and above.}
 }
 \description{
 This function makes a PyMOL file (.pml) that can be used to visualize data obtained from rdb.getBindingSeq()

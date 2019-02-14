@@ -4,9 +4,9 @@
 \alias{rbd.getBSfromIET}
 \title{Get Binding Sequences from Input/Eluate Table}
 \usage{
-rbd.getBSfromIET(filtered_input_eluate_table, fasta_file, align_to = "PDB",
-  protein_to_uniprot_id = NULL, protein_dict = NULL,
-  include_ambiguous = FALSE)
+rbd.getBSfromIET(filtered_input_eluate_table, fasta_file,
+  align_to = "PDB", protein_to_uniprot_id = NULL,
+  protein_dict = NULL, include_ambiguous = FALSE)
 }
 \arguments{
 \item{filtered_input_eluate_table}{filtered_input_eluate_table}

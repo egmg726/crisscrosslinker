@@ -4,8 +4,8 @@
 \alias{generate_2d_pdb_file}
 \title{Generate 2D PDB File}
 \usage{
-generate_2d_pdb_file(amino_acid_fragments, start_residue, x_coord = 82.998,
-  y_coord = -5.76, z_coord = -20.345)
+generate_2d_pdb_file(amino_acid_fragments, start_residue,
+  x_coord = 82.998, y_coord = -5.76, z_coord = -20.345)
 }
 \arguments{
 \item{amino_acid_fragments}{A vector containing an amino acid sequence.}

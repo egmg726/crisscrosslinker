@@ -1,16 +1,18 @@
-# library(ggplot2)
-# library(bio3d)
-# library(Biostrings)
-# library(seqinr)
-# library(RColorBrewer)
-# library(prodlim)
-# library(openxlsx)
-# library(stringr)
-# library(httr)
-# library(jsonlite)
-# library(xml2)
-# library(grDevices)
-# library(svglite)
+library(ggplot2)
+library(bio3d)
+library(Biostrings)
+library(seqinr)
+library(RColorBrewer)
+library(prodlim)
+library(openxlsx)
+library(stringr)
+library(httr)
+library(jsonlite)
+library(xml2)
+library(grDevices)
+library(svglite)
+library(XML)
+library(RCurl)
 
 #need to do importFrom for these packages so that only certain ones are taken out of the
 #packages --> no name conflicts
@@ -25,28 +27,32 @@ NULL
 #' @importFrom Biostrings pairwiseAlignment
 #import only pairwiseAlignment?
 NULL
-#' @importFrom seqinr read.fasta a aaa
+#'@importFrom seqinr read.fasta a aaa
 NULL
 #is that notation correct?
-#' @import RColorBrewer
+#'@import RColorBrewer
 NULL
-#' @importFrom prodlim row.match
+#'@importFrom prodlim row.match
 NULL
-#' @importFrom openxlsx read.xlsx
+#'@importFrom openxlsx read.xlsx
 NULL
-#' @importFrom stringr str_locate_all
+#'@importFrom stringr str_locate_all str_count
 NULL
-#str_locate_all?
-#' @import httr
+#'@import httr
 NULL
-#' @import jsonlite
+#'@import jsonlite
 NULL
-#' @import xml2
+#'@import xml2
 NULL
-#' @import grDevices
+#'@import grDevices
 NULL
-#' @importFrom svglite svglite
+#'@importFrom svglite svglite
 NULL
+#'@import viridis
+NULL
+#'@import svglite
+NULL
+
 #only import the svg function into the final version
 
 
@@ -393,34 +399,48 @@ get_missing_amino_acids <- function(maal,pwa_strings){
 
 
   #supposed start is actually the end of the sequence
-  for(aa_num in 1:(length(missing_animo_acids)-1)){
-    amino_acid_fragments <- c(amino_acid_fragments,subject_string_vector[aa_num])
-    if((missing_animo_acids[aa_num+1] - missing_animo_acids[aa_num]) != 1){
-      list_num <- list_num + 1
-      amino_acid_fragments_main_list[[list_num]] <- amino_acid_fragments
-      start_fragment_list[[list_num]] <- c(missing_animo_acids[aa_num],
-                                           length(amino_acid_fragments))
-
-      fragment_start <- missing_animo_acids[aa_num]-length(amino_acid_fragments)+1
-      start_fragment2 <- c(start_fragment2,fragment_start)
-      amino_acid_fragments <- c()
-    }
+  if(length(missing_animo_acids) == 1){
+    missing_animo_acids_length <- 1
+  } else {
+    missing_animo_acids_length <- length(missing_animo_acids)-1
   }
 
-  list_num <- list_num + 1
-  amino_acid_fragments_main_list[[list_num]] <- amino_acid_fragments
-  start_fragment_list[[list_num]] <- c(missing_animo_acids[aa_num],
-                                       length(amino_acid_fragments))
+  for(aa_num in 1:(missing_animo_acids_length)){
+    amino_acid_fragments <- c(amino_acid_fragments,subject_string_vector[aa_num])
 
-  fragment_start <- missing_animo_acids[aa_num]-length(amino_acid_fragments)+1
-  start_fragment2 <- c(start_fragment2,fragment_start)
+    if(!is.na(missing_animo_acids[aa_num+1])){
+
+      if((missing_animo_acids[aa_num+1] - missing_animo_acids[aa_num]) != 1){
+        list_num <- list_num + 1
+        amino_acid_fragments_main_list[[list_num]] <- amino_acid_fragments
+        start_fragment_list[[list_num]] <- c(missing_animo_acids[aa_num],
+                                             length(amino_acid_fragments))
+
+        fragment_start <- missing_animo_acids[aa_num]-length(amino_acid_fragments)+1
+        start_fragment2 <- c(start_fragment2,fragment_start)
+        amino_acid_fragments <- c()
+      }
+
+    } #end if(!is.na(missing_animo_acids[aa_num+1])){
 
 
-  aa_fragments <- list(amino_acid_fragments=amino_acid_fragments_main_list,
-                       start_fragment=start_fragment_list,
-                       start_fragment_num=start_fragment2)
+  } #end for(aa_num in 1:(missing_animo_acids_length))
+
+  #if(!is.na(missing_animo_acids[aa_num+1])){
+    list_num <- list_num + 1
+    amino_acid_fragments_main_list[[list_num]] <- amino_acid_fragments
+    start_fragment_list[[list_num]] <- c(missing_animo_acids[aa_num],
+                                         length(amino_acid_fragments))
+
+    fragment_start <- missing_animo_acids[aa_num]-length(amino_acid_fragments)+1
+    start_fragment2 <- c(start_fragment2,fragment_start)
 
 
+    aa_fragments <- list(amino_acid_fragments=amino_acid_fragments_main_list,
+                         start_fragment=start_fragment_list,
+                         start_fragment_num=start_fragment2)
+
+  #}
   return(aa_fragments)
 }
 
@@ -646,7 +666,7 @@ split_sequences2 <- function(xlink_string,proteins = TRUE){
 #'Get XYZ coordinates from PDB file
 #'
 #'This function makes a list of the xyz coordinates from a PDB file
-#'@param trimmed_pdb PDB file loaded by bio3d::read.pdb()
+#'@param trimmed_pdb PDB file loaded by bio3d::read.pdb2()
 #'@export
 
 get_xyz_coordinates_pdb <- function(trimmed_pdb){
@@ -833,9 +853,14 @@ rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
                                            amino_acid_after=aa_after_list)
   }
 
-  return(sequence_hit_list)
+  if(is.null(unlist(sequence_hit_list))){
+    warning('No matches to selected protein names, returning NULL\nTIP: Check to make sure that your FASTA file protein names match the protein names in your MaxQuant file')
+    return(NULL)
+  } else {
+    return(sequence_hit_list)
+  }
 
-}
+} #end function rbd.makeHitLists
 
 
 #----Make Eluate/Input Output Table----
@@ -877,7 +902,6 @@ rbd.makeIETable <- function(sequence_hit_list,
         cat(new_prefix)
         output_df <- make_intensity_output_df(sub_shl = new_sub_shl,prefix = new_prefix)
         df_output_list[[new_prefix]] <- output_df
-
       }
     } else { #if secondary_prefix == FALSE
       output_df <- make_intensity_output_df(sub_shl = sub_shl,prefix = prefix)
@@ -1179,15 +1203,18 @@ make_intensity_output_df <- function(sub_shl,prefix){
 
 #-----Updated Menu Loop Function------
 
-#can update this so that it also includes 'swissprot' as a database
+#can be a useful function on its own so should have an updated name to reflect that
+#blast.menu (?)
+
 #'BLAST sequence and go through menu loops
 #'
 #'This function will BLAST the given sequence and give the user an interactive menu to select the best option.
 #'@param fasta_sequence_vector Sequence as a vector to be used to BLAST against
-#'@param pdb Menu selected. FALSE uses the 'nr' library. Defaults to TRUE ('pdb' library)
+#'@param database Menu selected for blast.pdb(). Options: "pdb","nr", or "swissprot". Defaults to "pdb".
+#'@param time_out Integer indicating time in seconds the blast.pdb() will search before time out occurs. Defaults to
 #'@export
 
-go_through_menu_loops <- function(fasta_sequence_vector, database = 'pdb'){
+go_through_menu_loops <- function(fasta_sequence_vector, database = 'pdb', time_out = NULL){
 
   ff_sequence <- toupper(paste(fasta_sequence_vector,collapse=''))
 
@@ -1197,9 +1224,9 @@ go_through_menu_loops <- function(fasta_sequence_vector, database = 'pdb'){
   #   selected_database <- 'nr'
   # }
 
-  ff_blast <- tryCatch(blast.pdb(ff_sequence, database = database),
+  ff_blast <- tryCatch(blast.pdb(ff_sequence, database = database, time.out = time_out),
                        error = function(err){
-                         cat('No results for found for this sequence')
+                         cat('No results for found for this sequence\n')
                          return(NULL)
                        })
 
@@ -1394,7 +1421,7 @@ go_through_menu_loops <- function(fasta_sequence_vector, database = 'pdb'){
 #'
 #'This function is a shortcut to do a BioStrings::pairwiseAlignment() with a selected chain in a PDB file
 #'@param query_sequence Sequence to match the PDB sequence against
-#'@param pdb_read PDB file loaded by bio3d::read.pdb()
+#'@param pdb_read PDB file loaded by bio3d::read.pdb2()
 #'@param chain Character indicating the chain on the PDB file
 #'@param use_resid_and_resno Will get the resno_and_resid using get_resno_and_resid() from chain in PDB file rather than the seqres for alignment. Defaults to FALSE.
 #'@export
@@ -1435,7 +1462,7 @@ quick_pwa_from_pdb <- function(query_sequence,pdb_read,chain,use_resid_and_resno
 #'resno_and_resid Shortcut Function
 #'
 #'This function makes the resno_and_resid list directly from a given PDB file and chain
-#'@param pdb_read PDB file as loaded by bio3d::read.pdb()
+#'@param pdb_read PDB file as loaded by bio3d::read.pdb2()
 #'@param chain Character indicating the chain on the PDB file
 #'@export
 
@@ -1825,11 +1852,13 @@ make_binding_site_df <- function(pdb_info,
 #'
 #' @param vars List of variables to be used
 #' @param colors List of either PyMol colors, hexcodes, or standard colors in R. Will also accept color palette names from RColorBrewer and viridis. If left as NULL, will use standard PyMOL tint colors.
-#' @param jpeg.name Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.
+#' @param png.name Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.
 #' @param gray0 If TRUE, will shift color palette and replace 1st color as gray (corresponds 0 if using frequency). Defaults to FALSE.
 #' @export
 
 #zero indices as a parameter?
+#have vars as a number? can have boolean that overrides if it is a number
+#change png.name to something more general to indicate that it can output different picture file formats
 color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', gray0 = FALSE, print.legend = TRUE){
 
   num <- length(vars)
@@ -2263,8 +2292,8 @@ write.pymol <- function(pymol.data, colors = NULL, experiment.dir = NULL, write.
   chain <- substrRight(strsplit(made_pdb_file_name,'.pdb')[[1]],1)
   strsplit(made_pdb_file_name,'.pdb')[[1]]
 
-  made_pdb <- read.pdb('~/Downloads/ProXL_test/His-TEV-Tub4-yeast___5FM1_C.pdb')
-  real_pdb <- read.pdb('~/Downloads/ProXL_test/5FM1.pdb') #check_download_read?
+  made_pdb <- read.pdb2('~/Downloads/ProXL_test/His-TEV-Tub4-yeast___5FM1_C.pdb')
+  real_pdb <- read.pdb2('~/Downloads/ProXL_test/5FM1.pdb') #check_download_read?
 
   made_resno_resid <- quick_resno_and_resid(made_pdb,chain)
   real_resno_resid <- quick_resno_and_resid(real_pdb,chain)
@@ -2738,7 +2767,7 @@ check_download_read_pdb <- function(pdb_id){
   } #end if(!file.exists(paste(pdb_id,'.pdb',sep='')))
 
 
-  return(read.pdb(paste(pdb_id,'.pdb',sep='')))
+  return(read.pdb2(paste(pdb_id,'.pdb',sep='')))
 }
 
 #----Find PDB match and Get Info----
@@ -2890,15 +2919,30 @@ load_plink_file <- function(csv_file_path){
   #if file ends with csv --> read csv
   #if file ends with xlsx --> read xlsx and make into data.frame
 
-  if(grepl('.csv',csv_file_path)){
 
-    xlink_csv <- read.csv(csv_file_path)
+  if(typeof(csv_file_path) == 'character'){
 
-  } else if(grepl('.xlsx',csv_file_path) || grepl('.xls',csv_file_path)){
-    xlink_csv <- data.frame(read.xlsx(csv_file_path))
+    if(endsWith(csv_file_path,'csv')){
+      xlink_csv <- read.csv(csv_file_path)
+    } else if(endsWith(csv_file_path,'xlsx') || endsWith(csv_file_path,'xls')){
+      xlink_csv <- data.frame(read.xlsx(csv_file_path))
+    }
 
+  } else if(typeof(csv_file_path) == 'list'){ #end if(typeof(csv_file_path) == 'character'){
+
+      xlink_csv <- csv_file_path
+
+  } else {
+    warning('Unsupported file')
   }
-
+  # if(grepl('.csv',csv_file_path)){
+  #
+  #   xlink_csv <- read.csv(csv_file_path)
+  #
+  # } else if(grepl('.xlsx',csv_file_path) || grepl('.xls',csv_file_path)){
+  #   xlink_csv <- data.frame(read.xlsx(csv_file_path))
+  #
+  # }
 
   rows_with_order_nums <- c()
   row_num <- 0
@@ -3229,7 +3273,7 @@ make_start_end_pdb_list <- function(list_of_all_pdb_files){
   for(fasta_name in names(list_of_all_pdb_files)){
     for(pdb_name in list_of_all_pdb_files[[fasta_name]]){
 
-      pdb_read <- read.pdb(pdb_name)
+      pdb_read <- read.pdb2(pdb_name)
       resno <- pdb_read$atom$resno
       resno_min <- min(resno)
       resno_max <- max(resno)
@@ -3264,7 +3308,7 @@ get_pdb_structure_from_protein_pos <- function(protein_name,protein_pos,
     chain <- list_of_start_and_end_pdbs[[pdb_name]][3]
 
     #check if protein_pos is between start and end
-    if((protein_pos >= as.numeric(start_pos)) && (protein_pos <= as.numeric(end_pos))){
+    if((as.numeric(protein_pos) >= as.numeric(start_pos)) && (as.numeric(protein_pos) <= as.numeric(end_pos))){
       on_this_pdb_structure <- pdb_name
       break #is this necessary?
     }
@@ -3441,7 +3485,7 @@ generate_pdb_lists_and_files_from_fasta <- function(fasta_file,pdb_suffix,fasta_
 
     for(pdb_file_name in names(list_of_pdb_file_names2)){
 
-      pdb_read <- read.pdb(pdb_file_name)
+      pdb_read <- read.pdb2(pdb_file_name)
       resno_min <- min(list_of_pdb_file_names2[[pdb_file_name]])
       resno_max <- max(list_of_pdb_file_names2[[pdb_file_name]])
       chain_levels <- levels(factor(pdb_read$atom$chain))
@@ -3587,10 +3631,15 @@ find_and_generate_missing_aa_2d_structure_all <- function(fasta_file,
   trimmed_pdb <- trim.pdb(pdb_file,inds = inds)
   #trimmed_pdb$atom <- trimmed_pdb$atom[!is.na(a(firstup(trimmed_pdb$atom$resid))),]
   trimmed_pdb$atom$resno <- renumbered_pdb_residues$new_pdb_resnos
+  #trimmed_pdb$atom <- trimmed_pdb$atom[!is.na(trimmed_pdb$atom$resno),]
   #clean.pdb?
   pdb_file_name <- paste(fasta_sequence_name,'___',pdb_id,'_',chain,".pdb",sep='')
+  #need to remove NAs
+
+  #trimmed_pdb <- read.pdb2('H3___1KX5_A.pdb')
+  #trimmed_pdb$atom <- trimmed_pdb$atom[!is.na(trimmed_pdb$atom$resno),]
   write.pdb(trimmed_pdb,pdb_file_name)
-  resno <- trimmed_pdb$atom$resno
+  resno <- trimmed_pdb$atom$resno[!is.na(trimmed_pdb$atom$resno)]
   resno_min <- min(resno)
   resno_max <- max(resno)
   range_vector <- resno_min:resno_max
@@ -3644,7 +3693,8 @@ ppi.analyze <- function(list_of_files,fasta_file,
                         protein_alternative_names_dict = NULL,
                         pdb_directory = NULL,
                         data_input_type = 'plink',
-                        pdb_numbering = FALSE){
+                        pdb_numbering = FALSE,
+                        pdb_match_vector = NULL){
 
   if((!is.null(category_color_input_file)) && (typeof(category_color_input_file) == 'character')){
     category_color_input_file <- read.csv(category_color_input_file)
@@ -3713,19 +3763,22 @@ ppi.analyze <- function(list_of_files,fasta_file,
       #how to do it for each of the proteins?
       #have a mega list for each of the proteins with 2 vectors each
 
-      pdb_match_vector <- ppi.alignPDB(fasta_file = fasta_file)
+      if(is.null(pdb_match_vector)){
+        pdb_match_vector <- ppi.alignPDB(fasta_file = fasta_file)
+      }
+
 
     } else {
       #pdb_numbering == FALSE --> do what has been done before
+      generated_pdb_lists <- generate_pdb_lists_and_files_from_fasta(fasta_file,pdb_suffix,
+                                                                     fasta_names_to_generate_all_2d_structures)
 
+      make_start_end_pdb_df_output2(generated_pdb_lists = generated_pdb_lists)
 
     }
 
 
-    generated_pdb_lists <- generate_pdb_lists_and_files_from_fasta(fasta_file,pdb_suffix,
-                                                                   fasta_names_to_generate_all_2d_structures)
 
-    make_start_end_pdb_df_output2(generated_pdb_lists = generated_pdb_lists)
   } else { #if someone has indicated a PDB file to be used
 
     generated_pdb_lists <- generate_pdb_lists_from_pdb_csv(csv_pdb_input_file)
@@ -3734,8 +3787,15 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
   #return(generated_pdb_lists)
 
-  list_of_all_pdb_files <- generated_pdb_lists$all_pdb_files
-  list_of_start_and_end_pdbs <- generated_pdb_lists$start_end_chain
+
+  #if pdb_numbering == TRUE --> will need a substitute for these or otherwise ignore them
+  if(pdb_numbering == FALSE){
+    list_of_all_pdb_files <- generated_pdb_lists$all_pdb_files
+    list_of_start_and_end_pdbs <- generated_pdb_lists$start_end_chain
+  } else {
+    #end if(pdb_numbering == FALSE)
+    list_of_all_pdb_files <- pdb_match_vector
+  }
 
   #return(generated_pdb_lists)
 
@@ -3780,6 +3840,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
   }
 
+  #add in new variable for frequency_color_list to make the colors for ppi.pymol
   frequency_color_list <- pymol_colors
   seq_xlink_list <- c()
   pro_xlink_list <- c()
@@ -4065,7 +4126,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
       }
 
 
-      score_xlink <- min(xlink_list[[xlink_index]]$score_xlink)
+      score_xlink <- min(as.numeric(xlink_list[[xlink_index]]$score_xlink))
 
       #change the seq_xlink to the common name up here?
       #switch the order of some of the following so that it makes more sense
@@ -4162,6 +4223,9 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
             freq_xlink_list[seq_index] <- freq_xlink_list[seq_index] + 1
             freq_color_xlink_list[seq_index] <- frequency_color_list[freq_xlink_list[seq_index]]
+            if(score_xlink_list[seq_index] > score_xlink){
+              score_xlink_list[seq_index] <- score_xlink
+            }
 
           }
 
@@ -4340,7 +4404,10 @@ ppi.analyze <- function(list_of_files,fasta_file,
             #since it might be helpful to check beforehand if there is a PDB file for
             #the protein
 
-          } #if it does not have a PDB file but it does have a fasta file
+          } #end if(!(protein_name %in% names(list_of_all_pdb_files)))
+
+
+          #if it does not have a PDB file but it does have a fasta file
           #ask if the user does not if they want to run it in the fasta
 
           #first check if the protein really does need to be changed
@@ -4363,29 +4430,41 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
           #does this eject a NULL when there is an error?
           #can skip over this if pdb_numbering is TRUE
+
+          #return(protein_split_list)
           if(pdb_numbering == TRUE){
 
             protein_pos_match <- match(protein_pos,pdb_match_vector[[protein_name]]$fasta)
 
             #how to keep track of the new protein position within the
             pdb_protein_pos <- as.numeric(pdb_match_vector[[protein_name]]$pdb[protein_pos_match])
+
             #pdb_match_vector[[protein_name]]$chain[protein_pos_match]
 
-            protein_split_list[[index_num]] <- pdb_protein_pos
+            protein_split_list[[index_num]][2] <- pdb_protein_pos
 
+            on_this_pdb_structure <- pdb_match_vector[[protein_name]]$chain[protein_pos_match]
+
+
+            #if it == '-' --> make it NULL to match the rest of the code
+
+
+            #need to add to otps_list in order for this to work
 
             #on_this_pdb_structure
-            #otps_list <- c(otps_list,on_this_pdb_structure)
+            otps_list <- c(otps_list,on_this_pdb_structure)
 
 
 
           } else {
 
 
+
             on_this_pdb_structure <- get_pdb_structure_from_protein_pos(protein_name,
                                                                         protein_pos,
                                                                         list_of_all_pdb_files,
                                                                         list_of_start_and_end_pdbs)
+
 
 
             if(!is.null(on_this_pdb_structure)){
@@ -4406,7 +4485,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
         } #end for(index_num in 1:length(sequence_xlink_list))
 
-        if(length(otps_list) != 2){
+        if((length(otps_list) != 2) || ('-' %in% otps_list)){
 
           #not_included_xl_sites <- c(not_included_xl_sites,seq_xlink2)
           nixl_site <- paste(pro_xlink,' - ',plink_file)
@@ -4431,7 +4510,11 @@ ppi.analyze <- function(list_of_files,fasta_file,
         #print(pdb2_xlink_list)
         #print(grepl('___',otps_list))
 
-        if(!(FALSE %in% grepl('___',otps_list))){ #make sure that it is all TRUEs to go forward with dist calculation
+
+        #this only works when pdb_numbering == FALSE
+        #can add an or statement
+        #pdb_numbering must be true --> is that it?
+        if((!(FALSE %in% grepl('___',otps_list))) || pdb_numbering == TRUE){ #make sure that it is all TRUEs to go forward with dist calculation
           #calculate the distance here for the real distances
 
           #need to get/load the correct PDB file
@@ -4440,26 +4523,75 @@ ppi.analyze <- function(list_of_files,fasta_file,
           #use indices instead of going through the list
           #and use something like this instead
           #sequence_xlink_list[[c(2,2)]]
+
+          #return(otps_list)
+
           for(otps_index in 1:length(otps_list)){ #need to load the protein position as well
             #otps_index <- 1
             otps <- otps_list[otps_index]
             #print(otps)
-            if(!is.null(pdb_directory)){
-              #paste the directory to otps
-              if(!endsWith('/',pdb_directory)){
-                pdb_directory <- paste(pdb_directory,'/',sep='')
+
+
+            if(pdb_numbering == TRUE){
+
+              #can check the temporary directory for the PDB file
+              #see if pdb_id.pdb exists within the tempdir
+              #if yes, can
+              otps_split <- strsplit(otps,'_')[[1]]
+              pdb_id <- otps_split[1]
+              chain <- otps_split[2]
+
+
+              if(is.na(pdb_id)){
+                break
               }
 
-              pdb_path <- paste(pdb_directory,otps,sep='')
-              pdb_read <- read.pdb(pdb_path)
+              #print(pdb_id)
+              if(paste0(pdb_id,'.pdb') %in% list.files(tempdir())){
 
-            } else {
-              pdb_read <- read.pdb(otps)
-            }
+                pdb_read <- read.pdb2(paste0(tempdir(),'/',pdb_id,'.pdb'))
+
+              } else {
+
+                pdb_read <- read.pdb2(pdb_id)
+
+              } #end if(paste0(pdb_id,'.pdb') %in% list.files(tempdir()))
+
+
+              #once the pdb has been read --> get just the chain?
+
+              pdb_read$atom <- pdb_read$atom[pdb_read$atom$chain == chain,]
+
+              #use the read.pdb function to be able to
+
+            } else { #end if(pdb_numbering == TRUE)
+
+              if(!is.null(pdb_directory)){
+                #paste the directory to otps
+                if(!endsWith('/',pdb_directory)){
+                  pdb_directory <- paste(pdb_directory,'/',sep='')
+                }
+
+                pdb_path <- paste(pdb_directory,otps,sep='')
+                pdb_read <- read.pdb2(pdb_path)
+
+              } else {
+                pdb_read <- read.pdb2(otps)
+              }
+
+
+            } #end  else to if(pdb_numbering == TRUE)
+
+
 
             xyz_coords <- get_xyz_coordinates_pdb(pdb_read)
 
+
+
+            #return(protein_split_list)
             protein_pos <- protein_split_list[[c(otps_index,2)]]
+
+            #if pdb_numbering == TRUE, this may need to be changed slightly
             pos_match <- match(protein_pos,pdb_read$atom$resno)
 
             if(!is.na(pos_match)){ #checking if there is a true match
@@ -4607,7 +4739,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
         pro_xlink_list <- c(pro_xlink_list,pro_xlink)
 
 
-      }
+      } #!!!!!ELSE ENDS HERE
 
 
 
@@ -4775,7 +4907,7 @@ ppi.analyze <- function(list_of_files,fasta_file,
   for(pdb_name in pdbs_in_df){
     #load pdb files
 
-    if(!is.null(show_only_real_structures)){
+    if(!is.null(show_only_real_structures) && (pdb_numbering == FALSE)){
       pdb_in_sors <- FALSE
         for(sors in show_only_real_structures){
           #noob solution to current problem
@@ -4815,9 +4947,28 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
     } else {#end if(!is.null(show_only_real_structures))
 
-      py_line <- paste('load ',experiment_directory,'/',pdb_name,
-                       sep='')
-      pymol_lines <- c(pymol_lines,py_line)
+      if(pdb_numbering == TRUE){
+
+        #use the fetch command instead
+        pdb_name <- strsplit(pdb_name,'_')[[1]][1]
+
+        py_line <- paste0('fetch ',pdb_name,', async=0')
+
+
+      } else { #end if(pdb_numbering == TRUE)
+
+        py_line <- paste('load ',experiment_directory,'/',pdb_name,
+                         sep='')
+
+      } #end else to if(pdb_numbering == TRUE)
+
+
+
+      if(!(py_line %in% pymol_lines)){
+        pymol_lines <- c(pymol_lines,py_line)
+      }
+
+
 
 
     }
@@ -4837,8 +4988,8 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
   #can just have one option
   #if show_surface, color_gray == TRUE
-  py_line <- 'show surface'
-  pymol_lines <- c(pymol_lines,py_line)
+  #py_line <- 'show surface'
+  #pymol_lines <- c(pymol_lines,py_line)
   py_line <- 'color gray'
   pymol_lines <- c(pymol_lines,py_line)
 
@@ -4848,6 +4999,15 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
     pdb1 <- strsplit(as.character(xlink_mega_df$pdb1[row_num]),'.pdb')[[1]]
     pdb2 <- strsplit(as.character(xlink_mega_df$pdb2[row_num]),'.pdb')[[1]]
+
+    if(pdb_numbering == TRUE){
+      chain1 <- strsplit(pdb1,'_')[[1]][2]
+      chain2 <- strsplit(pdb2,'_')[[1]][2]
+      pdb1 <- strsplit(pdb1,'_')[[1]][1]
+      pdb2 <- strsplit(pdb2,'_')[[1]][1]
+
+
+    }
 
     #if grepl '___' get last character for the chain
     #otherwise use 'A'
@@ -4865,6 +5025,9 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
     pdb_names <- c(pdb1,pdb2)
     pro_pos_list <- c(pro_pos1,pro_pos2)
+    if(pdb_numbering == TRUE){
+      chain_list <- c(chain1,chain2)
+    }
     #file_type_2d <- 'single atom'
 
     #store new variables in a list?
@@ -4881,8 +5044,14 @@ ppi.analyze <- function(list_of_files,fasta_file,
       pdb_num_name <- paste('pdb',pdb_num_count,sep='')
       selection_name_list[[pdb_num_name]] <- pdb_num
 
-      if(grepl('___',pdb_num)){ #if 'real' PDB structure use last character since that is the chain
-        chain <- substrRight(pdb_num,1)
+      if(grepl('___',pdb_num) || pdb_numbering == TRUE){ #if 'real' PDB structure use last character since that is the chain
+
+        if(pdb_numbering == TRUE){
+          chain <- chain_list[pdb_num_count]
+        } else {
+          chain <- substrRight(pdb_num,1)
+        }
+
         selection_name_list[[chain_name]] <- chain
 
       } else {
@@ -5160,6 +5329,11 @@ ppi.analyze <- function(list_of_files,fasta_file,
 
 
 } #end function ppi.analyze
+
+
+
+
+
 
 #----Get new PWA Score-----
 
@@ -6343,7 +6517,7 @@ renumber_xinet_from_uniprot_fasta <- function(xinet_file,protein_to_uniprot_id,f
       pepstring <- as.character(xinet_file_row[[pepstring_name]])
 
       linkpos_name <- paste('LinkPos',as.character(pep_num),sep='')
-      linkpos <- as.numeric(xinet_file_row[[linkpos_name]])
+      linkpos <- as.numeric(as.character(xinet_file_row[[linkpos_name]]))
 
       uniprot_id <- as.character(protein_to_uniprot_id[protein_to_uniprot_id$protein_id == protein1,'uniprot_id'])
 
@@ -6376,6 +6550,7 @@ renumber_xinet_from_uniprot_fasta <- function(xinet_file,protein_to_uniprot_id,f
         #uniprot_fasta_seq <- toupper((uniprot_fasta[[names(uniprot_fasta)]]))
         #uniprot_fasta_seq[732]
 
+        levels(xinet_file[[peppos_name]]) <- c(levels(xinet_file[[peppos_name]]),new_peppos1)
         xinet_file[row_num,][[peppos_name]] <- new_peppos1
 
       }
@@ -6415,6 +6590,9 @@ renumber_xinet_from_uniprot_fasta <- function(xinet_file,protein_to_uniprot_id,f
 
 #----get vector of distances by position frequency----
 
+#' Get Vector of Distances by Position Frequency
+#'
+#'
 
 get_vector_of_distances_by_pos_freq <- function(xl_dataframe){
 
@@ -6469,8 +6647,8 @@ ppi.freqCount <- function(xlink_df){
   pro <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Protein', bs3_colname])
   freq <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Frequency', bs3_colname])
   seq <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Sequence', bs3_colname])
-  score <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Distance', bs3_colname])
-  dist <-as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Score', bs3_colname])
+  score <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Score', bs3_colname])
+  dist <-as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Distance', bs3_colname])
 
   #should be a way of getting the most recently made folder?
   #organize by date? choose the one that starts with make_diff_analysis and is at the top or bottom of the list
@@ -6637,6 +6815,7 @@ filter_xlink_df_by_protein_names <- function(xl_dataframe,list_of_protein_names)
 generate_random_lysine_distances_in_pdb <- function(pdb_id,frequency_vector,chains=NULL){
 
   pdb_6c23 <- check_download_read_pdb(pdb_id = pdb_id)
+  #pdb_6c23 <- read.pdb2('6C23.pdb')
 
   pdb_6c23_atom_filtered <- pdb_6c23$atom[pdb_6c23$atom$elety == 'CA',]
   pdb_6c23_atom_filtered <- pdb_6c23_atom_filtered[pdb_6c23_atom_filtered$resid == 'LYS',]
@@ -6801,19 +6980,20 @@ renumber_binding_site_df_from_uniprot_fasta <- function(binding_site_df,protein_
 #' Get Binding Sequence from RBDmap Data
 #'
 #' This funtion gets the binding sequence from RBDmap data
+#'
 #' @param ms_sequence The input sequence from MS, should be loaded as a string
 #' @param protease The protease used for the experiment, either 'ArgC' or 'LysC'
 #' @param sequence_for_alignment The sequence to find the binding sequence in. The ms_sequence must be within the sequence_for_alignment or NULL will be returned.
-#' @param protein_name Name of the protein to which the sequence_for_alignment belongs. Defaults to NULL
-#' @param database_name Name of the database used: 'PDB','UniProt' or 'FASTA' (for the input FASTA sequence). Defaults to NULL
-#' @param database_id Identifier for the database. Defaults to NULL
+#' @param protein_name Name of the protein to which the sequence_for_alignment belongs. Defaults to NA
+#' @param database_name Name of the database used: 'PDB','UniProt' or 'FASTA' (for the input FASTA sequence). Defaults to NA
+#' @param database_id Identifier for the database. Defaults to NA
 #' @param cleave_offset Cleave offset for the sequence. Defaults to 0
 #' @export
 
 
 rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
-                                 protein_name = NULL,database_name = NULL,
-                                 database_id = NULL, cleave_offset=0,last_aa = NULL,
+                                 protein_name = NA,database_name = NA,
+                                 database_id = NA, cleave_offset=0,last_aa = NULL,
                                  include_ambiguous = FALSE, proteolytic_fragments = FALSE){
 
   if(length(str_locate_all(sequence_for_alignment,ms_sequence)[[1]]) == 0){
@@ -6838,6 +7018,9 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
   sequence_for_alignment_split <- strsplit(sequence_for_alignment,'')[[1]]
 
   go_forwards <- NULL
+
+
+  #will need to do this again if the n_terminal boolean is activated
 
   #turn this into a function?
   if(grepl('ArgC',protease)){
@@ -6889,7 +7072,7 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
   binding_sequence <- c()
   current_aa <- sequence_for_alignment_split[current_aa_index]
 
-
+  #set the
   while((current_aa != end_binding_aa) && (current_aa_index <= length(sequence_for_alignment_split)) && (current_aa_index > 0)){
     if(aa_increment < 0){
       binding_sequence <- c(current_aa,binding_sequence)
@@ -6900,22 +7083,7 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
       current_aa <- sequence_for_alignment_split[current_aa_index]
       binding_sequence <- c(binding_sequence,current_aa)
     }
-
-
-    #search for another nearby peptide
-
-    #needs to see if there is another
-
-    #if it's 0 --> should return an empty string
-
-
-
-    #cleave_offset <- 0
-
-    #may need an if/else statement
-
-    #move current_aa increment down here to get rid of 'R' at end
-  }
+  } #end while((current_aa != end_binding_aa) && (current_aa_index <= length(sequence_for_alignment_split)) && (current_aa_index > 0)){
 
   #does this need to be within the while() loop so that it will continue to add amino acids
   #to binding sequence if needed
@@ -6964,8 +7132,25 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
     end_pattern <- 80
 
     list_of_cleaves_sub <- list_of_cleaves[start_pattern > list_of_cleaves]
-    tail(list_of_cleaves_sub,n=1) #last integer
-    tail(list_of_cleaves_sub,n=2)[1] #second to last integer
+
+    cleave_site_found <- FALSE
+
+    last_cleave <- tail(list_of_cleaves_sub,n=1) #last integer
+    last_cleave2 <- tail(list_of_cleaves_sub,n=2)[1] #second to last integer
+
+    #can have boolean out here that is false
+    #while the boolean is false --> the function will keep searching for the nearby
+    #cleave sites
+
+    #turn this into a function?
+
+
+    #put inside a while loop?
+    if((last_cleave-last_cleave2) < cleave_offset){
+      #if TRUE --> the difference between the two is less than
+
+    }
+
     #will have to deal with errors as well --> is.na() probably
 
 
@@ -7019,7 +7204,6 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
     binding_site_start_in_pdb <- end_pattern + 1
     binding_site_end_in_pdb <- current_aa_index
     resno_binding_peptide <- sequence_for_alignment_split[binding_site_start_in_pdb:binding_site_end_in_pdb]
-
 
   } else if(go_forwards == FALSE){
     binding_site_start_in_pdb <- current_aa_index + 1
@@ -7098,6 +7282,7 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
                              db_id=database_id)
 
 
+  #return(binding_site_ouput)
   return(data.frame(binding_site_ouput))
 }
 
@@ -7875,13 +8060,14 @@ get_uniprot_info_from_proteins_api <- function(uniprot_id,
     stop_for_status(r)
 
     json <- toJSON(content(r))
-    head(fromJSON(json))
+    #head(fromJSON(json))
 
     json_variation <- fromJSON(json)
 
 
 
-    json_variation$features
+
+    #json_variation$features
 
 
   } else if(type_of_info == 'feature'){ #end if(type_of_info == 'variation')
@@ -8369,6 +8555,9 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
       #see about the original sequence if
 
+      if(is.na(bs_start) || is.na(bs_end)){
+        next
+      }
       aa_count_vector[bs_start:bs_end] <- aa_count_vector[bs_start:bs_end] + 1
 
     }
@@ -8402,7 +8591,7 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
     #hm.palette <- colorRampPalette(rev(brewer.pal(4, 'Spectral')), space='Lab')
     #hm.palette <- colorRampPalette(c('#d0d0d0','#2f5ac6','#e50000'), space='Lab')
-    hm.palette <- colorRampPalette(colors = colors, space='Lab')
+    hm.palette <- colorRampPalette(colors = colors)
     #colorRampPalette('Blues',space='Lab')
 
 
@@ -8433,12 +8622,511 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
 } #end rbd.freq_vector function
 
+ppi.pymol2 <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = FALSE,
+                       custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE, experiment_directory = NULL,
+                       pdb_numbering = FALSE, pymol_file_list_file_name = 'pymol_output.pml'){
+
+  if(is.null(experiment_directory)){
+    experiment_directory <- getwd()
+  }
+
+  #if there is no start and end PDBs can just get the info from the PDB file itself?
+  #sd_pdb <- read.pdb2('Spc98-yeast_missing_sequence_3_single_dot.pdb')
+  #if(endsWith(pdb_name, 'single_dot.pdb'))
+  #sd_pdb$atom$resno #this will be the position for the making of the pymol file
+
+  #colnames(xlink_mega_df)
+
+  if('X' %in% colnames(xlink_mega_df)){
+    xlink_mega_df$X <- NULL
+  }
+
+  og_xlink_colnames <- c("seq","pro","dist","freq","freq_color","files","pdb1","pdb2",
+                         "pro_pos1","pro_pos2","pro_name1","pro_name2","pep_seq1","pep_seq2",
+                         "pep_pos1","pep_pos2","score")
+
+  if('Protein.Position.1' %in% colnames(xlink_mega_df)){
+    colnames(xlink_mega_df) <- og_xlink_colnames
+  }
+
+  if('category_color' %in% colnames(xlink_mega_df)){
+    colnames(xlink_mega_df)[colnames(xlink_mega_df) == 'category_color'] <- 'freq_color'
+
+  }
+
+  pymol_lines <- c()
+
+  #if custom color is TRUE
+  #would vars be frequency?
+  #xlink_mega_df <- xl_df2
+
+  if(custom.color == TRUE){
+
+    pymol_cc <- color.pymol(sort(unique(xlink_mega_df[[color_by]])), colors = colors)
+    #pymol_cc$vars
+    #pymol_cc$color_names
+
+    pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
+
+    levels(xlink_mega_df$freq_color) <- c(levels(xlink_mega_df$freq_color),pymol_cc$color_names)
+
+    #xlink_mega_df$freq
+
+    for(index_num in 1:length(pymol_cc$vars)){
+
+      var_name <- pymol_cc$vars[index_num]
+
+      #will rename the freq_color by whatever the var name is
+
+
+      xlink_mega_df[xlink_mega_df[[color_by]] == var_name, 'freq_color'] <- pymol_cc$color_names[index_num]
+
+      #within(xlink_mega_df, freq_color[color_by == var_name] <- pymol_cc$color_names[index_num])
+
+      #need to select and change the variable name based on the value
+
+
+    } #end for(index_num in 1:length(pymol_cc$vars))
+
+  } else {#end if custom color == TRUE
+    #custom_color == FALSE
+
+    #make the PyMOL legend still even if they're using the original colors
+    #just input those colors into the colors/vars
+
+  }
+  #should still produce a legend even if they have not opted for a custom color
+
+
+  #would have to replace the values in freq_color
+
+
+
+  #load the files
+  pdbs_in_df <- unique(c(levels(xlink_mega_df$pdb1),levels(xlink_mega_df$pdb2)))
+  #loop through the pdbs
+  #pdb_name <- pdbs_in_df[1]
+  for(pdb_name in pdbs_in_df){
+    #load pdb files
+
+    if(!is.null(show_only_real_structures) && (pdb_numbering == FALSE)){
+      pdb_in_sors <- FALSE
+      for(sors in show_only_real_structures){
+        #noob solution to current problem
+        if(grepl(sors,pdb_name)){
+          pdb_in_sors <- TRUE
+        }
+
+
+      } #end first for(sors in show_only_real_structures)
+
+
+      for(sors in show_only_real_structures){
+        #include the line of code if the protein is in list and is real
+        #or or if it does not show up in the list at all
+        #or statement needs to be able to
+
+
+
+        if((grepl(sors,pdb_name) && grepl('___',pdb_name))){
+
+          #do the code here
+          py_line <- paste('load ',experiment_directory,'/',pdb_name,
+                           sep='')
+          pymol_lines <- c(pymol_lines,py_line)
+
+        } #end if((grepl(sors,pdb_name) && grepl('___',pdb_name)) || !grepl(sors,pdb_name))
+      } #end for(sors in show_only_real_structures)
+
+      if(!pdb_in_sors){
+
+        py_line <- paste('load ',experiment_directory,'/',pdb_name,
+                         sep='')
+        pymol_lines <- c(pymol_lines,py_line)
+
+
+      }
+
+    } else {#end if(!is.null(show_only_real_structures))
+
+      if(pdb_numbering == TRUE){
+
+        #use the fetch command instead
+        pdb_name <- strsplit(pdb_name,'_')[[1]][1]
+
+        py_line <- paste0('fetch ',pdb_name,', async=0')
+
+
+      } else { #end if(pdb_numbering == TRUE)
+
+        py_line <- paste('load ',experiment_directory,'/',pdb_name,
+                         sep='')
+
+      } #end else to if(pdb_numbering == TRUE)
+
+
+
+      if(!(py_line %in% pymol_lines)){
+        pymol_lines <- c(pymol_lines,py_line)
+      }
+
+
+
+
+    } #end else to if(!is.null(show_only_real_structures))
+
+    # py_line <- paste('load ',experiment_directory,'/',pdb_name,
+    #                  sep='')
+    # pymol_lines <- c(pymol_lines,py_line)
+
+
+    #if this boolean is turned on,
+    #color color_name, protein_name
+
+    #should each of the PDBs be colored based on the protein they come from
+    #can make this a user option
+
+  }
+
+  #can just have one option
+  #if show_surface, color_gray == TRUE
+  #py_line <- 'show surface'
+  #pymol_lines <- c(pymol_lines,py_line)
+  py_line <- 'color gray'
+  pymol_lines <- c(pymol_lines,py_line)
+
+
+  mega_distance_count <- 0
+  for(row_num in 1:nrow(xlink_mega_df)){
+
+    pdb1 <- strsplit(as.character(xlink_mega_df$pdb1[row_num]),'.pdb')[[1]]
+    pdb2 <- strsplit(as.character(xlink_mega_df$pdb2[row_num]),'.pdb')[[1]]
+
+    if(pdb_numbering == TRUE){
+      chain1 <- strsplit(pdb1,'_')[[1]][2]
+      chain2 <- strsplit(pdb2,'_')[[1]][2]
+      pdb1 <- strsplit(pdb1,'_')[[1]][1]
+      pdb2 <- strsplit(pdb2,'_')[[1]][1]
+
+
+    }
+
+    #if grepl '___' get last character for the chain
+    #otherwise use 'A'
+
+    pro_pos1 <- as.character(xlink_mega_df$pro_pos1[row_num])
+    pro_pos2 <- as.character(xlink_mega_df$pro_pos2[row_num])
+
+    #if statement to select the right chain
+
+
+    #can do the check here in the grepl to do the check if it a single dot PDB structure, linear or curved
+
+    #should make a list of pdbs so that this is not repeated twice?
+    #can make output as a list that is then used for the next part of the function
+
+    pdb_names <- c(pdb1,pdb2)
+    pro_pos_list <- c(pro_pos1,pro_pos2)
+    if(pdb_numbering == TRUE){
+      chain_list <- c(chain1,chain2)
+    }
+    #file_type_2d <- 'single atom'
+
+    #store new variables in a list?
+    #check if list is empty or store the original values inside if not single atom?
+
+    selection_name_list <- list()
+
+    pdb_num_count <- 0
+
+    for(pdb_num in pdb_names){
+      pdb_num_count <- pdb_num_count + 1
+      chain_name <- paste('chain',as.character(pdb_num_count),sep='')
+      pro_pos_name <- paste('pro_pos',pdb_num_count,sep='')
+      pdb_num_name <- paste('pdb',pdb_num_count,sep='')
+      selection_name_list[[pdb_num_name]] <- pdb_num
+
+      if(grepl('___',pdb_num) || pdb_numbering == TRUE){ #if 'real' PDB structure use last character since that is the chain
+
+        if(pdb_numbering == TRUE){
+          chain <- chain_list[pdb_num_count]
+        } else {
+          chain <- substrRight(pdb_num,1)
+        }
+
+        selection_name_list[[chain_name]] <- chain
+
+      } else {
+
+        #should it be in this part
+        #should have an or statement or excessive?
+        #do we need file_type --> unless the file is being created within the function
+        #if(file_type_2d == 'single atom' && grepl('single_atom',pdb_num)){
+        if(grepl('single_dot',pdb_num)){
+
+          #transform the protein position for the PyMol script so it is the first in the list
+          pro_pos <- list_of_start_and_end_pdbs[[paste(pdb_num,'.pdb',sep='')]][1]
+
+          selection_name_list[[pro_pos_name]] <- pro_pos
+
+
+        } #series of if else statements for each of the other options or just else?
+
+        chain <- 'A'
+        selection_name_list[[chain_name]] <- chain
+      }
+
+      if(is.null(selection_name_list[[pro_pos_name]])){
+        #if has not been changed in the single atom loop, will establish the original
+        #protein position here
+        selection_name_list[[pro_pos_name]] <- pro_pos_list[pdb_num_count]
+
+      }
+
+
+    } #end loop for(pdb_num in pdb_names)
+
+
+    #getting the right selection names here
+    #assigning the derived values to the selection names
+
+    #pull out by the number?
+    #then pull out by name of the variable ie 'chain'
+
+
+    #create selection names
+
+    completed_selection_names <- c()
+    amino_acid_selection_names <- c()
+
+    sors_pdb_check <- list(is_in_list=c(),
+                           is_it_real=c())
+
+    both_pdbs_pass_sors <- TRUE
+    for(num in 1:2){
+      selection_names_filtered <- names(selection_name_list)[grepl(as.character(num),names(selection_name_list))]
+      sn_chain <- selection_names_filtered[grepl('chain',selection_names_filtered)]
+      sn_chain <- selection_name_list[[sn_chain]]
+      sn_pro_pos <- selection_names_filtered[grepl('pro_pos',selection_names_filtered)]
+      sn_pro_pos <- selection_name_list[[sn_pro_pos]]
+      sn_pdb <- selection_names_filtered[grepl('pdb',selection_names_filtered)]
+      sn_pdb <- selection_name_list[[sn_pdb]]
+
+      selection_name <- paste('/',sn_pdb,'//',sn_chain,'/',sn_pro_pos,'/CA',sep='')
+      aa_select_name <- paste('/',sn_pdb,'//',sn_chain,'/',sn_pro_pos, sep='')
+
+      completed_selection_names <- c(completed_selection_names,selection_name)
+      amino_acid_selection_names <- c(amino_acid_selection_names,aa_select_name)
+
+      #can do the process in here for determining whether or not the xl events should be
+      #in the PyMOL output file
+      #only one that does not meet the criteria should be excluded
+      #start with true before loop and then if one does not meet critertia, then
+      #make variable == FALSE
+
+      if(!is.null(show_only_real_structures)){
+
+        #check sn_pdb here
+        #there should be a way to grepl a whole list
+        for(sors in show_only_real_structures){
+
+          #grepl check sn_pdb
+          #another boolean?
+
+          # sors_pdb_check <- list(is_in_list=c(),
+          #                        is_it_real=c())
+
+          if(grepl(sors,sn_pdb)){
+
+            sors_pdb_check$is_in_list <- c(sors_pdb_check$is_in_list,TRUE)
+            is_in_list <- TRUE
+
+          } else {
+
+            sors_pdb_check$is_in_list <- c(sors_pdb_check$is_in_list,FALSE)
+            is_in_list <- FALSE
+          }
+
+          if(grepl('___',sn_pdb)){
+
+            sors_pdb_check$is_it_real <- c(sors_pdb_check$is_it_real,TRUE)
+            is_it_real <- TRUE
+
+          } else {
+
+            sors_pdb_check$is_it_real <- c(sors_pdb_check$is_it_real,FALSE)
+            is_it_real <- FALSE
+          }
+
+          if(!((is_in_list && is_it_real) || !is_in_list)){
+            both_pdbs_pass_sors <- FALSE
+          }
+
+
+
+          #similanteously do other check
+          #or just store booleans in two lists
+          #1st list: whether or not shows up in sors list
+          #2nd list: is it a real pdb structure
+
+          #either 1+2 == TRUE or 1==FALSE
+
+        }
+
+
+      } #end if(!is.null(show_only_real_structures))
+
+
+    } #end for(num in 1:2)
+
+    #enclose all of the following with pymol additions into the if/for/if loop
+
+    #need to change these loops to accomodate for the fact that there are two selection names
+    #here
+
+    if(!is.null(show_only_real_structures)){
+
+      #check list here
+      #sors_pdb_check$is_in_list
+      #sors_pdb_check$is_in_real
+
+      #need to account for the fact that there are 2 structures being compared
+      # pdbs_in_sors <- FALSE
+      # for(sors in show_only_real_structures){
+      #   if(grepl(sors,cs_name) && grepl('___',cs_name)){
+      #     pdbs_in_sors <- TRUE
+      #
+      #   }
+      #
+      #   #can make two T/F vectors and then compare them to see if they're both T/F
+      #
+      # for(cs_name in completed_selection_names){
+      #   for(sors in show_only_real_structures){
+      #     if(grepl(sors,cs_name) && grepl('___',cs_name)){
+      #       pdbs_in_sors <- TRUE
+      #
+      #     }
+      #
+      #   }
+      # }
+
+
+      #include the line of code if the protein is in list and is real
+      #or or if it does not show up in the list at all
+      if(both_pdbs_pass_sors){
+
+        #do the code here
+        freq_color <- as.character(xlink_mega_df$freq_color[row_num])
+        py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
+        pymol_lines <- c(pymol_lines,py_line)
+        py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
+        pymol_lines <- c(pymol_lines,py_line)
+        #accounting for peptides that show up in more than one XL event
+
+        mega_distance_count <- mega_distance_count + 1
+        py_line <- paste('distance ',completed_selection_names[1],', ',completed_selection_names[2], sep='')
+        pymol_lines <- c(pymol_lines,py_line)
+        #keep numerical list of distances?
+
+
+        if(nchar(mega_distance_count) == 1){
+          dist_name <- paste('dist0',mega_distance_count,sep='')
+        } else {
+          dist_name <- paste('dist',mega_distance_count,sep='')
+        }
+
+        freq_color <- as.character(xlink_mega_df$freq_color[row_num])
+        py_line <- paste('color ',freq_color,', ',dist_name,sep='')
+        pymol_lines <- c(pymol_lines,py_line)
+
+      } #end if((grepl(sors,pdb_name) && grepl('___',pdb_name)) || !grepl(sors,pdb_name))
+
+    } else {#end if(!is.null(show_only_real_structures))
+
+      freq_color <- as.character(xlink_mega_df$freq_color[row_num])
+      py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
+      pymol_lines <- c(pymol_lines,py_line)
+      py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
+      pymol_lines <- c(pymol_lines,py_line)
+      #accounting for peptides that show up in more than one XL event
+
+      mega_distance_count <- mega_distance_count + 1
+      py_line <- paste('distance ',completed_selection_names[1],', ',completed_selection_names[2], sep='')
+      pymol_lines <- c(pymol_lines,py_line)
+      #keep numerical list of distances?
+
+
+      if(nchar(mega_distance_count) == 1){
+        dist_name <- paste('dist0',mega_distance_count,sep='')
+      } else {
+        dist_name <- paste('dist',mega_distance_count,sep='')
+      }
+
+      freq_color <- as.character(xlink_mega_df$freq_color[row_num])
+      py_line <- paste('color ',freq_color,', ',dist_name,sep='')
+      pymol_lines <- c(pymol_lines,py_line)
+
+    }
+    #color the amino acids
+    # freq_color <- as.character(xlink_mega_df$freq_color[row_num])
+    # py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
+    # pymol_lines <- c(pymol_lines,py_line)
+    # py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
+    # pymol_lines <- c(pymol_lines,py_line)
+    # #accounting for peptides that show up in more than one XL event
+    #
+    # py_line <- paste('distance ',completed_selection_names[1],', ',completed_selection_names[2], sep='')
+    # pymol_lines <- c(pymol_lines,py_line)
+    # #keep numerical list of distances?
+    #
+    #
+    # if(nchar(row_num) == 1){
+    #   dist_name <- paste('dist0',row_num,sep='')
+    # } else {
+    #   dist_name <- paste('dist',row_num,sep='')
+    # }
+    #
+    # freq_color <- as.character(xlink_mega_df$freq_color[row_num])
+    # py_line <- paste('color ',freq_color,', ',dist_name,sep='')
+    # pymol_lines <- c(pymol_lines,py_line)
+    #
+
+    #can rename each of the crosslinking sites to xlink01 or something instead of dist01
+
+    #make distances for each of them
+    #add to list
+
+    #draw lines between
+
+    #use freq_color to color the distance line
+
+
+  }
+
+  py_line <- paste('hide labels',sep='')
+  pymol_lines <- c(pymol_lines,py_line)
+
+  #write lines to .txt
+  #separate by '\n'
+
+  #pymol_file_list_file_name <- 'pymol_ts_output.pml'
+
+  #setwd(new_directory)
+  write(paste(pymol_lines,collapse = '\n'),pymol_file_list_file_name)
+
+
+
+
+} #end function ppi.pymol2
+
+
+
 
 #----Write PPI PyMOL----
 
 #'Write PyMOL file for protein-protein interaction data
 #'
-#'ppi.pymol
+#'ppi.pymol description
 #'@param xlink_mega_df xlink_mega_df
 #'@param list_of_start_and_end_pdbs list_of_start_and_end_pdbs
 #'@param show_only_real_structures show_only_real_structures
@@ -8450,14 +9138,19 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 #'@export
 
 ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = FALSE,
-                      custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE){
+                      custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE, experiment_directory = NULL,
+                      pdb_numbering = FALSE){
   #rename the columns to the original column names for easier integration to the rest of
   #the function
 
+  if(is.null(experiment_directory)){
+    experiment_directory <- getwd()
+  }
+
   #if there is no start and end PDBs can just get the info from the PDB file itself?
-  #sd_pdb <- read.pdb('Spc98-yeast_missing_sequence_3_single_dot.pdb')
+  #sd_pdb <- read.pdb2('Spc98-yeast_missing_sequence_3_single_dot.pdb')
   #if(endsWith(pdb_name, 'single_dot.pdb'))
-  sd_pdb$atom$resno #this will be the position for the making of the pymol file
+  #sd_pdb$atom$resno #this will be the position for the making of the pymol file
 
   #colnames(xlink_mega_df)
 
@@ -8538,6 +9231,10 @@ ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_
       } #end first for(sors in show_only_real_structures)
 
 
+      #will also need to include option in case real PDB structures are being used
+      #won't have .pdb at the end?
+      #will split the ID and the chain to be able to get the
+
       for(sors in show_only_real_structures){
         #include the line of code if the protein is in list and is real
         #or or if it does not show up in the list at all
@@ -8588,8 +9285,8 @@ ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_
 
   #can just have one option
   #if show_surface, color_gray == TRUE
-  py_line <- 'show surface'
-  pymol_lines <- c(pymol_lines,py_line)
+  #py_line <- 'show surface'
+  #pymol_lines <- c(pymol_lines,py_line)
   py_line <- 'color gray'
   pymol_lines <- c(pymol_lines,py_line)
 
@@ -8646,7 +9343,7 @@ ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_
 
 
           if(is.null(list_of_start_and_end_pdbs)){
-            sd_pdb <- read.pdb(paste0(pdb_num,'.pdb'))
+            sd_pdb <- read.pdb2(paste0(pdb_num,'.pdb'))
             pro_pos <- sd_pdb$atom$resno
           } else {
             pro_pos <- list_of_start_and_end_pdbs[[paste(pdb_num,'.pdb',sep='')]][1]
@@ -8982,14 +9679,25 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
 
     #need to add in colors for freqVector
     bs_freqVector <- rbd.freqVector(bs_output = bs_output, name_by = 'db_id',heatmap = FALSE, db_selection = 'PDB')
+
+    #return(bs_freqVector)
     bsfv_vars <- min(unlist(bs_freqVector)):max(unlist(bs_freqVector))
     #explicitly make the bar??
+
+    #return(bsfv_vars)
+    #return(list(vars=bsfv_vars,colors = colors,gray0 = gray0))
     pymol_cc <- color.pymol(bsfv_vars, colors = colors, png.name = 'freqvector_legend_test.svg', gray0 = gray0)
+
+    #return(pymol_cc)
     bs_freqVector2 <- rbd.freqVector(bs_output = bs_output, name_by = 'db_id',heatmap = heatmap, db_selection = 'PDB', colors = pymol_cc$hexcodes)
+
+    #return(bs_freqVector2)
 
     #pymol_lines <- c()
     pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
 
+
+    #return(pymol_lines)
 
     for(pdb_name in names(bs_freqVector)){
       freq_vector <- bs_freqVector[[pdb_name]]
@@ -9312,7 +10020,7 @@ rbd.getBSfromIET <- function(filtered_input_eluate_table,
           uniprot_seq <- paste0(toupper(seqinr::read.fasta(paste0(uniprot_id,'.fasta'))),collapse='')
         } else {
           #does not exist in current directory --> fetching from UniProt
-          cat("Can't find FASTA file in current directory --> fetching from UniProt\n")
+          cat("\nCan't find FASTA file in current directory --> fetching from UniProt\n")
           uniprot_seq <- uniprot(uniprot_id)$sequence
         } #end else to if(paste0(uniprot_id,'.fa') %in% list.files()){
 
@@ -9321,8 +10029,11 @@ rbd.getBSfromIET <- function(filtered_input_eluate_table,
 
       } #end else to if(is.null(protein_to_uniprot_id))
 
+      #return(uniprot_seq)
 
       #grepl(uniprot_info$accession,pdb_info$pdb_id)
+
+      #return(length(str_locate_all(uniprot_seq,binding_seq)[[1]]))
 
       #if(length(str_locate_all(uniprot_seq,input_sequence)[[1]]) == 0){
       if(length(str_locate_all(uniprot_seq,binding_seq)[[1]]) == 0){
@@ -9338,15 +10049,22 @@ rbd.getBSfromIET <- function(filtered_input_eluate_table,
         #                                database_id = uniprot_id)
 
         bs_s_e <- str_locate_all(uniprot_seq,binding_seq)[[1]]
+        #return(bs_s_e)
+
+        #return(bs_output)
         bs_output$binding_site_start <- bs_s_e[1]
         bs_output$binding_site_end <- bs_s_e[2]
-        ms_s_e <- str_locate_all(uniprot_seq,bs_output$ms2_peptide_seq)[[1]]
+        ms_s_e <- str_locate_all(uniprot_seq,as.character(bs_output$ms2_peptide_seq))[[1]]
+        #return(ms_s_e)
         bs_output$ms2_start <- ms_s_e[1]
         bs_output$ms2_end <- ms_s_e[2]
         bs_output$source_sequence <- uniprot_seq
 
         bs_output$db <- 'UniProt'
         bs_output$db_id <- uniprot_id
+
+
+        #return(bs_output)
 
       } #end else to if(length(str_locate_all(paste0(pdb_info$resid,collapse=''),input_sequence)[[1]]) == 0){
 
@@ -9606,6 +10324,19 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'@usage data(pymol_color_table)
 #'
 "pymol_color_table"
+
+#'RBDmap Data
+#'
+#'RBDmap data
+#'
+#'@docType data
+#'
+#'@usage data(rbdmapData)
+#'@references \url{https://www.huber.embl.de/users/befische/RBDmap/}
+#'
+"rbdmapData"
+
+
 #add in pymol wiki info, etc. for the sake of documentation
 
 #first save the data to

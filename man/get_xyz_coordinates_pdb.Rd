@@ -7,7 +7,7 @@
 get_xyz_coordinates_pdb(trimmed_pdb)
 }
 \arguments{
-\item{trimmed_pdb}{PDB file loaded by bio3d::read.pdb()}
+\item{trimmed_pdb}{PDB file loaded by bio3d::read.pdb2()}
 }
 \description{
 This function makes a list of the xyz coordinates from a PDB file

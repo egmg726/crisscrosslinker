@@ -4,9 +4,9 @@
 \alias{get_uniprot_info_from_proteins_api}
 \title{get uniprot info from proteins api}
 \usage{
-get_uniprot_info_from_proteins_api(uniprot_id, type_of_info = c("variation",
-  "feature"), select_categories = NULL, protein_name = NULL,
-  fasta_file = NULL, start_and_end_pos = NULL,
+get_uniprot_info_from_proteins_api(uniprot_id,
+  type_of_info = c("variation", "feature"), select_categories = NULL,
+  protein_name = NULL, fasta_file = NULL, start_and_end_pos = NULL,
   output_xinet_domain_df = FALSE)
 }
 \arguments{

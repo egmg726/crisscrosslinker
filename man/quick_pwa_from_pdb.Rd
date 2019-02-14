@@ -10,7 +10,7 @@ quick_pwa_from_pdb(query_sequence, pdb_read, chain,
 \arguments{
 \item{query_sequence}{Sequence to match the PDB sequence against}
 
-\item{pdb_read}{PDB file loaded by bio3d::read.pdb()}
+\item{pdb_read}{PDB file loaded by bio3d::read.pdb2()}
 
 \item{chain}{Character indicating the chain on the PDB file}
 
