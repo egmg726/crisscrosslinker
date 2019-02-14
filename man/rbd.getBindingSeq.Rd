@@ -21,11 +21,11 @@ rbd.getBindingSeq(ms_sequence, protease, sequence_for_alignment,
 
 \item{sequence_for_alignment}{The sequence to find the binding sequence in. The ms_sequence must be within the sequence_for_alignment or NULL will be returned.}
 
-\item{protein_name}{Name of the protein to which the sequence_for_alignment belongs. Defaults to NULL}
+\item{protein_name}{Name of the protein to which the sequence_for_alignment belongs. Defaults to NA}
 
-\item{database_name}{Name of the database used: 'PDB','UniProt' or 'FASTA' (for the input FASTA sequence). Defaults to NULL}
+\item{database_name}{Name of the database used: 'PDB','UniProt' or 'FASTA' (for the input FASTA sequence). Defaults to NA}
 
-\item{database_id}{Identifier for the database. Defaults to NULL}
+\item{database_id}{Identifier for the database. Defaults to NA}
 
 \item{cleave_offset}{Cleave offset for the sequence. Defaults to 0}
 
