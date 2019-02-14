@@ -5,7 +5,6 @@
 #'@param rbd.df rbd.df
 #'@param fasta Name of fasta file or loaded fasta file by seqinr::read.fasta(). Defaults to NULL.
 #'@export
-
 rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
 
   #first check to make sure it has the 3 columns
@@ -29,6 +28,7 @@ rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
     rbd_row <- rbd.df[row_num,]
     trypticPeptide <- as.character(rbd_row$trypticPeptide)
     enzyme <- as.character(rbd_row$enzyme)
+    protID <- as.character(rbd_row$protID)
 
     if(!is.null(fasta)){
 
