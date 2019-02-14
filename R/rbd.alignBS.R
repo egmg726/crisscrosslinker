@@ -108,6 +108,8 @@ rbd.alignBS <- function(rbd.df,alignIDs,
       #check if there is a fasta file matching the uniprot ID
       #if not --> get the uniprot
 
+
+
     }
 
 

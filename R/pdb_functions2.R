@@ -10325,16 +10325,6 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'
 "pymol_color_table"
 
-#'RBDmap Data
-#'
-#'RBDmap data
-#'
-#'@docType data
-#'
-#'@usage data(rbdmapData)
-#'@references \url{https://www.huber.embl.de/users/befische/RBDmap/}
-#'
-"rbdmapData"
 
 
 #add in pymol wiki info, etc. for the sake of documentation

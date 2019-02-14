@@ -38,6 +38,9 @@ rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
       } #end if(typeof(fasta) == 'character'){
 
       sourceSequence <- toupper(paste0(fasta[[protID]],collapse = ''))
+      if(sourceSequence == ''){
+        sourceSequence <- toupper(paste0(fasta[[1]],collapse = ''))
+      }
 
     } else {#end if(!is.null(fasta)){
       sourceSequence <- uniprot.fasta(uniprot_id = protID)
