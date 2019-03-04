@@ -20,3 +20,6 @@ rbd.makeIETable(sequence_hit_list, prefixes, proteases = c("ArgC",
 \description{
 This function makes an input and eluate table based on the make_sequence_hit_list() function
 }
+\author{
+Emma Gail
+}

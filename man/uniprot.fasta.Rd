@@ -4,18 +4,21 @@
 \alias{uniprot.fasta}
 \title{Fetch FASTA sequence from Uniprot}
 \usage{
-uniprot.fasta(uniprot_id, download_fasta = FALSE,
-  console_message = TRUE, fasta_directory = getwd())
+uniprot.fasta(uniprot.id, download.fasta = FALSE,
+  console.message = TRUE, fasta.directory = getwd())
 }
 \arguments{
-\item{uniprot_id}{uniprot_id}
+\item{uniprot.id}{Uniprot ID of sequence wanted in the form "ID-isoform". Leave out isoform if using the canonical sequence.}
 
-\item{download_fasta}{download_fasta}
+\item{download.fasta}{If TRUE, will download the FASTA file to your chosen directory. Defaults to FALSE.}
 
-\item{console_message}{console_message}
+\item{console.message}{If TRUE, will display the name of the FASTA file when being loaded into R in the console. Defaults to TRUE.}
 
-\item{fasta_directory}{fasta_directory}
+\item{fasta.directory}{Directory chosen for your downloaded FASTA file. Defaults to current directory.}
 }
 \description{
-This function fetches the FASTA sequence from UniProt
+This function fetches the FASTA sequence directly from the UniProt .fasta page
+}
+\author{
+Emma Gail
 }

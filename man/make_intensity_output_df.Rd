@@ -14,3 +14,6 @@ make_intensity_output_df(sub_shl, prefix)
 \description{
 This function makes a dataframe out of a subsection of the sequence_hit_list
 }
+\author{
+Emma Gail
+}

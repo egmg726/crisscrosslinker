@@ -19,3 +19,6 @@ rbd.makeSeqHitList(fasta_file, experiment_directory = NULL,
 \description{
 This function creates a hit list of significant XL in UV XL-MS dataset
 }
+\author{
+Emma Gail
+}

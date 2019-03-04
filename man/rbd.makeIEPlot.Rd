@@ -29,3 +29,6 @@ rbd.makeIEPlot(input_eluate_table, prefixes, proteases = c("LysC",
 \description{
 This function takes the data from the input/eluate table and makes it into a plot
 }
+\author{
+Emma Gail
+}

@@ -19,3 +19,6 @@ color.pymol(vars, colors = NULL, png.name = "pymol_legend\%03d.svg",
 \description{
 Generate colors to be used when generating a PyMol script
 }
+\author{
+Emma Gail
+}
