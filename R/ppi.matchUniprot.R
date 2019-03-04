@@ -34,6 +34,9 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
   #can turn into a list and save if needed as a csv file
 
   if(!is.null(protein_to_uniprot_id)){
+
+    protein_to_uniprot_id <- protein_to_uniprot_id[protein_to_uniprot_id$ProteinName %in% names(fasta_file),]
+
     match_protein <- as.character(protein_to_uniprot_id$ProteinName)
     match_uniprot <- as.character(protein_to_uniprot_id$UniProtID)
     if('UniProtSeq' %in% colnames(protein_to_uniprot_id)){
@@ -119,6 +122,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
         # }
 
         match_sequence <- c(match_sequence,uniprot_fasta_seq)
+        #match_protein <- c(match_protein,pep_pro)
 
         if(download_fasta == TRUE){
           write(uniprot_fasta,paste0(fasta_directory,'/',uniprot_id2,'.fasta'))
@@ -176,6 +180,8 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
 
 
   } #end for(protein_name in names(fasta_file)){
+
+
 
 
   match_df <- (data.frame(ProteinName = match_protein,
