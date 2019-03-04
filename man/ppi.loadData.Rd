@@ -18,5 +18,5 @@ ppi.loadData(xldata, fasta_file, file_directory = getwd(),
 }
 \description{
 This function loads the data from your XL-MS experiments to a format that is readable by
-ppi.combineData()
+ppi.combineData
 }
