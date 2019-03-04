@@ -1,23 +1,19 @@
 #'PPI: Load Data
 #'
-#'This function loads the data from your XL-MS experiments to a format that is readable by
-#'ppi.combineData()
+#'This function loads the data from your XL-MS experiments to a format that is readable by ppi.combineData
 #'
 #'@param xldata Name of files or loaded data.frames. If using pLink2 data, it is recommended to use the name of file.
 #'@param fasta_file FASTA file as loaded by seqinr::read.fasta()
 #'@param file_directory Directory where XL-MS data is located. Defaults to getwd().
 #'@param datatype Type of data being loaded. Will automatically detect otherwise. Defaults to NULL.
 #'@export
+
 ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype = NULL){
 
   #should also load fasta_file here if not already loaded
   list_of_protein_names <- names(fasta_file)
   #typeof
-  #'character' c()
-  #'list list() or dataframe() will need to check if there are column names
-  #'#if is.null(nrow(xldata)) --> then it is a list rather than a dataframe
-  #'
-  #'
+
 
   xldata_loaded <- list()
   #need to initially keep a list of names and dataframes and then go through them?
