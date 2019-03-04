@@ -8,8 +8,6 @@
 #'@param uniprot2pdb Boolean, defaults to TRUE. This will align to Uniprot sequence before PDB and using the uniprot.PDBmap function to improve alignment accuracy. Highly recommended for PDB alignments.
 #'@param allowpartialBS Boolean, defaults to FALSE.
 #'@export
-
-
 rbd.alignBS <- function(rbd.df,alignIDs,
                         alignTo=c('pdb','uniprot','fasta'),
                         uniprot2pdb=TRUE,allowPartialBS=FALSE){
@@ -25,6 +23,8 @@ rbd.alignBS <- function(rbd.df,alignIDs,
   source_sequence_list <- c()
 
   #do the for loop up here
+
+  pdb_reads <- list()
 
   for(row_num in 1:nrow(rbd.df)){
 
@@ -45,7 +45,7 @@ rbd.alignBS <- function(rbd.df,alignIDs,
         alignID_split <- strsplit(alignID,'_')[[1]]
         pdb_id <- alignID_split[1]
         chain <- alignID_split[2]
-        uniprot_id <- alignID <- as.character(alignIDs[alignIDs$protID==protID,'uniprotID'])
+        uniprot_id <- as.character(alignIDs[alignIDs$protID==protID,'uniprotID'])
         if(!(uniprot_id == protID)){
           #if TRUE --> they do not match so can't just use fragmentStart and fragmentStop
           #need to do an alignment with the uniprot sequence
@@ -69,7 +69,13 @@ rbd.alignBS <- function(rbd.df,alignIDs,
 
         #will need if(NA %in% pdb_positions) too
         #will exclude those matches if allowPartialBS == FALSE
-        pdb_read <- check_download_read_pdb(pdb_id) #add ID to list of IDs that need to be loaded?
+        if(pdb_id %in% names(pdb_reads)){
+          pdb_read <- pdb_reads[[pdb_id]]
+        } else {
+          pdb_read <- read.pdb2(pdb_id, verbose = FALSE)
+          pdb_reads[[pdb_id]] <- pdb_read
+        }
+         #add ID to list of IDs that need to be loaded?
         resno_and_resid <- quick_resno_and_resid(pdb_read = pdb_read, chain = chain)
         pdb_seq <- paste0(resno_and_resid$resid,collapse='')
 
@@ -96,7 +102,7 @@ rbd.alignBS <- function(rbd.df,alignIDs,
         binding_site_start_list <- c(binding_site_start_list,pdb_positions[1])
         binding_site_end_list <- c(binding_site_end_list,pdb_positions[2])
         #pdb_seq <- pdb.annotate(pdb_id)[paste0(pdb_id,'_',chain),]$sequence
-        pdb_read <- read.pdb2(pdb_id) #add ID to list of IDs that need to be loaded?
+        #pdb_read <- read.pdb2(pdb_id) #add ID to list of IDs that need to be loaded?
         resno_and_resid <- quick_resno_and_resid(pdb_read = pdb_read, chain = chain)
         pdb_seq <- paste0(resno_and_resid$resid,collapse='')
         source_sequence_list <- c(source_sequence_list,pdb_seq)

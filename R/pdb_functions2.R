@@ -1,162 +1,30 @@
-library(ggplot2)
-library(bio3d)
-library(Biostrings)
-library(seqinr)
-library(RColorBrewer)
-library(prodlim)
-library(openxlsx)
-library(stringr)
-library(httr)
-library(jsonlite)
-library(xml2)
-library(grDevices)
-library(svglite)
-library(XML)
-library(RCurl)
+# library(ggplot2)
+# library(bio3d)
+# library(Biostrings)
+# library(seqinr)
+# library(RColorBrewer)
+# library(prodlim)
+# library(openxlsx)
+# library(stringr)
+# library(httr)
+# library(jsonlite)
+# library(xml2)
+# library(grDevices)
+# library(svglite)
+# library(XML)
+# library(RCurl)
 
 #need to do importFrom for these packages so that only certain ones are taken out of the
 #packages --> no name conflicts
-#' @import ggplot2
-NULL
-#' @import bio3d
-NULL
-#which functions have been imported from bio3d?
-#read.pdb
-#write.pdb??
-#can also just import entire function for now
-#' @importFrom Biostrings pairwiseAlignment
-#import only pairwiseAlignment?
-NULL
-#'@importFrom seqinr read.fasta a aaa
-NULL
-#is that notation correct?
-#'@import RColorBrewer
-NULL
-#'@importFrom prodlim row.match
-NULL
-#'@importFrom openxlsx read.xlsx
-NULL
-#'@importFrom stringr str_locate_all str_count
-NULL
-#'@import httr
-NULL
-#'@import jsonlite
-NULL
-#'@import xml2
-NULL
-#'@import grDevices
-NULL
-#'@importFrom svglite svglite
-NULL
-#'@import viridis
-NULL
-#'@import svglite
-NULL
+
 
 #only import the svg function into the final version
 
 
-#-----Generate 2D PDB file-----
-
-#' Generate 2D PDB File
-#'
-#' This function allows you to turn a list of amino acids into a 2D PDB file that can be downloaded.
-#' @param amino_acid_fragments A vector containing an amino acid sequence.
-#' @keywords pdb
-#' @export
-#' @examples
-#' new_pdb_file <- generate_2d_pdb_file(amino_acid_fragments)
-
-#should x and y coordinates be based on the PDB file enetered?
-#need to possibly change z-coordinates (or some other coordinates) so that they do
-#not overlap with
-
-#should each of the different PDB files be on different chains?
-#need to make it so that you can customize the chain
-generate_2d_pdb_file <- function(amino_acid_fragments,start_residue,
-                                 x_coord = 82.998, y_coord = -5.760,
-                                 z_coord = -20.345){
-  #x_coord <- 82.998
-  #y_coord <- -42.760
-  #y_coord <- -5.760
-  #z_coord <- -10.345
-  #z_coord <- -20.345
-  downward <- TRUE
-  z_negative <- FALSE
-  res_num <- start_residue
-
-  new_pdb_file <- c()
-
-  for(num in 1:length(amino_acid_fragments)){
-    if(num != length(amino_acid_fragments)){
-      new_line <- '\n'
-    } else {
-      new_line <- ''
-    }
-
-    num_atom_spaces <- 7 - nchar(num)
-    atom_spaces <- paste(rep(" ",num_atom_spaces),collapse = "")
-    two_spaces <- "  "
-    atom_number <- num
-    residue_name <- toupper(aaa(amino_acid_fragments[num]))
-    residue_number <- res_num
-    six_spaces <- "      "
-    num_residue_spaces <- 4 - nchar(residue_number)
-
-    if(downward == TRUE){
-      x_coord <- x_coord - 0.5
-      y_coord <- y_coord - 0.6
-      z_coord <- z_coord - 1.3
-      downward <- FALSE
-
-    } else {
-      x_coord <- x_coord + 0.2
-      y_coord <- y_coord - 1.5
-      if(z_negative == TRUE){
-        z_coord <- z_coord - 0.05
-        z_negative <- FALSE
-      } else {
-        z_coord <- z_coord + 0.05
-        z_negative <- TRUE
-      }
-      downward <- TRUE
-    }
-
-
-    num_x_y_spaces <- 7 - nchar(y_coord)
-    if(num_x_y_spaces > 0){
-      x_y_spaces <- paste(rep(" ",num_x_y_spaces),collapse = "")
-    } else {
-      x_y_spaces <- ""
-    }
-    num_y_z_spaces <- 7 - nchar(z_coord)
-    if(num_y_z_spaces > 0){
-      y_z_spaces <- paste(rep(" ",num_y_z_spaces),collapse = "")
-    } else {
-      y_z_spaces <- ""
-    }
-
-    residue_spaces <- paste(rep(" ",num_residue_spaces),collapse = "")
-    pdb_line <- paste('ATOM',atom_spaces,as.character(atom_number),two_spaces,
-                      "CA",two_spaces,residue_name," A",residue_spaces,
-                      as.character(residue_number),six_spaces,
-                      as.character(format(x_coord,nsmall=3)),x_y_spaces,
-                      as.character(format(y_coord,nsmall = 3)),
-                      y_z_spaces, as.character(format(z_coord,nsmall=3)),two_spaces,
-                      "1.00109.30           CA",new_line,
-                      collapse = "",sep = "")
-
-    new_pdb_file <- c(new_pdb_file,pdb_line)
-    res_num <- res_num + 1
-  }
-
-  new_pdb_file <- paste(new_pdb_file,sep="", collapse="")
-
-  return(new_pdb_file)
-
-}
 
 #-----firstup-----
+
+#need a reference here to the stackoverflow page
 
 #' Capitalize first letter
 #'
@@ -177,124 +45,6 @@ firstup <- function(x) {
 }
 
 
-#----Get PWA ranges----
-
-#' Get ranges from pairwise alignment results
-#'
-#' This function allows you to return ranges (start and end) from pairwise alignment results
-#' @param pwa_results Result from function pairwiseAlignment()
-#' @keywords pairwise alignment
-#' @export
-#' @examples
-#' pwa_ranges <- get_pwa_ranges(pwa_results)
-
-
-get_pwa_ranges <- function(pwa_results){
-
-  start_pattern <- start(pattern(pwa_results))
-  end_pattern <- end(pattern(pwa_results))
-
-  start_subject <- start(subject(pwa_results))
-  end_subject <- end(subject(pwa_results))
-
-  start_difference <- start_subject - start_pattern
-
-  pwa_ranges <- list(start_pattern = start_pattern,
-                     end_pattern = end_pattern,
-                     start_subject = start_subject,
-                     end_subject = end_subject,
-                     start_difference = start_difference)
-
-  return(pwa_ranges)
-
-}
-
-#------Get PWA string-----
-
-#' Get string from pairwise alignment results
-#'
-#' This function allows you to return strings from pairwise alignment results
-#' @param pwa_results Result from function pairwiseAlignment()
-#' @param result_as_vector If TRUE, returns string as a vector
-#' @keywords pairwise alignment
-#' @export
-#' @examples
-#' pwa_strings <- get_pwa_strings(pwa_results)
-
-
-get_pwa_strings <- function(pwa_results,result_as_vector = FALSE){
-  subject_string <- toString(subject(pwa_results))
-  pattern_string <- toString(pattern(pwa_results))
-
-  if(result_as_vector == FALSE){
-    subject_string <- strsplit(subject_string,split='')[[1]]
-    pattern_string <- strsplit(pattern_string,split='')[[1]]
-  }
-
-  pwa_strings <- list(subject_string=subject_string,
-                     pattern_string=pattern_string)
-
-  return(pwa_strings)
-}
-
-
-#----Renumber and identify missing amino acids----
-
-#' Renumber and identify missing amino acids in pairwise alignment results
-#'
-#' This function allows you to renumber and identify missing amino acids in pairwise alignment results
-#' @param pwa_results Result from function pairwiseAlignment()
-#' @param start_difference Difference between starting amino acid in subject and pattern alignments
-#' @keywords pairwise alignment
-#' @export
-#' @examples
-#' renumbered_missing_amino_acids <- renumber_and_identify_missing_aa(pwa_strings,start_difference)
-
-
-renumber_and_identify_missing_aa <- function(pwa_strings,start_difference){
-  subject_string_vector <- pwa_strings$subject_string
-  pattern_string_vector <- pwa_strings$pattern_string
-
-  if(length(subject_string_vector) == 1){
-    subject_string_vector <- strsplit(subject_string_vector,split='')[[1]]
-    pattern_string_vector <- strsplit(pattern_string_vector,split='')[[1]]
-  }
-
-  missing_animo_acids_pattern <- c()
-  missing_animo_acids_subject <- c()
-  other_mutations <- c()
-  new_pdb_numbering <- c()
-  maa_pattern_numbering <- c()
-  for(vector_num in 1:length(subject_string_vector)){
-    if(pattern_string_vector[vector_num] != subject_string_vector[vector_num]){
-      if(pattern_string_vector[vector_num] == '-'){
-        missing_animo_acids_pattern <- c(missing_animo_acids_pattern,vector_num)
-        new_resno <- vector_num + start_difference
-        maa_pattern_numbering <- c(maa_pattern_numbering,new_resno)
-      }
-      else if(subject_string_vector[vector_num] == '-'){
-        missing_animo_acids_subject <- c(missing_animo_acids_subject,vector_num)
-      } else {
-        other_mutations <- c(other_mutations,vector_num)
-        new_resno <- vector_num + start_difference
-        new_pdb_numbering <- c(new_pdb_numbering, new_resno)
-      }
-      #else == pattern and subject match
-    } else {
-      new_resno <- vector_num + start_difference
-      new_pdb_numbering <- c(new_pdb_numbering, new_resno)
-    }
-  }
-
-  missing_animo_acids_list <- list(pattern=missing_animo_acids_pattern,
-                                   subject=missing_animo_acids_subject,
-                                   mutations=other_mutations,
-                                   new_pdb_numbering=new_pdb_numbering,
-                                   maa_pattern_numbering=maa_pattern_numbering)
-
-  return(missing_animo_acids_list)
-
-}
 
 #-----Get resno and resid list----
 
@@ -609,7 +359,9 @@ edit_features_subset <- function(features_subset,renumbered_feature_lines){
 #------split sequences (for xlinking data)-----
 
 
-
+#'Split Sequences
+#'
+#'@export
 split_sequences <- function(xlink_string,proteins = TRUE,split_by_parenthesis=FALSE){
 
   seq_to_split <- xlink_string
@@ -760,6 +512,7 @@ fasta.combine <- function(fasta_file_names,experiment_directory = NULL,
 #'@param experiment_directory Directory where experiment files are. If NULL, defaults to current directory using getwd().
 #'@param file_format Can be either 'csv' or 'xlsx', the suffix to the experiment files
 #'@param cutoff_score Cutoff for Andromeda score. Defaults to 20.
+#'@author Emma Gail
 #'@export
 
 rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
@@ -872,6 +625,7 @@ rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
 #'@param sequence_hit_list Output from rbd.makeSeqHitList() function
 #'@param proteases Proteases used in the experiment. Defaults to c('ArgC','LysC')
 #'@param outline_file_name Name of output file. Defaults to 'pipeline_output_file.csv'
+#'@author Emma Gail
 #'@export
 
 rbd.makeIETable <- function(sequence_hit_list,
@@ -948,6 +702,7 @@ rbd.makeIETable <- function(sequence_hit_list,
 #'@param colour Same as "colour" from ggplot2 for plot
 #'@param size Same as "size" from ggplot2 for plot
 #'@param pipeline_generated_plot_title Title for generated plot. Must end in '.png'. Defaults to 'pipeline_generated_plot.png'.
+#'@author Emma Gail
 #'@export
 
 #should add in naming options for png plot output
@@ -1089,6 +844,7 @@ rbd.makeIEPlot <- function(input_eluate_table,
 #'This function makes a dataframe out of a subsection of the sequence_hit_list
 #'@param sub_shl Subsection of sequence_hit_list, ouput of make_sequence_hit_list()
 #'@param prefix Prefix that will be used to categorized the subsection in the output
+#'@author Emma Gail
 #'@export
 
 make_intensity_output_df <- function(sub_shl,prefix){
@@ -1854,6 +1610,7 @@ make_binding_site_df <- function(pdb_info,
 #' @param colors List of either PyMol colors, hexcodes, or standard colors in R. Will also accept color palette names from RColorBrewer and viridis. If left as NULL, will use standard PyMOL tint colors.
 #' @param png.name Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.
 #' @param gray0 If TRUE, will shift color palette and replace 1st color as gray (corresponds 0 if using frequency). Defaults to FALSE.
+#' @author Emma Gail
 #' @export
 
 #zero indices as a parameter?
@@ -5813,15 +5570,21 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
   #xlink_df <- prc2_rna_diff_analysis
 
   if('pro_pos1' %in% colnames(xlink_df)){
-    xlink_viewer_csv$PepPos1 <- xlink_df$pro_pos1
-    xlink_viewer_csv$PepPos2 <- xlink_df$pro_pos2
+    # xlink_viewer_csv$PepPos1 <- xlink_df$pro_pos1
+    # xlink_viewer_csv$PepPos2 <- xlink_df$pro_pos2
+    # xlink_viewer_csv$Protein1 <- xlink_df$pro_name1
+    # xlink_viewer_csv$Protein2 <- xlink_df$pro_name2
+    # xlink_viewer_csv$PepSeq1 <- xlink_df$pep_seq1
+    # xlink_viewer_csv$PepSeq2 <- xlink_df$pep_seq2
+    # xlink_viewer_csv$LinkPos1 <- xlink_df$pep_pos1
+    # xlink_viewer_csv$LinkPos2 <- xlink_df$pep_pos2
+    # xlink_viewer_csv$Score <- xlink_df$score
     xlink_viewer_csv$Protein1 <- xlink_df$pro_name1
     xlink_viewer_csv$Protein2 <- xlink_df$pro_name2
-    xlink_viewer_csv$PepSeq1 <- xlink_df$pep_seq1
-    xlink_viewer_csv$PepSeq2 <- xlink_df$pep_seq2
-    xlink_viewer_csv$LinkPos1 <- xlink_df$pep_pos1
-    xlink_viewer_csv$LinkPos2 <- xlink_df$pep_pos2
+    xlink_viewer_csv$LinkPos1 <- xlink_df$pro_pos1
+    xlink_viewer_csv$LinkPos2 <- xlink_df$pro_pos2
     xlink_viewer_csv$Score <- xlink_df$score
+
     if(add_color == TRUE){
       if('category_color' %in% colnames(xlink_df)){
         xlink_viewer_csv$CategoryColor <- xlink_df$category_color
@@ -5875,7 +5638,7 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
 #'Make pLink2 master list
 #'
 #'This function creates the list of
-
+#'@export
 make_plink2_master_list <- function(plink2_peptides, list_of_protein_names,
                                     plink2_type_of_file=c('cross-linked','loop-linked'),
                                     master_list_index = 0){
@@ -6098,10 +5861,23 @@ make_plink2_master_list <- function(plink2_peptides, list_of_protein_names,
 
       } #end else if(plink2_type_of_file == 'loop-linked')
 
-    } else if(length(plink2_row) == length(layer2_column_names)){
+    } else if((length(plink2_row) == length(layer2_column_names)) || ((length(plink2_row)-1) == length(layer2_column_names))){
       #it is in layer 2
       #add all of this information to the index as defined above
-      plink2_row
+      #plink2_row
+
+      if(((length(plink2_row)-1) == length(layer2_column_names))){
+        if(is.na(as.numeric(plink2_row[layer2_column_names == 'Charge']))){
+          #if this is true, the Charge column is not actually the charge column
+          #need to merge the 2 columns
+          plink2_row <- c(plink2_row[1:2],paste0(plink2_row[3:4],collapse=''),plink2_row[5:length(plink2_row)])
+
+        } else { #end if(is.na(as.numeric(plink2_row[layer2_column_names == 'Charge']))){
+          cat('Unknown layer detected\n')
+          next
+          }#end else to if(is.na(as.numeric(plink2_row[layer2_column_names == 'Charge']))){
+      } #end if(((length(plink2_row)-1) == length(layer2_column_names))){
+
 
       row_list$score_xlink <- c(row_list$score_xlink,plink2_row[layer2_column_names == 'Score'])
       row_list$delta_xlink <- c(row_list$delta_xlink,plink2_row[layer2_column_names == 'Precursor_Mass_Error(Da)'])
@@ -6122,7 +5898,7 @@ make_plink2_master_list <- function(plink2_peptides, list_of_protein_names,
 
     } else {
       #it is in an unknown layer
-      cat('Unknown layer detected')
+      cat('Unknown layer detected\n')
 
     } #end else #if(length(plink2_row) == length(layer1_column_names))
 
@@ -6374,11 +6150,16 @@ extract_protein_name_and_peptide_num <- function(split_proteins,list_of_protein_
 
   qc_pro_check <- paste(pro_output[[1]][1],'(',pro_output[[1]][2],')-',pro_output[[2]][1],'(',pro_output[[2]][2],')',sep='')
 
+  #return(c(qc_pro_check,split_proteins))
+
   if(!(qc_pro_check == split_proteins)){
 
-    cat('Protein naming error may have occurred')
-    cat(qc_pro_check)
-    return(NULL)
+    qc_pro_check2  <- paste(pro_output[[1]][1],' (',pro_output[[1]][2],')-',pro_output[[2]][1],' (',pro_output[[2]][2],')',sep='')
+    if(!(qc_pro_check2 == split_proteins)){
+      cat('Protein naming error may have occurred')
+      cat(qc_pro_check)
+      return(NULL)
+    }
   }
 
   return(pro_output)
@@ -8622,6 +8403,8 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
 } #end rbd.freq_vector function
 
+
+
 ppi.pymol2 <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = FALSE,
                        custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE, experiment_directory = NULL,
                        pdb_numbering = FALSE, pymol_file_list_file_name = 'pymol_output.pml'){
@@ -9123,483 +8906,6 @@ ppi.pymol2 <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only
 
 
 #----Write PPI PyMOL----
-
-#'Write PyMOL file for protein-protein interaction data
-#'
-#'ppi.pymol description
-#'@param xlink_mega_df xlink_mega_df
-#'@param list_of_start_and_end_pdbs list_of_start_and_end_pdbs
-#'@param show_only_real_structures show_only_real_structures
-#'@param write_file write_file
-#'@param custom.color custom.color
-#'@param colors colors
-#'@param color_by color_by
-#'@param write.df write.df
-#'@export
-
-ppi.pymol <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = FALSE,
-                      custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE, experiment_directory = NULL,
-                      pdb_numbering = FALSE){
-  #rename the columns to the original column names for easier integration to the rest of
-  #the function
-
-  if(is.null(experiment_directory)){
-    experiment_directory <- getwd()
-  }
-
-  #if there is no start and end PDBs can just get the info from the PDB file itself?
-  #sd_pdb <- read.pdb2('Spc98-yeast_missing_sequence_3_single_dot.pdb')
-  #if(endsWith(pdb_name, 'single_dot.pdb'))
-  #sd_pdb$atom$resno #this will be the position for the making of the pymol file
-
-  #colnames(xlink_mega_df)
-
-  if('X' %in% colnames(xlink_mega_df)){
-    xlink_mega_df$X <- NULL
-  }
-
-  og_xlink_colnames <- c("seq","pro","dist","freq","freq_color","files","pdb1","pdb2",
-                         "pro_pos1","pro_pos2","pro_name1","pro_name2","pep_seq1","pep_seq2",
-                         "pep_pos1","pep_pos2","score")
-
-  if('Protein.Position.1' %in% colnames(xlink_mega_df)){
-    colnames(xlink_mega_df) <- og_xlink_colnames
-  }
-
-  pymol_lines <- c()
-
-  #if custom color is TRUE
-  #would vars be frequency?
-  #xlink_mega_df <- xl_df2
-
-  if(custom.color == TRUE){
-
-    pymol_cc <- color.pymol(sort(unique(xlink_mega_df[[color_by]])), colors = colors)
-    #pymol_cc$vars
-    #pymol_cc$color_names
-
-    pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
-
-    levels(xlink_mega_df$freq_color) <- c(levels(xlink_mega_df$freq_color),pymol_cc$color_names)
-
-    #xlink_mega_df$freq
-
-    for(index_num in 1:length(pymol_cc$vars)){
-
-      var_name <- pymol_cc$vars[index_num]
-
-      #will rename the freq_color by whatever the var name is
-
-
-      xlink_mega_df[xlink_mega_df[[color_by]] == var_name, 'freq_color'] <- pymol_cc$color_names[index_num]
-
-      #within(xlink_mega_df, freq_color[color_by == var_name] <- pymol_cc$color_names[index_num])
-
-      #need to select and change the variable name based on the value
-
-
-    } #end for(index_num in 1:length(pymol_cc$vars))
-
-  } else {#end if custom color == TRUE
-    #custom_color == FALSE
-
-    #make the PyMOL legend still even if they're using the original colors
-    #just input those colors into the colors/vars
-
-  }
-  #should still produce a legend even if they have not opted for a custom color
-
-
-  #would have to replace the values in freq_color
-
-
-  pdbs_in_df <- unique(c(levels(xlink_mega_df$pdb1),levels(xlink_mega_df$pdb2)))
-  #loop through the pdbs
-  #pdb_name <- pdbs_in_df[1]
-  for(pdb_name in pdbs_in_df){
-    #load pdb files
-
-    if(!is.null(show_only_real_structures)){
-      pdb_in_sors <- FALSE
-      for(sors in show_only_real_structures){
-        #noob solution to current problem
-        if(grepl(sors,pdb_name)){
-          pdb_in_sors <- TRUE
-        }
-
-
-      } #end first for(sors in show_only_real_structures)
-
-
-      #will also need to include option in case real PDB structures are being used
-      #won't have .pdb at the end?
-      #will split the ID and the chain to be able to get the
-
-      for(sors in show_only_real_structures){
-        #include the line of code if the protein is in list and is real
-        #or or if it does not show up in the list at all
-        #or statement needs to be able to
-
-
-
-        if((grepl(sors,pdb_name) && grepl('___',pdb_name))){
-
-          #do the code here
-          py_line <- paste('load ',experiment_directory,'/',pdb_name,
-                           sep='')
-          pymol_lines <- c(pymol_lines,py_line)
-
-        } #end if((grepl(sors,pdb_name) && grepl('___',pdb_name)) || !grepl(sors,pdb_name))
-      } #end for(sors in show_only_real_structures)
-
-      if(!pdb_in_sors){
-
-        py_line <- paste('load ',experiment_directory,'/',pdb_name,
-                         sep='')
-        pymol_lines <- c(pymol_lines,py_line)
-
-
-      }
-
-    } else {#end if(!is.null(show_only_real_structures))
-
-      py_line <- paste('load ',experiment_directory,'/',pdb_name,
-                       sep='')
-      pymol_lines <- c(pymol_lines,py_line)
-
-
-    }
-
-    # py_line <- paste('load ',experiment_directory,'/',pdb_name,
-    #                  sep='')
-    # pymol_lines <- c(pymol_lines,py_line)
-
-
-    #if this boolean is turned on,
-    #color color_name, protein_name
-
-    #should each of the PDBs be colored based on the protein they come from
-    #can make this a user option
-
-  }
-
-  #can just have one option
-  #if show_surface, color_gray == TRUE
-  #py_line <- 'show surface'
-  #pymol_lines <- c(pymol_lines,py_line)
-  py_line <- 'color gray'
-  pymol_lines <- c(pymol_lines,py_line)
-
-
-  mega_distance_count <- 0
-  for(row_num in 1:nrow(xlink_mega_df)){
-
-    pdb1 <- strsplit(as.character(xlink_mega_df$pdb1[row_num]),'.pdb')[[1]]
-    pdb2 <- strsplit(as.character(xlink_mega_df$pdb2[row_num]),'.pdb')[[1]]
-
-    #if grepl '___' get last character for the chain
-    #otherwise use 'A'
-
-    pro_pos1 <- as.character(xlink_mega_df$pro_pos1[row_num])
-    pro_pos2 <- as.character(xlink_mega_df$pro_pos2[row_num])
-
-    #if statement to select the right chain
-
-
-    #can do the check here in the grepl to do the check if it a single dot PDB structure, linear or curved
-
-    #should make a list of pdbs so that this is not repeated twice?
-    #can make output as a list that is then used for the next part of the function
-
-    pdb_names <- c(pdb1,pdb2)
-    pro_pos_list <- c(pro_pos1,pro_pos2)
-    #file_type_2d <- 'single atom'
-
-    #store new variables in a list?
-    #check if list is empty or store the original values inside if not single atom?
-
-    selection_name_list <- list()
-
-    pdb_num_count <- 0
-
-    for(pdb_num in pdb_names){
-      pdb_num_count <- pdb_num_count + 1
-      chain_name <- paste('chain',as.character(pdb_num_count),sep='')
-      pro_pos_name <- paste('pro_pos',pdb_num_count,sep='')
-      pdb_num_name <- paste('pdb',pdb_num_count,sep='')
-      selection_name_list[[pdb_num_name]] <- pdb_num
-
-      if(grepl('___',pdb_num)){ #if 'real' PDB structure use last character since that is the chain
-        chain <- substrRight(pdb_num,1)
-        selection_name_list[[chain_name]] <- chain
-
-      } else {
-
-        #should it be in this part
-        #should have an or statement or excessive?
-        #do we need file_type --> unless the file is being created within the function
-        #if(file_type_2d == 'single atom' && grepl('single_atom',pdb_num)){
-        if(grepl('single_dot',pdb_num)){
-
-
-          if(is.null(list_of_start_and_end_pdbs)){
-            sd_pdb <- read.pdb2(paste0(pdb_num,'.pdb'))
-            pro_pos <- sd_pdb$atom$resno
-          } else {
-            pro_pos <- list_of_start_and_end_pdbs[[paste(pdb_num,'.pdb',sep='')]][1]
-          }
-
-          #transform the protein position for the PyMol script so it is the first in the list
-
-          selection_name_list[[pro_pos_name]] <- pro_pos
-
-
-        } #series of if else statements for each of the other options or just else?
-
-        chain <- 'A'
-        selection_name_list[[chain_name]] <- chain
-      }
-
-      if(is.null(selection_name_list[[pro_pos_name]])){
-        #if has not been changed in the single atom loop, will establish the original
-        #protein position here
-        selection_name_list[[pro_pos_name]] <- pro_pos_list[pdb_num_count]
-
-      }
-
-
-    } #end loop for(pdb_num in pdb_names)
-
-
-    #getting the right selection names here
-    #assigning the derived values to the selection names
-
-    #pull out by the number?
-    #then pull out by name of the variable ie 'chain'
-
-
-    #create selection names
-
-    completed_selection_names <- c()
-    amino_acid_selection_names <- c()
-
-    sors_pdb_check <- list(is_in_list=c(),
-                           is_it_real=c())
-
-    both_pdbs_pass_sors <- TRUE
-    for(num in 1:2){
-      selection_names_filtered <- names(selection_name_list)[grepl(as.character(num),names(selection_name_list))]
-      sn_chain <- selection_names_filtered[grepl('chain',selection_names_filtered)]
-      sn_chain <- selection_name_list[[sn_chain]]
-      sn_pro_pos <- selection_names_filtered[grepl('pro_pos',selection_names_filtered)]
-      sn_pro_pos <- selection_name_list[[sn_pro_pos]]
-      sn_pdb <- selection_names_filtered[grepl('pdb',selection_names_filtered)]
-      sn_pdb <- selection_name_list[[sn_pdb]]
-
-      selection_name <- paste('/',sn_pdb,'//',sn_chain,'/',sn_pro_pos,'/CA',sep='')
-      aa_select_name <- paste('/',sn_pdb,'//',sn_chain,'/',sn_pro_pos, sep='')
-
-      completed_selection_names <- c(completed_selection_names,selection_name)
-      amino_acid_selection_names <- c(amino_acid_selection_names,aa_select_name)
-
-      #can do the process in here for determining whether or not the xl events should be
-      #in the PyMOL output file
-      #only one that does not meet the criteria should be excluded
-      #start with true before loop and then if one does not meet critertia, then
-      #make variable == FALSE
-
-      if(!is.null(show_only_real_structures)){
-
-        #check sn_pdb here
-        #there should be a way to grepl a whole list
-        for(sors in show_only_real_structures){
-
-          #grepl check sn_pdb
-          #another boolean?
-
-          # sors_pdb_check <- list(is_in_list=c(),
-          #                        is_it_real=c())
-
-          if(grepl(sors,sn_pdb)){
-
-            sors_pdb_check$is_in_list <- c(sors_pdb_check$is_in_list,TRUE)
-            is_in_list <- TRUE
-
-          } else {
-
-            sors_pdb_check$is_in_list <- c(sors_pdb_check$is_in_list,FALSE)
-            is_in_list <- FALSE
-          }
-
-          if(grepl('___',sn_pdb)){
-
-            sors_pdb_check$is_it_real <- c(sors_pdb_check$is_it_real,TRUE)
-            is_it_real <- TRUE
-
-          } else {
-
-            sors_pdb_check$is_it_real <- c(sors_pdb_check$is_it_real,FALSE)
-            is_it_real <- FALSE
-          }
-
-          if(!((is_in_list && is_it_real) || !is_in_list)){
-            both_pdbs_pass_sors <- FALSE
-          }
-
-
-
-          #similanteously do other check
-          #or just store booleans in two lists
-          #1st list: whether or not shows up in sors list
-          #2nd list: is it a real pdb structure
-
-          #either 1+2 == TRUE or 1==FALSE
-
-        }
-
-
-      } #end if(!is.null(show_only_real_structures))
-
-
-    } #end for(num in 1:2)
-
-    #enclose all of the following with pymol additions into the if/for/if loop
-
-    #need to change these loops to accomodate for the fact that there are two selection names
-    #here
-
-    if(!is.null(show_only_real_structures)){
-
-      #check list here
-      #sors_pdb_check$is_in_list
-      #sors_pdb_check$is_in_real
-
-      #need to account for the fact that there are 2 structures being compared
-      # pdbs_in_sors <- FALSE
-      # for(sors in show_only_real_structures){
-      #   if(grepl(sors,cs_name) && grepl('___',cs_name)){
-      #     pdbs_in_sors <- TRUE
-      #
-      #   }
-      #
-      #   #can make two T/F vectors and then compare them to see if they're both T/F
-      #
-      # for(cs_name in completed_selection_names){
-      #   for(sors in show_only_real_structures){
-      #     if(grepl(sors,cs_name) && grepl('___',cs_name)){
-      #       pdbs_in_sors <- TRUE
-      #
-      #     }
-      #
-      #   }
-      # }
-
-
-      #include the line of code if the protein is in list and is real
-      #or or if it does not show up in the list at all
-      if(both_pdbs_pass_sors){
-
-        #do the code here
-        freq_color <- as.character(xlink_mega_df$freq_color[row_num])
-        py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
-        pymol_lines <- c(pymol_lines,py_line)
-        py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
-        pymol_lines <- c(pymol_lines,py_line)
-        #accounting for peptides that show up in more than one XL event
-
-        mega_distance_count <- mega_distance_count + 1
-        py_line <- paste('distance ',completed_selection_names[1],', ',completed_selection_names[2], sep='')
-        pymol_lines <- c(pymol_lines,py_line)
-        #keep numerical list of distances?
-
-
-        if(nchar(mega_distance_count) == 1){
-          dist_name <- paste('dist0',mega_distance_count,sep='')
-        } else {
-          dist_name <- paste('dist',mega_distance_count,sep='')
-        }
-
-        freq_color <- as.character(xlink_mega_df$freq_color[row_num])
-        py_line <- paste('color ',freq_color,', ',dist_name,sep='')
-        pymol_lines <- c(pymol_lines,py_line)
-
-      } #end if((grepl(sors,pdb_name) && grepl('___',pdb_name)) || !grepl(sors,pdb_name))
-
-    } else {#end if(!is.null(show_only_real_structures))
-
-      freq_color <- as.character(xlink_mega_df$freq_color[row_num])
-      py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
-      pymol_lines <- c(pymol_lines,py_line)
-      py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
-      pymol_lines <- c(pymol_lines,py_line)
-      #accounting for peptides that show up in more than one XL event
-
-      mega_distance_count <- mega_distance_count + 1
-      py_line <- paste('distance ',completed_selection_names[1],', ',completed_selection_names[2], sep='')
-      pymol_lines <- c(pymol_lines,py_line)
-      #keep numerical list of distances?
-
-
-      if(nchar(mega_distance_count) == 1){
-        dist_name <- paste('dist0',mega_distance_count,sep='')
-      } else {
-        dist_name <- paste('dist',mega_distance_count,sep='')
-      }
-
-      freq_color <- as.character(xlink_mega_df$freq_color[row_num])
-      py_line <- paste('color ',freq_color,', ',dist_name,sep='')
-      pymol_lines <- c(pymol_lines,py_line)
-
-    }
-    #color the amino acids
-    # freq_color <- as.character(xlink_mega_df$freq_color[row_num])
-    # py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
-    # pymol_lines <- c(pymol_lines,py_line)
-    # py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
-    # pymol_lines <- c(pymol_lines,py_line)
-    # #accounting for peptides that show up in more than one XL event
-    #
-    # py_line <- paste('distance ',completed_selection_names[1],', ',completed_selection_names[2], sep='')
-    # pymol_lines <- c(pymol_lines,py_line)
-    # #keep numerical list of distances?
-    #
-    #
-    # if(nchar(row_num) == 1){
-    #   dist_name <- paste('dist0',row_num,sep='')
-    # } else {
-    #   dist_name <- paste('dist',row_num,sep='')
-    # }
-    #
-    # freq_color <- as.character(xlink_mega_df$freq_color[row_num])
-    # py_line <- paste('color ',freq_color,', ',dist_name,sep='')
-    # pymol_lines <- c(pymol_lines,py_line)
-    #
-
-    #can rename each of the crosslinking sites to xlink01 or something instead of dist01
-
-    #make distances for each of them
-    #add to list
-
-    #draw lines between
-
-    #use freq_color to color the distance line
-
-
-  }
-
-  py_line <- paste('hide labels',sep='')
-  pymol_lines <- c(pymol_lines,py_line)
-
-
-  if(write_file == TRUE){
-    write(paste(pymol_lines,collapse = '\n'),pymol_file_list_file_name)
-  }
-
-  return(pymol_lines)
-
-  #need to have 2 options: write and output a list that can be used
-} #end function ppi.pymol()
-
 
 
 
@@ -10324,6 +9630,7 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'@usage data(pymol_color_table)
 #'
 "pymol_color_table"
+
 
 
 

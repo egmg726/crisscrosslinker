@@ -1,7 +1,7 @@
 
 ![alt text](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
 
-This package is designed to analyze and visualize crosslinking (XL) data from multiple sources (mainly BS3 and UV).
+This package is designed to analyze and visualize crosslinking (XL) data from multiple sources (mainly XL-MS and RBDmap).
 
 **Analysis**
 
@@ -9,11 +9,11 @@ This package is designed to analyze and visualize crosslinking (XL) data from mu
 
 -   Crosslinking frequency
 
--   Creation of represental PDB files for missing peptides
+-   Creation of PDB files for missing peptides
 
 -   Mutation and Uniprot Integration (*coming soon!*)
 
-**BS3**
+**XL-MS**
 
 -   Control distances for PDB structures
 
@@ -33,12 +33,6 @@ This package is designed to analyze and visualize crosslinking (XL) data from mu
 
 Installation
 ------------
-
-To explore all functions and complete the tutorials:
-
-``` r
-source("~/R/pdb_functions.R")
-```
 
 
 To download the functions with documentation:

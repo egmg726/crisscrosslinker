@@ -8,8 +8,6 @@
 #'@param file_directory Directory where XL-MS data is located. Defaults to getwd().
 #'@param datatype Type of data being loaded. Will automatically detect otherwise. Defaults to NULL.
 #'@export
-
-
 ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype = NULL){
 
   #should also load fasta_file here if not already loaded
@@ -110,7 +108,7 @@ ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype 
             #if TRUE, the file structure matches that of the regular plink1 file
             #can also have or statement if it has been designated as a plink1 file
 
-            xlink_list <- load_file_name(loaded_data)
+            xlink_list <- load_plink_file(loaded_data)
 
             #if it has been loaded as a xlsx file that means it is not a plink2 file
 
@@ -173,7 +171,7 @@ ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype 
           #if TRUE, the file structure matches that of the regular plink1 file
           #can also have or statement if it has been designated as a plink1 file
 
-          xlink_list <- load_file_name(loaded_data)
+          xlink_list <- load_plink_file(loaded_data)
 
           #if it has been loaded as a xlsx file that means it is not a plink2 file
 

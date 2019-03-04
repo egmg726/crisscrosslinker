@@ -21,6 +21,10 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
     category_color_input_file <- read.csv(category_color_input_file)
   }
 
+  if(typeof(protein_alternative_names_dict) == 'character'){
+    protein_alternative_names_dict <- read.csv(protein_alternative_names_dict)
+  }
+
   pymol_reds <- c('red','tv_red','raspberry','darksalmon','salmon','deepsalmon',
                   'warmpink','firebrick','ruby','chocolate','brown')
   pymol_greens <- c('green','tv_green','chartreuse','splitpea','smudge',
