@@ -1,16 +1,16 @@
-ppi.alignIDs
-xldf3_row <- xlink.df.filtered3[1,]
-
-pro_pos <- as.character(xldf3_row$pro_pos1)
-pro_name <- as.character(xldf3_row$pro_name1)
-
-pdbID <- as.character(ppi.alignIDs[ppi.alignIDs$protID==pro_name,'pdbID'])
-
-pdb_split <- strsplit(pdbID,'_')[[1]]
-pdb.id <- pdb_split[1]
-chain <- pdb_split[2]
-
-pdb_resno <- uniprot.PDBmap(pdb.id,chain,pro_pos,output='pdb')
+# ppi.alignIDs
+# xldf3_row <- xlink.df.filtered3[1,]
+#
+# pro_pos <- as.character(xldf3_row$pro_pos1)
+# pro_name <- as.character(xldf3_row$pro_name1)
+#
+# pdbID <- as.character(ppi.alignIDs[ppi.alignIDs$protID==pro_name,'pdbID'])
+#
+# pdb_split <- strsplit(pdbID,'_')[[1]]
+# pdb.id <- pdb_split[1]
+# chain <- pdb_split[2]
+#
+# pdb_resno <- uniprot.PDBmap(pdb.id,chain,pro_pos,output='pdb')
 
 #can also have an option that will create a new PDB file for any NAs that are generated
 
