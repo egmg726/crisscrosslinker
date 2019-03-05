@@ -7,7 +7,6 @@
 #'@param file_directory Directory where XL-MS data is located. Defaults to getwd().
 #'@param datatype Type of data being loaded. Will automatically detect otherwise. Defaults to NULL.
 #'@export
-
 ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype = NULL){
 
   #should also load fasta_file here if not already loaded

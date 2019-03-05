@@ -545,6 +545,8 @@ rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
       csv_file <- read.csv(file_name1)
     } else if(file_format == 'xlsx'){
       csv_file <- data.frame(read.xlsx(file_name1))
+    } else if(file_format == 'txt'){
+      csv_file <- read.table(file_name1,sep='\t',header=TRUE)
     }
 
     csv_file_filtered <- csv_file[grep(paste(protein_prefix, collapse='|'),
