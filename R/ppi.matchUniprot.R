@@ -36,6 +36,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
   if(!is.null(protein_to_uniprot_id)){
 
     protein_to_uniprot_id <- protein_to_uniprot_id[protein_to_uniprot_id$ProteinName %in% names(fasta_file),]
+    protein_to_uniprot_id <- protein_to_uniprot_id[match(names(fasta_file),protein_to_uniprot_id$ProteinName),]
 
     match_protein <- as.character(protein_to_uniprot_id$ProteinName)
     match_uniprot <- as.character(protein_to_uniprot_id$UniProtID)
@@ -199,7 +200,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
     xlink_df_row <- xlink_df[row_num,]
     for(pep_num in 1:2){
       peppos_name <- paste('pro_pos',as.character(pep_num),sep='')
-      peppos1 <- as.numeric(xlink_df_row[[peppos_name]])
+      peppos1 <- as.numeric(as.character(xlink_df_row[[peppos_name]]))
       pepstring_name <- paste('pep_seq',as.character(pep_num),sep='')
       pepstring <- as.character(xlink_df_row[[pepstring_name]])
       pep_pro_name <- paste('pro_name',as.character(pep_num),sep='')

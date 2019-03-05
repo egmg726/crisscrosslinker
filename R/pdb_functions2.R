@@ -635,15 +635,11 @@ rbd.makeIETable <- function(sequence_hit_list,
                             proteases = c('ArgC','LysC'),
                             output_file_name = 'pipeline_output_file.csv',
                             experiment_directory = NULL){
-
-
   secondary_prefix <- TRUE
 
   if(is.null(experiment_directory)){
     experiment_directory <- getwd()
-
   }
-
 
   df_output_list <- list()
   for(prefix in prefixes){
