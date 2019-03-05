@@ -1,3 +1,4 @@
+**NSMB Updated Tutorials will be up shortly**
 
 ![alt text](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
 
