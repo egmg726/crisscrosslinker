@@ -8208,9 +8208,10 @@ load_proxl_data <- function(proxl_data){
 #'@param heatmap heatmap
 #'@param db_selection db_selection
 #'@param colors colors
+#'@param save_plot save_plot
 #'@export
 
-rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_selection = NULL, colors = c('#d0d0d0','#2f5ac6','#e50000')){
+rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_selection = NULL, colors = c('#d0d0d0','#2f5ac6','#e50000'),save_plot=TRUE){
 
   #will only work if the data is all Uniprot or FASTA
   #will be a list
@@ -8370,7 +8371,34 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
     #hm.palette <- colorRampPalette(rev(brewer.pal(4, 'Spectral')), space='Lab')
     #hm.palette <- colorRampPalette(c('#d0d0d0','#2f5ac6','#e50000'), space='Lab')
-    hm.palette <- colorRampPalette(colors = colors)
+
+    viridis_colors <- c("magma","inferno","plasma","viridis","cividis")
+
+    if((colors %in% rownames(brewer.pal.info)) || (colors %in% viridis_colors)){
+      freq_vars <- sort(unique(unlist(bs_freqVector)))
+      freq_colors <- color.pymol(freq_vars,colors=colors)
+      hm.palette <- colorRampPalette(colors = freq_colors$hexcodes)
+    } else {
+      hm.palette <- colorRampPalette(colors = colors)
+    }
+
+
+
+
+
+
+    #startsWith(colors,'#')
+
+    #color.pymol(,colors = colors)
+
+    #color.pymol()
+
+    #colors <- c('#d0d0d0','#2f5ac6','#e50000')
+
+
+    #color.pymol(1:leng)
+
+
     #colorRampPalette('Blues',space='Lab')
 
 
@@ -8388,7 +8416,10 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
     print(aa_plot)
 
-    ggsave('uvxlms_heatmap_all_proteins.svg')
+    if(save_plot == TRUE){
+      ggsave('uvxlms_heatmap_all_proteins.svg')
+    }
+
 
 
 
@@ -8928,8 +8959,8 @@ ppi.pymol2 <- function(xlink_mega_df,list_of_start_and_end_pdbs = NULL,show_only
 rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
                       colors = NULL, file.name = 'rbd_pymol.pml',
                       write.file = TRUE, experiment.dir = NULL,
-                      gray0 = FALSE, heatmap = TRUE, assembly=0,
-                      fetch=TRUE){
+                      gray0 = FALSE, heatmap = TRUE, assembly = 0,
+                      fetch = TRUE){
 
   #what is color_by is frequency?
 
@@ -8964,8 +8995,7 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
     pymol_lines <- c(pymol_lines,py_line)
   }
 
-  pymol_lines <- c(pymol_lines,'color gray')
-  pymol_lines <- c(pymol_lines,'show surface')
+
 
   if(color_by == 'freq'){
 
@@ -8992,6 +9022,8 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
     #return(list(vars=bsfv_vars,colors = colors,gray0 = gray0))
     pymol_cc <- color.pymol(bsfv_vars, colors = colors, png.name = 'freqvector_legend_test.svg', gray0 = gray0)
 
+
+
     #return(pymol_cc)
     bs_freqVector2 <- rbd.freqVector(bs_output = bs_output, name_by = 'db_id',heatmap = heatmap, db_selection = 'PDB', colors = pymol_cc$hexcodes)
 
@@ -8999,6 +9031,23 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
 
     #pymol_lines <- c()
     pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
+
+    #can alter this so the first color set that is equal to 0 will be the 0
+    if(gray0 == TRUE){
+      pymol_lines <- c(pymol_lines,'color gray')
+    } else {#if gray0 == FALSE
+      if(length(paste0('color ',pymol_cc$color_names[pymol_cc$vars == 0])) > 0){
+        pymol_lines <- c(pymol_lines,paste0('color ',pymol_cc$color_names[pymol_cc$vars == 0]))
+      } else {
+        cat('No var with value 0 detected --> coloring gray')
+        pymol_lines <- c(pymol_lines,'color gray')
+      }
+
+    } #end else to if(gray0 == TRUE){
+
+    #should have this changed
+    pymol_lines <- c(pymol_lines,'show surface')
+    #pymol_cc$color_names[pymol_cc$vars == 0]
 
 
     #return(pymol_lines)
@@ -9069,8 +9118,28 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
     #do what's below
     #assume that it's the name of a column in bs_output
 
+    pymol_lines <- c(pymol_lines,'show surface')
+
+    # if((is.numeric(bs_output[[color_by]]) == FALSE) && (gray0 == FALSE)){
+    #   cat('color_by not numeric --> gray0 is now true\n')
+    #   gray0 <- TRUE
+    # }
+
     pymol_cc <- color.pymol(sort(unique(bs_output[[color_by]])), colors = colors, gray0 = gray0)
     pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
+
+    if(gray0 == TRUE){
+      pymol_lines <- c(pymol_lines,'color gray')
+    } else {#if gray0 == FALSE
+      if(length(pymol_cc$color_names[pymol_cc$vars == 0]) > 0){
+        pymol_lines <- c(pymol_lines,paste0('color ',pymol_cc$color_names[pymol_cc$vars == 0]))
+      } else {
+        cat('No var with value 0 detected --> coloring gray')
+        pymol_lines <- c(pymol_lines,'color gray')
+      }
+
+    } #end else to if(gray0 == TRUE){
+
     bs_output$color <- rep(NA,nrow(bs_output))
     levels(bs_output$color) <- c(levels(bs_output$color),pymol_cc$color_names)
 
