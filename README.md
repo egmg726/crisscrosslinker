@@ -1,4 +1,4 @@
-**NSMB Updated Tutorials will be up shortly - please check back on March 7th for full-length how-to guides**
+**NSMB Updated Tutorials will be up shortly - please check back soon for full-length how-to guides**
 
 ![alt text](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
 
