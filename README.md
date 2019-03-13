@@ -1,4 +1,4 @@
-**NSMB Updated Tutorials will be up shortly - please check back soon for full-length how-to guides**
+**NSMB Tutorials are now available under the 'tutorials' folder**
 
 ![alt text](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
 
