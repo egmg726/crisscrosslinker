@@ -1,8 +1,26 @@
 #should be able to use multiple resnos
-uniprot.PDBmap <- function(pdb_id,chain,resno,output=c('pdb','uniprot')){
+
+#chain should be optional
+#uniprot ID should also be an option to put in
+
+uniprot.PDBmap <- function(pdb_id,resno,chain=NULL,uniprot_id=NULL,output=c('pdb','uniprot')){
 
   uniprot_match <- NA
-  pdbmap_id <- paste0(pdb_id,'.',chain)
+
+  use_pdb <- FALSE
+  use_uniprot <- FALSE
+
+  if(!is.null(chain)){
+    use_pdb <- TRUE
+    pdbmap_id <- paste0(pdb_id,'.',chain)
+  } else if(!is.null(uniprot_id)){
+    use_uniprot <- TRUE
+    pdbmap_id <- uniprot_id
+  } else {
+    warning('Chain or UniProt ID must be selected')
+    return(NULL)
+  }
+
 
   pdb_uniprot_mapping <- GET(paste0('https://www.rcsb.org/pdb/rest/das/pdb_uniprot_mapping/alignment?query=',pdb_id))
   xml_data <- xmlParse(pdb_uniprot_mapping)
@@ -17,8 +35,16 @@ uniprot.PDBmap <- function(pdb_id,chain,resno,output=c('pdb','uniprot')){
       segment_df <- t(data.frame(segment_data))
       if(nrow(segment_df) == 2){
         if(pdbmap_id %in% segment_df[,'intObjectId']){
-          uniprot_line <- segment_df[segment_df[,"intObjectId"] != pdbmap_id,] #the uniprot line
-          pdb_line <- segment_df[segment_df[,"intObjectId"] == pdbmap_id,] #the PDB line --> should check to make sure the PDB ID is in there
+
+          if(use_pdb == TRUE){
+            uniprot_line <- segment_df[segment_df[,"intObjectId"] != pdbmap_id,] #the uniprot line
+            pdb_line <- segment_df[segment_df[,"intObjectId"] == pdbmap_id,] #the PDB line
+          } else if(use_uniprot == TRUE){
+            uniprot_line <- segment_df[segment_df[,"intObjectId"] == pdbmap_id,] #the uniprot line
+            pdb_line <- segment_df[segment_df[,"intObjectId"] != pdbmap_id,] #the PDB line
+          }
+          # uniprot_line <- segment_df[segment_df[,"intObjectId"] != pdbmap_id,] #the uniprot line
+          # pdb_line <- segment_df[segment_df[,"intObjectId"] == pdbmap_id,] #the PDB line --> should check to make sure the PDB ID is in there
 
           #grepl(pdb_info$pdb_id,as.character(pdb_line[names(pdb_line) == "intObjectId"]))
 
@@ -49,7 +75,9 @@ uniprot.PDBmap <- function(pdb_id,chain,resno,output=c('pdb','uniprot')){
             #if it is within the two
             resno_index <- match(resno,uniprot_line_start:uniprot_line_end)
             uniprot_match <- (pdb_line_start:pdb_line_end)[resno_index]
-
+            if(use_uniprot == TRUE){
+              uniprot_match <- c(uniprot_match,pdb_line_chain)
+            }
 
           } else if(output == 'uniprot'){
 

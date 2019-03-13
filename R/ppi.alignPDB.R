@@ -3,26 +3,73 @@
 #does this need boolean?
 #should also accept protein_dict --> but will need to account for the multiple chains
 #user should also be able to just put in the PDB ID with no chain --> will have to do a grepl check to see if '_' exists in string
-ppi.alignPDB <- function(fasta_file){
+
+#' PPI ALign PDB
+#'
+#' This functions aligns fasta file to PDB
+#'
+#' @param fasta_file fasta_file
+#' @param alignIDs alignIDs
+#' @param uniprot2pdb uniprot2pdb
+#'
+#' @export
+
+ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
 
   pdb_vector_match_mega <- list()
+  stored_pdbs <- list()
+  stored_annos <- list()
 
   for(protein_name in names(fasta_file)){
 
     #will need to remove check_download etc if switching to fetch system
-    pdb_info <- display_preferred_pdb_structure_menu(protein_name,fasta_file)
+
+    if(is.null(alignIDs)){
+      pdb_info <- display_preferred_pdb_structure_menu(protein_name,fasta_file)
+      chain <- pdb_info$chain
+      pdb_id <- pdb_info$pdb_id
+    } else {
+
+      if(!(protein_name %in% as.character(alignIDs$ProteinName))){
+        next
+      }
+
+      pdb_chain <- strsplit(as.character(alignIDs[alignIDs$ProteinName == protein_name,'PDB']),'_')[[1]]
+      chain <- pdb_chain[2]
+      pdb_id <- pdb_chain[1]
+    }
+
+    if(!(pdb_id %in% names(stored_pdbs))){
+      pdb_file <- read.pdb2(pdb_id)
+      stored_pdbs[[pdb_id]] <- pdb_file
+      pdb_anno <- pdb.annotate(pdb_id)
+      stored_annos[[pdb_id]] <- pdb_anno
+    } else {
+      pdb_anno <- stored_annos[[pdb_id]]
+      pdb_file <- stored_pdbs[[pdb_id]]
+    }
+
+
+
     #can update this to include option to combine PDB chains or use multiple
     #how to use multiple?
 
 
-    chain <- pdb_info$chain
     #pdb_file <- check_download_read_pdb(pdb_info$pdb_id)
-    pdb_file <- read.pdb2(pdb_info$pdb_id)
 
-    pdb_anno <- pdb.annotate(pdb_info$pdb_id)
     uniprot_id <- pdb_anno[pdb_anno$chainId == chain,"db_id"]
+
+    if(uniprot2pdb == TRUE){
+      uniprot_sequence <- uniprot.fasta(uniprot.id = uniprot_id)
+
+    } else { #end if(uniprot2pdb == TRUE){
+      uniprot_sequence <- toupper(paste0(fasta_file[[protein_name]],collapse=''))
+
+    } #end else to if(uniprot2pdb == TRUE){
+
+
     #uniprot_sequence <-uniprot(uniprot_id)$sequence #taking a really long time?
-    uniprot_sequence <- uniprot.fasta(uniprot_id = uniprot_id)
+
 
     chain_matches <- pdb_anno[pdb_anno$db_id == uniprot_id,"chainId"]
 
@@ -45,6 +92,7 @@ ppi.alignPDB <- function(fasta_file){
 
     # pwa_results <- quick_pwa_from_pdb(fasta_file[[protein_name]],pdb_file,chain,
     #                                   use_resid_and_resno = FALSE)
+
 
     pwa_results <- pairwiseAlignment(uniprot_sequence,toupper(paste0(fasta_file[[protein_name]],collapse='')))
 
@@ -184,8 +232,8 @@ ppi.alignPDB <- function(fasta_file){
     #pdb_id <- '6C23'
     #pdb_anno <- pdb.annotate(pdb_info$pdb_id)
 
-    pdb_anno$compound
-    pdb_anno$chainId #will need all
+    #pdb_anno$compound
+    #pdb_anno$chainId #will need all
 
     # uniprot_chain_match <- list()
     #
@@ -229,7 +277,7 @@ ppi.alignPDB <- function(fasta_file){
     #can make this into its own function
     #input --> pdb_id, optional input: chains and/or UniProt ID?
 
-    pdb_uniprot_mapping <- GET(paste0('https://www.rcsb.org/pdb/rest/das/pdb_uniprot_mapping/alignment?query=',pdb_info$pdb_id))
+    pdb_uniprot_mapping <- GET(paste0('https://www.rcsb.org/pdb/rest/das/pdb_uniprot_mapping/alignment?query=',pdb_id))
     xml_data <- xmlParse(pdb_uniprot_mapping)
     xml_data <- xmlToList(xml_data)
 
@@ -293,6 +341,8 @@ ppi.alignPDB <- function(fasta_file){
             uniprot_start_index <- match(uniprot_line_start,uniprot_seq_alignment_vector)
             uniprot_end_index <- match(uniprot_line_end,uniprot_seq_alignment_vector)
 
+            #return(c(uniprot_start_index,uniprot_end_index))
+
             if(uniprot_line_end > max(uniprot_seq_alignment_vector)){
               uniprot_end_index <- max(uniprot_seq_alignment_vector)
             }
@@ -300,7 +350,7 @@ ppi.alignPDB <- function(fasta_file){
             #uniprot_seq_alignment_vector
             pdb_alignment_vector[uniprot_start_index:uniprot_end_index] <- pdb_line_start:pdb_line_end
 
-            pdb_line_fullid <- paste0(pdb_info$pdb_id,'_',pdb_line_chain)
+            pdb_line_fullid <- paste0(pdb_id,'_',pdb_line_chain)
             #
             chain_alignment_vector[uniprot_start_index:uniprot_end_index] <- rep(pdb_line_fullid,length(uniprot_line_start:uniprot_line_end))
 

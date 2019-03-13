@@ -4,7 +4,7 @@
 \alias{rbd.getBSfromDF}
 \title{RBD: Get binding sequences from Dataframe}
 \usage{
-rbd.getBSfromDF(rbd.df, fasta = NULL)
+rbd.getBSfromDF(rbd.df, fasta = NULL, cleave_offset = 4)
 }
 \arguments{
 \item{rbd.df}{rbd.df}

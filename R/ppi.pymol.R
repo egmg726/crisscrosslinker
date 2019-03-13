@@ -13,7 +13,7 @@
 
 ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = FALSE,
                       custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE, experiment_directory = NULL,
-                      pdb_numbering = FALSE){
+                      pdb_numbering = FALSE,pymol_file_list_file_name='xlink.pml'){
   #rename the columns to the original column names for easier integration to the rest of
   #the function
 
@@ -47,6 +47,11 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
   #xlink.df <- xl_df2
 
   if(custom.color == TRUE){
+
+    if(color_by == 'dist'){
+      #do the cut here
+      #have another variable for the cutoff for dist?
+    }
 
     pymol_cc <- color.pymol(sort(unique(xlink.df[[color_by]])), colors = colors)
     #pymol_cc$vars
@@ -87,46 +92,71 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
   #would have to replace the values in freq_color
 
 
+  is_pdb_match_vector <- FALSE
   pdbs_in_df <- unique(c(levels(xlink.df$pdb1),levels(xlink.df$pdb2)))
-  #loop through the pdbs
-  #pdb_name <- pdbs_in_df[1]
-  for(pdb_name in pdbs_in_df){
-    #load pdb files
+  if(is.null(pdbs_in_df)){
+    pdbs_in_df <- unique(c((xlink.df$pdb1),(xlink.df$pdb2)))
+  }
 
-    if(!is.null(show_only_real_structures)){
-      pdb_in_sors <- FALSE
-      for(sors in show_only_real_structures){
-        #noob solution to current problem
-        if(grepl(sors,pdb_name)){
-          pdb_in_sors <- TRUE
-        }
+  #return(unique(c((xlink.df$pdb1),(xlink.df$pdb2))))
+
+  if(!(grepl('\\.pdb',paste0(pdbs_in_df,'|',collapse = '')))){
+    #If TRUE --> it's a pdb_match_vector
+    is_pdb_match_vector <- TRUE
+    pdbs_in_df <- pdbs_in_df[pdbs_in_df != '-']
+    #return(pdbs_in_df)
+    pdbs_in_df <- unique(unlist(strsplit(pdbs_in_df,'_'))[c(T,F)])
+    for(pdb_name in pdbs_in_df){
+      py_line <- paste0('fetch ',pdb_name,",async=0")
+      pymol_lines <- c(pymol_lines,py_line)
+    }
+  } else { #end if(!(grepl('\\.pdb',paste0(pdbs_in_df,'|',collapse = '')))){
+    for(pdb_name in pdbs_in_df){
+      #load pdb files
+
+      if(!is.null(show_only_real_structures)){
+        pdb_in_sors <- FALSE
+        for(sors in show_only_real_structures){
+          #noob solution to current problem
+          if(grepl(sors,pdb_name)){
+            pdb_in_sors <- TRUE
+          }
 
 
-      } #end first for(sors in show_only_real_structures)
+        } #end first for(sors in show_only_real_structures)
 
 
-      #will also need to include option in case real PDB structures are being used
-      #won't have .pdb at the end?
-      #will split the ID and the chain to be able to get the
+        #will also need to include option in case real PDB structures are being used
+        #won't have .pdb at the end?
+        #will split the ID and the chain to be able to get the
 
-      for(sors in show_only_real_structures){
-        #include the line of code if the protein is in list and is real
-        #or or if it does not show up in the list at all
-        #or statement needs to be able to
+        for(sors in show_only_real_structures){
+          #include the line of code if the protein is in list and is real
+          #or or if it does not show up in the list at all
+          #or statement needs to be able to
 
 
 
-        if((grepl(sors,pdb_name) && grepl('___',pdb_name))){
+          if((grepl(sors,pdb_name) && grepl('___',pdb_name))){
 
-          #do the code here
+            #do the code here
+            py_line <- paste('load ',experiment_directory,'/',pdb_name,
+                             sep='')
+            pymol_lines <- c(pymol_lines,py_line)
+
+          } #end if((grepl(sors,pdb_name) && grepl('___',pdb_name)) || !grepl(sors,pdb_name))
+        } #end for(sors in show_only_real_structures)
+
+        if(!pdb_in_sors){
+
           py_line <- paste('load ',experiment_directory,'/',pdb_name,
                            sep='')
           pymol_lines <- c(pymol_lines,py_line)
 
-        } #end if((grepl(sors,pdb_name) && grepl('___',pdb_name)) || !grepl(sors,pdb_name))
-      } #end for(sors in show_only_real_structures)
 
-      if(!pdb_in_sors){
+        }
+
+      } else {#end if(!is.null(show_only_real_structures))
 
         py_line <- paste('load ',experiment_directory,'/',pdb_name,
                          sep='')
@@ -135,27 +165,24 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
 
       }
 
-    } else {#end if(!is.null(show_only_real_structures))
-
-      py_line <- paste('load ',experiment_directory,'/',pdb_name,
-                       sep='')
-      pymol_lines <- c(pymol_lines,py_line)
+      # py_line <- paste('load ',experiment_directory,'/',pdb_name,
+      #                  sep='')
+      # pymol_lines <- c(pymol_lines,py_line)
 
 
-    }
+      #if this boolean is turned on,
+      #color color_name, protein_name
 
-    # py_line <- paste('load ',experiment_directory,'/',pdb_name,
-    #                  sep='')
-    # pymol_lines <- c(pymol_lines,py_line)
+      #should each of the PDBs be colored based on the protein they come from
+      #can make this a user option
+
+    } #end for(pdb_name in pdbs_in_df)
+  } #end else to if(!(grepl('\\.pdb',paste0(pdbs_in_df,'|',collapse = '')))){
 
 
-    #if this boolean is turned on,
-    #color color_name, protein_name
+  #loop through the pdbs
+  #pdb_name <- pdbs_in_df[1]
 
-    #should each of the PDBs be colored based on the protein they come from
-    #can make this a user option
-
-  }
 
   #can just have one option
   #if show_surface, color_gray == TRUE
@@ -164,12 +191,18 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
   py_line <- 'color gray'
   pymol_lines <- c(pymol_lines,py_line)
 
-
   mega_distance_count <- 0
   for(row_num in 1:nrow(xlink.df)){
 
-    pdb1 <- strsplit(as.character(xlink.df$pdb1[row_num]),'.pdb')[[1]]
-    pdb2 <- strsplit(as.character(xlink.df$pdb2[row_num]),'.pdb')[[1]]
+    if(!endsWith(as.character(xlink.df$pdb1[row_num]),'pdb')){
+      #this means it is a pdb_match_vector
+      pdb1 <- strsplit(as.character(xlink.df$pdb1[row_num]),'_')[[1]][1]
+      pdb2 <- strsplit(as.character(xlink.df$pdb2[row_num]),'_')[[1]][1]
+    } else {
+      pdb1 <- strsplit(as.character(xlink.df$pdb1[row_num]),'.pdb')[[1]]
+      pdb2 <- strsplit(as.character(xlink.df$pdb2[row_num]),'.pdb')[[1]]
+    }
+
 
     #if grepl '___' get last character for the chain
     #otherwise use 'A'
@@ -207,7 +240,10 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
         chain <- substrRight(pdb_num,1)
         selection_name_list[[chain_name]] <- chain
 
-      } else {
+      } else if(is_pdb_match_vector == TRUE){
+        chain <- strsplit(as.character(xlink.df[[paste0('pdb',pdb_num_count)]][row_num]),'_')[[1]][2]
+        selection_name_list[[chain_name]] <- chain
+      }else {
 
         #should it be in this part
         #should have an or statement or excessive?

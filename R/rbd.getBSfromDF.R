@@ -5,7 +5,7 @@
 #'@param rbd.df rbd.df
 #'@param fasta Name of fasta file or loaded fasta file by seqinr::read.fasta(). Defaults to NULL.
 #'@export
-rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
+rbd.getBSfromDF <- function(rbd.df,fasta = NULL, cleave_offset = 4){
 
   #first check to make sure it has the 3 columns
   if(FALSE %in% (c('ProtID','enzyme','trypticPeptide') %in% colnames(rbd.df))){
@@ -30,6 +30,8 @@ rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
     enzyme <- as.character(rbd_row$enzyme)
     protID <- as.character(rbd_row$ProtID)
 
+
+
     if(!is.null(fasta)){
 
       #check if file or list
@@ -45,14 +47,17 @@ rbd.getBSfromDF <- function(rbd.df,fasta = NULL){
 
 
     } else {#end if(!is.null(fasta)){
-      sourceSequence <- uniprot.fasta(uniprot_id = protID)
+
+      #tryCatch here?
+      sourceSequence <- uniprot.fasta(uniprot.id = protID)
 
     }#end if(!is.null(fasta)){
 
     #uniprotSeq <- uniprot.fasta(uniprot_id = protID)
 
     bindSeq <- rbd.getBindingSeq3(trypticPeptide = trypticPeptide,
-                                  enzyme = enzyme, sourceSequence = sourceSequence)
+                                  enzyme = enzyme, sourceSequence = sourceSequence,
+                                  cleave_offset = cleave_offset)
 
     start_end <- str_locate_all(sourceSequence,bindSeq)[[1]]
     startp <- start_end[1]

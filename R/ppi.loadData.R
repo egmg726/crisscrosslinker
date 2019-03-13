@@ -63,7 +63,7 @@ ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype 
           #if TRUE, this has been loaded in via readLines
 
           #if the file has the phrase 'filtered_cross-linked_peptides' in it OR
-          if((grepl('filtered_cross-linked_peptides',file_name)) || (!(FALSE %in% (loaded_data[1:2] == c("Peptide_Order,Peptide,Peptide_Mass,Modifications,Proteins,Protein_Type",
+          if((grepl('cross-linked_peptides',file_name,ignore.case = TRUE)) || (!(FALSE %in% (loaded_data[1:2] == c("Peptide_Order,Peptide,Peptide_Mass,Modifications,Proteins,Protein_Type",
                                                                                                          ",Spectrum_Order,Title,Charge,Precursor_Mass,Evalue,Score,Precursor_Mass_Error(Da),Precursor_Mass_Error(ppm),Alpha_Evalue,Beta_Evalue"))))){
             #If TRUE, then it is a filtered_cross-linked_peptides file and should be loaded via the
             #function
@@ -80,7 +80,8 @@ ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype 
             #add to bigger list of files
 
 
-          } else if(grepl('filtered_loop-linked_peptides',file_name)){
+          } else if(grepl('loop-linked_peptides',file_name,ignore.case = TRUE) || (!(FALSE %in% (loaded_data[1:2] == c("Peptide_Order,Peptide,Peptide_Mass,Modifications,Proteins",
+                                                                                                             ",Spectrum_Order,Title,Charge,Precursor_Mass,Evalue,Score,Precursor_Mass_Error(Da),Precursor_Mass_Error(ppm),Alpha_Evalue,Beta_Evalue"))))){
 
             xlink_list <- make_plink2_master_list(plink2_peptides = loaded_data,
                                                   list_of_protein_names = list_of_protein_names,

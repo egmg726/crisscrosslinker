@@ -8,7 +8,7 @@ ppi.pymol(xlink.df, list_of_start_and_end_pdbs = NULL,
   show_only_real_structures = NULL, write_file = FALSE,
   custom.color = FALSE, colors = NULL, color_by = "freq",
   write.df = FALSE, experiment_directory = NULL,
-  pdb_numbering = FALSE)
+  pdb_numbering = FALSE, pymol_file_list_file_name = "xlink.pml")
 }
 \arguments{
 \item{xlink.df}{data.frame output from ppi.combineData()}

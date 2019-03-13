@@ -5,7 +5,8 @@
 \title{Get Frequency Vector for RBDmap}
 \usage{
 rbd.freqVector(bs_output, name_by = "pro_name", heatmap = TRUE,
-  db_selection = NULL, colors = c("#d0d0d0", "#2f5ac6", "#e50000"))
+  db_selection = NULL, colors = c("#d0d0d0", "#2f5ac6", "#e50000"),
+  save_plot = TRUE)
 }
 \arguments{
 \item{bs_output}{bs_output}
@@ -17,6 +18,8 @@ rbd.freqVector(bs_output, name_by = "pro_name", heatmap = TRUE,
 \item{db_selection}{db_selection}
 
 \item{colors}{colors}
+
+\item{save_plot}{save_plot}
 }
 \description{
 This function gets the frequency vector

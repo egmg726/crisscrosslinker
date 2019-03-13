@@ -8,6 +8,7 @@ ppi.matchPDB(xlink_df, fasta_file, pdb_numbering = FALSE,
   pdb_directory = NULL, pdb_match_vector = NULL,
   csv_pdb_input_file = NULL,
   fasta_names_to_generate_all_2d_structures = NULL,
+  protein_alternative_names_dict = NULL, download_pdb = TRUE,
   file_type_2d = "single_dot")
 }
 \arguments{
@@ -24,6 +25,8 @@ ppi.matchPDB(xlink_df, fasta_file, pdb_numbering = FALSE,
 \item{csv_pdb_input_file}{csv_pdb_input_file}
 
 \item{fasta_names_to_generate_all_2d_structures}{fasta_names_to_generate_all_2d_structures}
+
+\item{protein_alternative_names_dict}{protein_alternative_names_dict}
 
 \item{file_type_2d}{file_type_2d}
 }

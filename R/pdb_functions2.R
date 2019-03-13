@@ -1645,7 +1645,7 @@ color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', 
 
 
 
-  } else if((typeof(colors) == 'character') & (length(colors) == 1)){
+  } else if((typeof(colors) == 'character') && (length(colors) == 1) && (!startsWith(colors,"#"))){
 
     #number will have to be the length of the
     #can also have it within a tryCatch loop?
@@ -1682,7 +1682,7 @@ color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', 
 
     #brewer.pal(8,'null')
 
-  } else if((typeof(colors) == 'character') & (startsWith(colors,"#"))){
+  } else if((typeof(colors) == 'character') && (startsWith(colors,"#"))){
 
     chosen_pymol_colors <- colors
     is_hexcode <- TRUE
@@ -5565,22 +5565,34 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
 
   xlink_viewer_csv <- list()
 
+  #xlink_pep_pos1 <- as.numeric(as.character(xlink_df$pro_pos1)) - as.numeric(as.character(xlink_df$pep_pos1))
+  #xlink_pep_pos2 <- as.numeric(as.character(xlink_df$pro_pos2)) - as.numeric(as.character(xlink_df$pep_pos2))
+
+  #xlink.df$pep_start1 <- (xlink.df$pro_pos1 - xlink.df$pep_pos1)
+
   #xlink_df <- prc2_rna_diff_analysis
 
   if('pro_pos1' %in% colnames(xlink_df)){
+    xlink_pep_pos1 <- as.numeric(as.character(xlink_df$pro_pos1)) - as.numeric(as.character(xlink_df$pep_pos1)) +1
+    xlink_pep_pos2 <- as.numeric(as.character(xlink_df$pro_pos2)) - as.numeric(as.character(xlink_df$pep_pos2)) +1
+
+
     # xlink_viewer_csv$PepPos1 <- xlink_df$pro_pos1
     # xlink_viewer_csv$PepPos2 <- xlink_df$pro_pos2
+    xlink_viewer_csv$PepPos1 <- xlink_pep_pos1
+    xlink_viewer_csv$PepPos2 <- xlink_pep_pos2
+
     # xlink_viewer_csv$Protein1 <- xlink_df$pro_name1
     # xlink_viewer_csv$Protein2 <- xlink_df$pro_name2
-    # xlink_viewer_csv$PepSeq1 <- xlink_df$pep_seq1
-    # xlink_viewer_csv$PepSeq2 <- xlink_df$pep_seq2
-    # xlink_viewer_csv$LinkPos1 <- xlink_df$pep_pos1
-    # xlink_viewer_csv$LinkPos2 <- xlink_df$pep_pos2
+    xlink_viewer_csv$PepSeq1 <- xlink_df$pep_seq1
+    xlink_viewer_csv$PepSeq2 <- xlink_df$pep_seq2
+    xlink_viewer_csv$LinkPos1 <- xlink_df$pep_pos1
+    xlink_viewer_csv$LinkPos2 <- xlink_df$pep_pos2
     # xlink_viewer_csv$Score <- xlink_df$score
     xlink_viewer_csv$Protein1 <- xlink_df$pro_name1
     xlink_viewer_csv$Protein2 <- xlink_df$pro_name2
-    xlink_viewer_csv$LinkPos1 <- xlink_df$pro_pos1
-    xlink_viewer_csv$LinkPos2 <- xlink_df$pro_pos2
+    #xlink_viewer_csv$LinkPos1 <- xlink_df$pro_pos1
+    #xlink_viewer_csv$LinkPos2 <- xlink_df$pro_pos2
     xlink_viewer_csv$Score <- xlink_df$score
 
     if(add_color == TRUE){
@@ -5594,16 +5606,22 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
 
 
   } else {
+    xlink_pep_pos1 <- as.numeric(as.character(xlink_df[['Protein.Position.1']])) - as.numeric(as.character(xlink_df[['Peptide.Position.1']])) +1
+    xlink_pep_pos2 <- as.numeric(as.character(xlink_df[['Protein.Position.2']])) - as.numeric(as.character(xlink_df[['Peptide.Position.2']])) +1
+
+
     # xlink_viewer_csv$PepPos1 <- xlink_df[['Protein.Position.1']]
     # xlink_viewer_csv$PepPos2 <- xlink_df[['Protein.Position.2']]
     xlink_viewer_csv$Protein1 <- xlink_df[['Protein.Name.1']]
     xlink_viewer_csv$Protein2 <- xlink_df[['Protein.Name.2']]
-    # xlink_viewer_csv$PepSeq1 <- xlink_df[['Peptide.Sequence.1']]
-    # xlink_viewer_csv$PepSeq2 <- xlink_df[['Peptide.Sequence.2']]
-    # xlink_viewer_csv$LinkPos1 <- xlink_df[['Peptide.Position.1']]
-    # xlink_viewer_csv$LinkPos2 <- xlink_df[['Peptide.Position.2']]
-    xlink_viewer_csv$LinkPos1 <- xlink_df[['Protein.Position.1']]
-    xlink_viewer_csv$LinkPos2 <- xlink_df[['Protein.Position.2']]
+    xlink_viewer_csv$PepPos1 <- xlink_pep_pos1
+    xlink_viewer_csv$PepPos2 <- xlink_pep_pos2
+    xlink_viewer_csv$PepSeq1 <- xlink_df[['Peptide.Sequence.1']]
+    xlink_viewer_csv$PepSeq2 <- xlink_df[['Peptide.Sequence.2']]
+    xlink_viewer_csv$LinkPos1 <- xlink_df[['Peptide.Position.1']]
+    xlink_viewer_csv$LinkPos2 <- xlink_df[['Peptide.Position.2']]
+    #xlink_viewer_csv$LinkPos1 <- xlink_df[['Protein.Position.1']]
+    #xlink_viewer_csv$LinkPos2 <- xlink_df[['Protein.Position.2']]
     xlink_viewer_csv$Score <- xlink_df[['Score']]
 
     if(add_color == TRUE){
@@ -5764,6 +5782,7 @@ make_plink2_master_list <- function(plink2_peptides, list_of_protein_names,
 
             enclosed_protein_name <- gsub('\\)','\\\\)',protein_name)
             enclosed_protein_name <- gsub('\\(','\\\\(',enclosed_protein_name)
+            enclosed_protein_name <- gsub('\\|','\\\\|',enclosed_protein_name)
 
             #see if the protein name is in split_protein2
 
@@ -5806,9 +5825,13 @@ make_plink2_master_list <- function(plink2_peptides, list_of_protein_names,
               new_peptide2_list <- c(new_peptide2_list,new_peptide2)
 
             } else {
-
-              new_peptide2_list <- c(new_peptide2_list,paste('failed_quality_check:',split_proteins2))
-
+              loop_qc_check <- paste(loop_protein_name,' (',loop_pep1,')(',loop_pep2,')',sep='')
+              if(loop_qc_check == split_protein2){
+                new_peptide2_list <- c(new_peptide2_list,new_peptide2)
+              } else {
+                #cat(paste(loop_qc_check,split_protein2,'\n'))
+                new_peptide2_list <- c(new_peptide2_list,paste('failed_quality_check:',split_proteins2))
+              }
             }
 
             #new_peptide2_list <- c(new_peptide2_list,new_peptide2)
@@ -7813,6 +7836,7 @@ make_binding_site_rows_for_supp_df <- function(proteins_and_intensity_list,ident
 #'@export
 
 
+
 get_uniprot_info_from_proteins_api <- function(uniprot_id,
                                                type_of_info = c('variation','feature'),
                                                select_categories = NULL,
@@ -7821,6 +7845,10 @@ get_uniprot_info_from_proteins_api <- function(uniprot_id,
                                                start_and_end_pos = NULL,
                                                output_xinet_domain_df = FALSE){
 
+
+
+  #still need to add custom colors
+  #should separate so that the domain df is different?
 
   #start_and_end_pos
   #will be a list of two positions
@@ -7861,11 +7889,16 @@ get_uniprot_info_from_proteins_api <- function(uniprot_id,
     stop_for_status(r)
 
     json <- toJSON(content(r))
+
+    #fromJSON(toJSON(content(r)))
+
     #head(fromJSON(json))
 
 
 
-    json_features <- fromJSON(json)
+    json_features <- jsonlite::fromJSON(json)
+
+    #return(json_features)
 
     if(is.null(json_features$features)){
       return(NULL)
@@ -7875,10 +7908,13 @@ get_uniprot_info_from_proteins_api <- function(uniprot_id,
     #json_features$features$category == c('STRUCTURAL','DOMAINS_AND_SITES')
     #
 
+    #unlisted_features <- (unlist(json_features$features))
     if(is.null(select_categories)){
       #if select categories is NULL, make it so that it is equal to all of the categories
-
-      select_categories <- unlist(unique(json_features$features$category))
+      #unlisted_features <- (unlist(json_features$features))
+      #select_categories <- (unique(unlisted_features[names(unlisted_features) == 'category']))
+      select_categories <- unique(unlist(json_features$features)[names(unlist(json_features$features)) == 'category'])
+      #select_categories <- unlist(unique(json_features$features$category))
 
     }
 
@@ -7901,6 +7937,7 @@ get_uniprot_info_from_proteins_api <- function(uniprot_id,
     #domain_features <- json_features$features[unlist(json_features$features$category) == select_categories,]
 
 
+    #unlisted_features
     domain_features <- json_features$features[unlist(json_features$features$category) == 'DOMAINS_AND_SITES',]
 
 
