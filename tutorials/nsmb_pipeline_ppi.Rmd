@@ -1,0 +1,238 @@
+---
+title: "Identification of protein-protein interactions between PRC2 to its accessory subunits AEBP2, PHF19, MTF2 and EPOP"
+author: "Emma Gail"
+date: "3/14/2019"
+output: html_document
+---
+
+__This tutorial is still under development and may change slightly as it is being edited.__
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Downloads/NSMB_Manuscript_BS3_files")
+```
+
+## A Brief Introduction
+
+This tutorial shows how analysis was performed for the BS3 XL-MS data in the 2019 paper [RNA exploits an exposed regulatory site to inhibit the enzymatic activity of PRC2](https://www.nature.com/articles/s41594-019-0197-y).
+
+In this tutorial, we will cover:
+
+* data filtration
+* sequence alignment to UniProt and PDB files
+* data visualization
+
+All data is publicly available [here](https://doi.org/10.26180/5c3d8dd45651b) (including .raw files). The processed data by pLink can also be loaded using `crisscrosslinker`.
+
+## Load Libraries
+
+First, we need to load all of the libraries that we need for the analysis, including `crisscrosslinker`.
+
+```{r, include=FALSE}
+
+library(ggplot2)
+library(bio3d)
+library(Biostrings)
+library(seqinr)
+library(RColorBrewer)
+library(openxlsx)
+library(viridis)
+library(crisscrosslinker)
+library(stringr)
+library(svglite)
+library(RCurl)
+```
+
+
+```{r}
+
+library(ggplot2)
+library(bio3d)
+library(Biostrings)
+library(seqinr)
+library(RColorBrewer)
+library(openxlsx)
+library(viridis)
+library(crisscrosslinker)
+library(stringr)
+library(svglite)
+library(RCurl)
+```
+
+
+
+## Load Files
+
+First, we specify the names of the complexes so we can run them each separately.
+
+```{r}
+
+complexes <- c('PRC2-AEBP2','PRC2-MTF2-EPOP','PRC2-PHF19')
+fasta <- seqinr::read.fasta(system.file("extdata/NSMB_FASTA",'PRC2_5m.fasta',package = 'crisscrosslinker',mustWork = TRUE))
+
+```
+
+In this case, different names were used for different experiments so we must use a dictionary to be able to match them all. __It is highly recommended to use consistent naming for all of your experiments.__ If you have the same protein matched to different protein FASTA files that are different sequences across repeats, it is recommended to not use a dictionary and just align them all to a UniProt canonical sequence to match them against each other.
+
+
+```{r}
+
+protein_alternative_names_dict <- read.csv(system.file("extdata/NSMB_misc","PRC2_alternative_dict.csv",package = 'crisscrosslinker',mustWork = TRUE))
+head(protein_alternative_names_dict)
+```
+
+
+In this case, we will start by processing just 1 of the 3 complexes.
+
+```{r}
+
+sys.dir <- system.file("extdata/NSMB_XLMS",package = 'crisscrosslinker',mustWork = TRUE)
+xlms.files <- list.files(path=sys.dir)[startsWith(list.files(path=sys.dir),complexes[1])]
+xlms.files
+
+
+```
+
+As you can see, there is a mix of .xlsx and .csv files. However, this is not an issue for the `ppi.loadData`.
+
+```{r}
+
+xlms.data <- ppi.loadData(xlms.files,fasta,file_directory = sys.dir)
+
+```
+
+
+The `original_name` must correspond with the name used in the FASTA file. Any name listed in the subsequent columns will be changed to that of the first row.
+
+
+```{r, results="hide"}
+
+xlms.df <- ppi.combineData(xlms.data,fasta,protein_alternative_names_dict = protein_alternative_names_dict)
+
+```
+
+We can look at the combined data here:
+
+```{r}
+
+head(xlms.df)
+```
+
+Since we have 7 repeats, let's check to see how many of these crosslinking events occur more than once.
+
+```{r}
+
+table(xlms.df$freq)
+
+```
+
+We can also visualize this with a histogram:
+
+```{r}
+
+qplot(xlms.df$freq)
+
+```
+
+
+The vast majority occur in just 1 repeat, so it is important to filter these results so that we can visualize only signficant results. In this paper, we defined significant as showing up in more than 2 repeats or have a p-value of less than 1e-4 (see Methods section of paper for more details).
+
+This can be done when processing the data by using the cutoffs within the `combineData` function or after the fact with conditional statements. For the purposes of this demonstration, we will re-process the data again to show how to filter it.
+
+```{r, include=FALSE}
+
+xlms.df.filt <- ppi.combineData(xlms.data,fasta,protein_alternative_names_dict = protein_alternative_names_dict,freq_cutoff = 2,score_cutoff = 1e-04,cutoff_cond = 'or')
+
+```
+
+Let's see how the frequencies of our crosslinking sites look now:
+
+```{r}
+table(xlms.df.filt$freq)
+```
+
+In this case, many of the crosslinking events with `freq` < 2 are still there since they had significant p-values.
+
+```{r}
+
+#put in here the control histogram
+
+```
+
+
+
+
+
+## Match to UniProt
+
+In this case, the proteins used in the experiment do not have sequences that match up exactly to the UniProt canonical sequences and have slightly different N-terminals. However, this is not an issue as the canonical sequence can be aligned to the experimental sequence using `ppi.matchUniprot`.
+
+First, a table needs to be made containing the protein names in the FASTA file and their corresponding UniProt IDs.
+
+```{r}
+
+prc2.alignIDs<- read.csv(system.file("extdata/NSMB_misc",'PRC2_protein_dict.csv',package = 'crisscrosslinker',mustWork = TRUE))[,1:2]
+colnames(prc2.alignIDs) <- c('ProteinName',"UniProtID")
+prc2.alignIDs
+```
+
+
+The `ProteinName` column should correspond to the names within the FASTA file and the `UniProtID` should be a valid UniProt ID. If a specific isoform is needed, this should be designated by "id-isoform". If you already have sequences that you would like to use, you can input them in a third column: `UniprotSeq`. Otherwise they will be retrieved by the UniProt website.
+
+They will then be aligned using the following function:
+
+```{r}
+
+xlink.df.uniprot <- ppi.matchUniprot(xlms.df.filt,fasta,prc2.alignIDs)
+head(xlink.df.uniprot)
+```
+
+As you can see, some of the protein positions have been replaced with `NA`. In this case, this is because the N-terminal sequence is different from that of the UniProt sequences used due to the vectors used in the experiment.
+
+We're not interested in those positions which have not been matched to a UniProt position so we will omit them from our final analysis.
+
+```{r}
+xlink.df.uniprot <- na.omit(xlink.df.uniprot)
+```
+
+
+## Export to xiNET
+
+Once the proteins have been aligned to the UniProt sequence of our choosing, we can then visualize them. An easy and popular way to do this is to input them into the web server [xiNET](http://crosslinkviewer.org/). We can directly translate this data into one that can be understood by their server using the following function:
+
+```{r}
+
+xlink.xinet <- ppi.xinet(xlink.df.uniprot)
+head(xlink.xinet)
+```
+
+We can then write the file and upload it to their server for use online along with a FASTA file containing the UniProt sequences.
+
+```{r}
+
+write.csv(xlink.xinet,"PRC2-AEBP2_xinet.csv")
+
+```
+
+If you do not have a FASTA file containing the sequences of the UniProt sequences, you can download them using the `download_fasta` argument within `ppi.matchUniprot` or individually by using the `uniprot.fasta` function for each one individually.
+
+However, you will have to remember to replace the name of the UniProt name with that of your protein name in order for xiNET to recognize the match.
+
+You should get an image like this after uploading to xiNET:
+
+
+![](/Users/emmagail/Downloads/NSMB_Manuscript_BS3_files/nsmb_xinet2.png)
+
+##Notes
+
+The PyMOL aspect of analysis was __not__ done for this particular workflow. An upcoming tutorial will explore this further in detail.
+
+It should be noted that for this particular analysis, domains were built manually by the user. A tutorial on how to do this automatically will be included in the next tutorial.
+
+##References
+
+1. Yang, B. et al. Identification of cross-linked peptides from complex samples. Nature Methods 9, 904-906, doi:10.1038/nmeth.2099 (2012)
+
+2. Combe, C. W., Fischer, L. & Rappsilber, J. xiNET: Cross-link Network Maps With Residue
+Resolution. Molecular & Cellular Proteomics : MCP 14, 1137-1147,
+doi:10.1074/mcp.O114.042259 (2015).

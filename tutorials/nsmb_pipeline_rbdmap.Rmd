@@ -1,0 +1,389 @@
+---
+title: "Mapping protein-RNA interactions between a recombinant human PRC2 to RNA using RBDmap"
+author: "Emma Gail"
+date: "3/13/2019"
+output: html_document
+---
+
+__This tutorial is still under development and may change slightly as it is being edited.__
+
+## A Brief Introduction
+
+This tutorial is relevant to the published paper [RNA exploits an exposed regulatory site to inhibit the enzymatic activity of PRC2](https://www.nature.com/articles/s41594-019-0197-y). However, the workflow can be used for data processed by MaxQuant. The data for this tutorial is available [here](https://doi.org/10.26180/5c3d9751c64ae).The relevant files are located within the .zip files for each repeat as MaxQuant_txt_folder_output/peptides.txt. For simplicity, all "peptides.txt" files have been re-named according to their experiment numbers as part of the external data available as part of the R package. 
+
+In this tutorial, we w
+
+```{r setup, include=FALSE}
+require(knitr)
+
+#get the doi from the manuscript
+#make the directory that has everything in it with the right naming conventions
+knitr::opts_knit$set(root.dir = '/Users/emmagail/Downloads/NSMB_RBDmap')
+```
+
+##Setting Up Our Environment
+
+###Load Libraries
+First, load the libraries needed for the package and tutorial.
+
+```{r library_load, include=FALSE, echo=FALSE}
+library(ggplot2)
+library(bio3d)
+library(Biostrings)
+library(seqinr)
+library(RColorBrewer)
+library(openxlsx)
+library(viridis)
+library(crisscrosslinker)
+library(stringr)
+library(svglite)
+#source('~/Documents/monash/project.functions/R/pdb_functions.R')
+
+```
+
+```{r library_load2, include=TRUE}
+library(ggplot2)
+library(bio3d)
+library(Biostrings)
+library(seqinr)
+library(RColorBrewer)
+library(openxlsx)
+library(viridis)
+library(stringr)
+library(svglite)
+library(crisscrosslinker)
+
+```
+
+
+###Defining Our Variables
+
+When loading the data, it is important to make sure that the files for input are named well so the functions will be able to correctly identify and organize the data.
+
+```{r}
+
+
+sys.path <- system.file("extdata/NSMB_RBDmap",package = 'crisscrosslinker',mustWork = TRUE)
+
+
+sys.files <- list.files(sys.path)
+sys.files
+```
+
+
+Each of the file names contains 3 pieces of information: the name of the experiment, if it is an input/eluate file, and which protease was used for the experiment.
+
+```{r}
+
+head(read.table(paste0(sys.path,'/',sys.files)[1], sep='\t',header = TRUE))
+
+
+```
+
+
+If comparing between multiple experiments, indicate the experiment names in the code.
+
+```{r experiment_names}
+
+#experiment_names <- c('experiment1','experiment2')
+experiment_names <- c('Repeat02_NoXL','Repeat02_UV')
+
+
+```
+
+We will also need to load the FASTA file that was used during the initial analysis to get the tryptic peptides. For more information on how this FASTA file was generated, please refer to the paper.
+
+```{r}
+
+
+fasta_file <- seqinr::read.fasta(system.file("extdata/NSMB_FASTA",'PRC2_5m.fasta',package = 'crisscrosslinker',mustWork = TRUE))
+
+```
+
+
+If the file format is from MaxQuant with an Andromeda score, you will need to set it. The default setting is 20 and we will explicitly set it in this demonstration. 
+
+```{r}
+
+cutoff_score <- 20
+
+```
+
+
+##Initializing the Data
+
+###Extracting the Hits
+We are now ready to get a list of the relevant hits for our data.
+
+```{r rbd.makeSeqHitList}
+
+sequence_hit_list <- rbd.makeSeqHitList(fasta_file = fasta_file,
+                                        file_format = 'txt',
+                                        cutoff_score = cutoff_score,
+                                        experiment_directory = sys.path)
+
+sequence_hit_list[[2]]
+
+```
+
+Here we have found all of the tryptic peptides that:
+
+* Have R/K or K/R cleavage
+* Correspond to a protein name in the FASTA file
+* Have an Andromeda score > our cutoff
+
+
+###Making an Input/Eluate Table
+Since we want to compare the input and eluate data from the experiments, let's make a table comparing the two.
+
+```{r rbd.makeIETable, results='hide'}
+
+input_eluate_table <- rbd.makeIETable(sequence_hit_list, experiment_names)
+
+```
+
+We can see how the results look here:
+
+```{r}
+
+head(input_eluate_table)
+
+```
+
+We can now move on to making a plot.
+
+###Making an Input/Eluate Plot
+
+As you can see, many of the hits that were found in the input were not found in the eluate. We will filter those later. For now, let's plot everything.
+
+
+```{r rbd.makeIEPlot}
+
+input_eluate_graph <- rbd.makeIEPlot(input_eluate_table, experiment_names)
+
+print(input_eluate_graph)
+```
+
+
+We can change the default settings of the plot, including colors and the title by inputting some more variables:
+
+```{r}
+
+name_of_experiment <- 'RBDmap Experiments: Input vs. Eluate'
+input_eluate_graph <- rbd.makeIEPlot(input_eluate_table,
+                                     experiment_names,
+                                     palette = 'Pastel1',
+                                     fill = 'white',
+                                     colour = 'black',
+                                     size = 1,
+                                     title = name_of_experiment)
+
+print(input_eluate_graph)
+```
+
+##Finding the Binding Sites
+
+Now that we've compared our control, let's remove all results that do not show up in the eluate files.
+
+```{r}
+
+filtered_input_eluate_table <- input_eluate_table[input_eluate_table$eluate > 0,]
+
+head(filtered_input_eluate_table)
+```
+
+We'll use these results for finding binding sequences. We'll first get a data.frame of the binding sequences aligned to the FASTA file.
+
+```{r}
+
+bs_output_fasta <- rbd.getBSfromIET(filtered_input_eluate_table,
+                                    fasta_file = fasta_file,
+                                    align_to = 'FASTA')
+
+head(bs_output_fasta[,1:6])
+```
+
+###Making a Heatmap
+
+Let's make a heatmap and sort the sequences by their names.
+
+```{r}
+
+bs_freqVector <- rbd.freqVector(bs_output = bs_output_fasta,
+                                name_by = 'pro_name',
+                                heatmap = TRUE,
+                                db_selection = 'FASTA')
+
+```
+
+We can also adjust the colors of the heatmap if we so wish. You can put in a standard `RColorBrewer` or `viridis` palette or a list of hexcodes and/or standard R Colors.
+
+```{r}
+bs_freqVector <- rbd.freqVector(bs_output = bs_output_fasta,
+                                name_by = 'pro_name',
+                                heatmap = TRUE,
+                                db_selection = 'FASTA',
+                                colors = "Blues",
+                                save_plot = FALSE)
+```
+
+
+```{r}
+
+#do a grid of different color options?
+bs_freqVector <- rbd.freqVector(bs_output = bs_output_fasta,
+                                name_by = 'pro_name',
+                                heatmap = TRUE,
+                                db_selection = 'FASTA',
+                                colors = c('#b3ecec','#43e8d8','#48d1cc'),
+                                save_plot = FALSE)
+
+```
+
+
+```{r}
+bs_freqVector <- rbd.freqVector(bs_output = bs_output_fasta,
+                                name_by = 'pro_name',
+                                heatmap = TRUE,
+                                db_selection = 'FASTA',
+                                colors = c("#465ca8","#7767b8","#a272c4",
+                                           "#cc7ecc",'#f38bd1'), #palette from color-hex.com
+                                save_plot = FALSE)
+```
+
+
+If you require further customization, we recommend using the freqVector directly within a heatmap and customizing from there.
+
+
+###Aligning Peptides to a PDB File
+
+We will now align the binding sequences to a PDB file. For simplicity, we'll only focus on one protein: EZH2.
+
+```{r}
+
+ezh2_iet <- filtered_input_eluate_table[filtered_input_eluate_table$protein == 'EZH2_Q15910-2',]
+
+```
+
+
+We already know the PDB file and chain that we want to align the proteins to. In this case, we can create and add a new table:
+
+```{r diff_analysis2}
+
+protein_dict <- read.csv(system.file("extdata/NSMB_misc",'PRC2_protein_dict.csv',package = 'crisscrosslinker',mustWork = TRUE))
+head(protein_dict)
+
+```
+
+Now we don't have to go through menus to be able to define the PDB ID/chain that we need to use. This will save us time when making our table of binding sequences.
+
+You can always leave the dictionary blank in order to access an interactive menu to be able to use BLAST in order to align your sequence to a known PDB structure.
+
+```{r}
+
+bs_ezh2 <- rbd.getBSfromIET(ezh2_iet,
+                            fasta_file = fasta_file,
+                            align_to = 'PDB',
+                            protein_dict = protein_dict)
+
+```
+
+Let's see how many matches we had to the chain we chose:
+
+```{r}
+
+bs_ezh2$db
+
+```
+
+
+2 matched our chain! Let's visualize it.
+
+###Making the PyMOL File
+
+Now that we have the binding sequences aligned to a PDB file, we can create a PyMOL file.
+
+```{r}
+
+rbd.pymol(bs_ezh2, color_by = 'binding_sequence', colors = NULL)
+
+```
+
+![](/Users/emmagail/Downloads/NSMB_RBDmap/pymol_generic_colors.png){width=100%}
+
+There is an additional legend with the colors corresponding to the binding sequences. The colors will be assigned based on the order the binding sequences are in. If you would like the sequences in a different order, please order them before executing rbd.pymol().
+
+
+If we do not choose any colors, it will default to the PyMOL tints palette. However, we can input any RColorBrewer or viridis palette as well as standard PyMOL/R colors or hexcodes.
+
+
+```{r }
+
+par(mfrow=c(2,2))
+rbd.pymol(bs_ezh2, color_by = 'binding_sequence', colors = 'Dark2', file.name = 'pymol_Dark2.pml') #RColorBrewer palette
+rbd.pymol(bs_ezh2, color_by = 'binding_sequence', colors = 'magma', file.name = 'pymol_magma.pml') #viridis palette
+rbd.pymol(bs_ezh2, color_by = 'binding_sequence', colors = c('red','blue'), file.name = 'pymol_rgb.pml') #standard colors
+rbd.pymol(bs_ezh2, color_by = 'binding_sequence', colors = c("#f8a1be","#ffb6b1"), file.name = 'pymol_hexcodes.pml') #hexcodes
+
+```
+![](/Users/emmagail/Downloads/NSMB_RBDmap/Asset 1prc2_rbd_all.png){width=100%}
+
+##Differential Analysis
+
+
+We have now looked at one experiment, but now we want to look at multiple experiments we have run and compare between them. First we will do what we have done before, but combine the different runs together to examine how often these binding sites appear.
+
+
+Each of these experiments have slighly different prefixes, so we will adjust them accordingly with a list. In this instance, we could probably get away with just using "UV" for all 3 repeats. However, for the purposes of this tutorial, we will explicitly define the prefixes.
+
+We're now ready to proceed to get the binding sequences for each of these repeats.
+
+```{r diff_analysis3, results='hide'}
+
+bs_output_diff_analysis <- data.frame()
+num_repeats <- 1:4
+repeat_names <- paste0('Repeat0',num_repeats)
+
+for(rname in repeat_names){
+  shl <- sequence_hit_list[startsWith(names(sequence_hit_list),rname)]
+  enames <- paste0(rname,'_',c('UV','NoXL'))
+  input_eluate_table <- rbd.makeIETable(shl, enames)
+  filtered_input_eluate_table <- input_eluate_table[input_eluate_table$eluate > 0,]
+  
+  bs_output_pdb <- rbd.getBSfromIET(filtered_input_eluate_table,
+                                  fasta_file = fasta_file,
+                                  align_to = 'PDB',
+                                  protein_dict = protein_dict)
+  
+  bs_output_diff_analysis <- rbind(bs_output_diff_analysis,data.frame(bs_output_pdb))
+}
+
+
+```
+
+
+Now that we have loaded the data into our R environment, let's make a PyMOL file:
+
+```{r}
+
+rbd.pymol(bs_output_diff_analysis, color_by = 'freq', colors = 'magma', file.name = 'pymol_magma_diff_analysis.pml')
+
+```
+
+It will also create a heatmap with the same color scheme as the PyMOL file if `heatmap` is kept as `TRUE`. A legend will also be generated to go with the PyMOL file, though it will be similar to the one generated by the heatmap.
+
+![](/Users/emmagail/Downloads/NSMB_RBDmap/pymol_magma_diff_analysis3.gif){width=50%}
+![](/Users/emmagail/Downloads/NSMB_RBDmap/freqvector_legend_test2.png)
+
+
+
+Since slightly different but overlapping peptides may show up due to the use of different proteases, the frequency is measured by the amino acid rather than the full peptide.
+
+##References
+
+
+1. Castello, A. et al. Comprehensive Identification of RNA-Binding Domains in Human Cells. Molecular Cell 63, 696-710, doi:10.1016/j.molcel.2016.06.029 (2016).
+
+2. Tyanova, S., Temu, T. & Cox, J. The MaxQuant computational platform for mass spectrometry-based shotgun proteomics. Nature Protocols 11, 2301-2319, doi:10.1038/nprot.2016.136 (2016).
+
+
