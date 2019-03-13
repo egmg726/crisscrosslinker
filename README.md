@@ -1,4 +1,4 @@
-**NSMB Tutorials are now available under the 'tutorials' folder**
+**NSMB Tutorials are now available under the 'tutorials' folder as RMarkdown files. HTML versions will be available soon via my site.**
 
 ![alt text](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
 
