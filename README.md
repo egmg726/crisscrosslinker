@@ -1,6 +1,6 @@
-**NSMB Tutorials are now available under the 'tutorials' folder as RMarkdown files. HTML versions will be available soon via my site.**
+**NSMB Tutorials are now available under the 'tutorials' folder as RMarkdown files. The HTML workflows for [protein-protein interactions](https://egmg726.github.io/crisscrosslinker/nsmb_pipeline_ppi.html) and [protein-RNA interactions](https://egmg726.github.io/crisscrosslinker/nsmb_pipeline_rbdmap.html) are available via the links provided.**
 
-![alt text](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
+![logo](https://raw.githubusercontent.com/egmg726/crisscrosslinker/master/images/crisscrosslinker_logo.png)
 
 This package is designed to analyze and visualize crosslinking (XL) data from multiple sources (mainly XL-MS and RBDmap).
 
