@@ -6444,6 +6444,7 @@ ppi.freqCount <- function(xlink_df){
   pro_string_freq_list <- c()
   score_freq_list <- c()
   distance_freq_list <- c()
+  pdb_freq_list <- c()
 
   bs3_colname <- ppi.colnamesConvert(xl_dataframe)
   pro <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Protein', bs3_colname])
@@ -6451,6 +6452,7 @@ ppi.freqCount <- function(xlink_df){
   seq <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Sequence', bs3_colname])
   score <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Score', bs3_colname])
   dist <-as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'Distance', bs3_colname])
+  pdb <- as.character(bs3_colnames_converter[bs3_colnames_converter$colnames2 == 'PDB1', bs3_colname])
 
   #should be a way of getting the most recently made folder?
   #organize by date? choose the one that starts with make_diff_analysis and is at the top or bottom of the list
@@ -6475,8 +6477,18 @@ ppi.freqCount <- function(xlink_df){
     score_f <- min(xl_sub_df[[score]])
     score_freq_list <- c(score_freq_list,score_f)
 
-    distance_freq_list <- c(distance_freq_list,as.character(xl_dataframe[[dist]]))
+    #distance_freq_list <- c(distance_freq_list,as.character(xl_dataframe[[dist]]))
+    distance_freq_list <- c(distance_freq_list,unique(as.character(xl_sub_df[[dist]])))
 
+    #have the PDB here
+    if(is.na(unique(xl_sub_df[[dist]]))){
+      #if is
+      pdb_freq_list <- c(pdb_freq_list,NA)
+
+    } else {#end if(is.na(xl_sub_df[[dist]])){
+
+      pdb_freq_list <- c(pdb_freq_list,strsplit(unique(xl_sub_df[[pdb]]),'_')[[1]][1])
+    }
     #list of the sequence types?
     #columns: score,
 
@@ -6488,7 +6500,10 @@ ppi.freqCount <- function(xlink_df){
                        Position_Frequency=pos_freq_list,
                        Sequence_Strings=pos_string_freq_list,
                        Lowest_Score=score_freq_list,
-                       Distance=distance_freq_list)
+                       Distance=distance_freq_list,
+                       PDB=pdb_freq_list)
+
+  #return(xl_freq_list)
 
   xl_freq_df <- data.frame(xl_freq_list)
 
@@ -6616,8 +6631,8 @@ filter_xlink_df_by_protein_names <- function(xl_dataframe,list_of_protein_names)
 #what is the frequency vector?? need this info for documentation
 generate_random_lysine_distances_in_pdb <- function(pdb_id,frequency_vector,chains=NULL){
 
-  pdb_6c23 <- check_download_read_pdb(pdb_id = pdb_id)
-  #pdb_6c23 <- read.pdb2('6C23.pdb')
+  #pdb_6c23 <- check_download_read_pdb(pdb_id = pdb_id)
+  pdb_6c23 <- read.pdb2(pdb_id)
 
   pdb_6c23_atom_filtered <- pdb_6c23$atom[pdb_6c23$atom$elety == 'CA',]
   pdb_6c23_atom_filtered <- pdb_6c23_atom_filtered[pdb_6c23_atom_filtered$resid == 'LYS',]
@@ -9754,3 +9769,5 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #roxygen2::roxygenise()
 #requireNamespace("crisscrosslinker")
 
+#build manual
+#system("R CMD Rd2pdf ~/Documents/monash/project.functions")

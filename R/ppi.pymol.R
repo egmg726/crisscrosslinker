@@ -46,14 +46,34 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
   #would vars be frequency?
   #xlink.df <- xl_df2
 
-  if(custom.color == TRUE){
+  if(color_by == 'dist'){
+    #do the cut here
+    #have another variable for the cutoff for dist?
+    #this will also need to be true even if custom.color is FALSE?
 
-    if(color_by == 'dist'){
-      #do the cut here
-      #have another variable for the cutoff for dist?
-    }
+    #xlink.df.pdb$freq_color <-
 
-    pymol_cc <- color.pymol(sort(unique(xlink.df[[color_by]])), colors = colors)
+    #will need to choose the colors by the custom.color
+    #if custom.color is false can just choose a random palette?
+
+    xlink.df$freq_color <- cut(xlink.df$dist, c(-Inf,10,15,20,Inf), c("blue", "green", "orange","red"))
+
+    #xlink.df.pdb
+
+    #can just have a differe
+
+    pymol_cc <- color.pymol(1:4, colors = c("blue", "green", "orange","red"))
+    pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
+
+  } #end if(color_by == 'dist')
+
+
+  if((custom.color == TRUE) && color_by != 'dist'){
+
+
+      pymol_cc <- color.pymol(sort(unique(xlink.df[[color_by]])), colors = colors)
+
+
     #pymol_cc$vars
     #pymol_cc$color_names
 
