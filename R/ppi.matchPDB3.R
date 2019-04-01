@@ -20,7 +20,7 @@ ppi.matchPDB3 <- function(xlms.df,pdb_numbering){
   for(row_num in 1:nrow(xlms.df)){
     xlink_row <- xlms.df[row_num,]
     otps_list <- c()
-    xyz_coords_list <- list()
+    xyz_coord_list <- list()
 
     for(pro_num in 1:2){
       protein_name <- as.character(xlink_row[[paste0('pro_name',pro_num)]])
