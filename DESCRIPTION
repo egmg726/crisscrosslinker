@@ -1,10 +1,10 @@
 Package: crisscrosslinker
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: Protein Interaction Analysis
+Version: 0.9
+Authors@R: person("Emma","Gail",email='emma.gail@monash.edu",role=c("aut","cre"))
+Description: Can do analysis of XL-MS and RBDmap data
 Depends: R (>= 3.4.1)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

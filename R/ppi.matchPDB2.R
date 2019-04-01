@@ -26,10 +26,10 @@
 #'
 #'This function is the newer version
 #'
-#'@param xlink.df xlink.df
-#'@param fasta_file fasta_file
-#'@param alignIDs alignIDs
-#'@param uniprot2pdb uniprot2pdb
+#'@param xlink.df A data.frame made by ppi.combineData()
+#'@param fasta_file Name of fasta file or loaded fasta file by seqinr::read.fasta().
+#'@param alignIDs A data.frame containing the columns "ProteinName", "UniProtID", and "PDB"
+#'@param uniprot2pdb If TRUE, will align to the UniProt sequence before aligning to the PDB. This parameter should be selected if the sequences used are not exactly UniProt (such as a slightly different N-terminal), but are relatively similar.
 #'@param dist.histogram dist.histogram
 #'@export
 ppi.matchPDB2 <- function(xlink.df,fasta_file,alignIDs,uniprot2pdb=TRUE,
@@ -37,6 +37,8 @@ ppi.matchPDB2 <- function(xlink.df,fasta_file,alignIDs,uniprot2pdb=TRUE,
 
   #will need to load the PDB file as well
   #but don't need to necessarily download it
+
+
 
   # dist_xlink_list <- c()
   # pdb1_xlink_list <- c()
@@ -56,37 +58,6 @@ ppi.matchPDB2 <- function(xlink.df,fasta_file,alignIDs,uniprot2pdb=TRUE,
     #xlink.df <- xlms.df.filt
 
     xlink.df <- ppi.matchUniprot(xlink.df,fasta_file,protein_to_uniprot_id = alignIDs,canonical = TRUE)
-    # xlink.df$pdb1 <- rep(NA,nrow(xlink.df))
-    # xlink.df$pdb2 <- rep(NA,nrow(xlink.df))
-    # xlink.df$dist <- rep(NA,nrow(xlink.df))
-    #
-    # for(row_num in 1:nrow(xlink.df)){
-    #   xlink_row <- xlink.df[row_num,]
-    #   xlink_row <- na.omit(xlink_row)
-    #   if(nrow(xlink_row) == 0){
-    #     next
-    #   }
-    #   for(pro_num in 1:2){
-    #     pro_pos <- as.numeric(as.character((xlink_row[[paste0('pro_pos',pro_num)]])))
-    #     pro_name <- as.character((xlink_row[[paste0('pro_name',pro_num)]]))
-    #     pdb_chain <- strsplit(as.character(alignIDs[alignIDs$ProteinName == pro_name,'PDB']),'_')[[1]]
-    #     pdb <- pdb_chain[1]
-    #     #chain <- pdb_chain[2]
-    #     uniprot_id <- strsplit(as.character(alignIDs[alignIDs$ProteinName == pro_name,'UniProtID']),'-')[[1]][1]
-    #     uniprot.PDBmap(pdb_id = pdb,resno = pro_pos, uniprot_id = uniprot_id, output = 'pdb')
-    #
-    #     ppi.alignPDB(fasta_file,alignIDs = alignIDs, uniprot2pdb = TRUE)
-    #
-    #     #will also need to output the chain
-    #
-    #   } #end for(pro_num in 1:2){
-    #
-    #   #will need to ignore the rows that have NA in them
-    #
-    #
-    #   #uniprot.PDBmap()
-    #
-    # } #end for(row_num in 1:nrow(xlink.df))
     pdb_match_vector <- ppi.alignPDB(fasta_file,alignIDs = alignIDs, uniprot2pdb = uniprot2pdb)
     xlink.df <- ppi.matchPDB(xlink.df,fasta_file=fasta_file,pdb_numbering = TRUE,pdb_match_vector = pdb_match_vector)
 

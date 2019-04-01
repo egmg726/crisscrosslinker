@@ -7,12 +7,18 @@
 ppi.alignPDB(fasta_file, alignIDs = NULL, uniprot2pdb = TRUE)
 }
 \arguments{
-\item{fasta_file}{fasta_file}
+\item{fasta_file}{Name of fasta file or loaded fasta file by seqinr::read.fasta().}
 
-\item{alignIDs}{alignIDs}
+\item{alignIDs}{A data.frame containing the columns "ProteinName", "UniProtID", and "PDB"}
 
-\item{uniprot2pdb}{uniprot2pdb}
+\item{uniprot2pdb}{If TRUE, will align to the UniProt sequence before aligning to the PDB. This parameter should be selected if the sequences used are not exactly UniProt (such as a slightly different N-terminal), but are relatively similar.}
+}
+\value{
+A list containing vectors corresponding to the length of the FASTA file sequences. Containments alignments to UniProt and PDB with corresponding chain IDs.
 }
 \description{
 This functions aligns fasta file to PDB
+}
+\author{
+Emma Gail
 }

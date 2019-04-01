@@ -1,19 +1,19 @@
 #'Write PyMOL file for protein-protein interaction data
 #'
-#'ppi.pymol description
-#'@param xlink.df data.frame output from ppi.combineData()
+#'Generates a file for PyMOL based on the XL sites aligned to PDB structures.
+#'
+#'@param xlink.df.pdb data.frame output from ppi.matchPDB() or ppi.matchPDB2()
 #'@param list_of_start_and_end_pdbs list_of_start_and_end_pdbs
 #'@param show_only_real_structures show_only_real_structures
-#'@param write_file write_file
-#'@param custom.color custom.color
-#'@param colors colors
-#'@param color_by color_by
-#'@param write.df write.df
+#'@param write_file If TRUE, will write the produced .pml file.
+#'@param colors A list of colors as R names or hexcodes or a palette defined by RColorBrewer/viridis. If left blank, will use the colors that are in the column freq_color.
+#'@param color_by If colors is not NULL, choose either 'freq' or 'dist' for which variable should be colored.
+#'@param file.name File name for the exported PyMOL file. Should end in '.pml'
 #'@export
 
-ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = FALSE,
-                      custom.color = FALSE, colors = NULL, color_by = 'freq', write.df = FALSE, experiment_directory = NULL,
-                      pdb_numbering = FALSE,pymol_file_list_file_name='xlink.pml'){
+ppi.pymol <- function(xlink.df.pdb,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = TRUE,
+                      colors = NULL, color_by = 'freq', experiment_directory = NULL,
+                      pdb_numbering = FALSE,file.name='xlink.pml'){
   #rename the columns to the original column names for easier integration to the rest of
   #the function
 
@@ -21,44 +21,54 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
     experiment_directory <- getwd()
   }
 
+  if(!is.null(colors)){
+    custom.color <- TRUE
+  } else {
+    custom.color <- FALSE
+  }
+
   #if there is no start and end PDBs can just get the info from the PDB file itself?
   #sd_pdb <- read.pdb2('Spc98-yeast_missing_sequence_3_single_dot.pdb')
   #if(endsWith(pdb_name, 'single_dot.pdb'))
   #sd_pdb$atom$resno #this will be the position for the making of the pymol file
 
-  #colnames(xlink.df)
+  #colnames(xlink.df.pdb)
 
-  if('X' %in% colnames(xlink.df)){
-    xlink.df$X <- NULL
+  if('X' %in% colnames(xlink.df.pdb)){
+    xlink.df.pdb$X <- NULL
   }
 
   og_xlink_colnames <- c("seq","pro","dist","freq","freq_color","files","pdb1","pdb2",
                          "pro_pos1","pro_pos2","pro_name1","pro_name2","pep_seq1","pep_seq2",
                          "pep_pos1","pep_pos2","score")
 
-  if('Protein.Position.1' %in% colnames(xlink.df)){
-    colnames(xlink.df) <- og_xlink_colnames
+  if('Protein.Position.1' %in% colnames(xlink.df.pdb)){
+    colnames(xlink.df.pdb) <- og_xlink_colnames
   }
 
   pymol_lines <- c()
 
   #if custom color is TRUE
   #would vars be frequency?
-  #xlink.df <- xl_df2
+  #xlink.df.pdb <- xl_df2
 
   if(color_by == 'dist'){
     #do the cut here
     #have another variable for the cutoff for dist?
     #this will also need to be true even if custom.color is FALSE?
 
-    #xlink.df.pdb$freq_color <-
+    #xlink.df.pdb.pdb$freq_color <-
 
     #will need to choose the colors by the custom.color
     #if custom.color is false can just choose a random palette?
 
-    xlink.df$freq_color <- cut(xlink.df$dist, c(-Inf,10,15,20,Inf), c("blue", "green", "orange","red"))
+    #can customize
+    #dist.int <- c('start','end','int')
 
-    #xlink.df.pdb
+
+    xlink.df.pdb$freq_color <- cut(xlink.df.pdb$dist, c(-Inf,10,15,20,Inf), c("blue", "green", "orange","red"))
+
+    #xlink.df.pdb.pdb
 
     #can just have a differe
 
@@ -71,7 +81,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
   if((custom.color == TRUE) && color_by != 'dist'){
 
 
-      pymol_cc <- color.pymol(sort(unique(xlink.df[[color_by]])), colors = colors)
+      pymol_cc <- color.pymol(sort(unique(xlink.df.pdb[[color_by]])), colors = colors)
 
 
     #pymol_cc$vars
@@ -79,9 +89,9 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
 
     pymol_lines <- c(pymol_lines,pymol_cc$set_colors)
 
-    levels(xlink.df$freq_color) <- c(levels(xlink.df$freq_color),pymol_cc$color_names)
+    levels(xlink.df.pdb$freq_color) <- c(levels(xlink.df.pdb$freq_color),pymol_cc$color_names)
 
-    #xlink.df$freq
+    #xlink.df.pdb$freq
 
     for(index_num in 1:length(pymol_cc$vars)){
 
@@ -90,9 +100,9 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
       #will rename the freq_color by whatever the var name is
 
 
-      xlink.df[xlink.df[[color_by]] == var_name, 'freq_color'] <- pymol_cc$color_names[index_num]
+      xlink.df.pdb[xlink.df.pdb[[color_by]] == var_name, 'freq_color'] <- pymol_cc$color_names[index_num]
 
-      #within(xlink.df, freq_color[color_by == var_name] <- pymol_cc$color_names[index_num])
+      #within(xlink.df.pdb, freq_color[color_by == var_name] <- pymol_cc$color_names[index_num])
 
       #need to select and change the variable name based on the value
 
@@ -113,12 +123,12 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
 
 
   is_pdb_match_vector <- FALSE
-  pdbs_in_df <- unique(c(levels(xlink.df$pdb1),levels(xlink.df$pdb2)))
+  pdbs_in_df <- unique(c(levels(xlink.df.pdb$pdb1),levels(xlink.df.pdb$pdb2)))
   if(is.null(pdbs_in_df)){
-    pdbs_in_df <- unique(c((xlink.df$pdb1),(xlink.df$pdb2)))
+    pdbs_in_df <- unique(c((xlink.df.pdb$pdb1),(xlink.df.pdb$pdb2)))
   }
 
-  #return(unique(c((xlink.df$pdb1),(xlink.df$pdb2))))
+  #return(unique(c((xlink.df.pdb$pdb1),(xlink.df.pdb$pdb2))))
 
   if(!(grepl('\\.pdb',paste0(pdbs_in_df,'|',collapse = '')))){
     #If TRUE --> it's a pdb_match_vector
@@ -212,23 +222,23 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
   pymol_lines <- c(pymol_lines,py_line)
 
   mega_distance_count <- 0
-  for(row_num in 1:nrow(xlink.df)){
+  for(row_num in 1:nrow(xlink.df.pdb)){
 
-    if(!endsWith(as.character(xlink.df$pdb1[row_num]),'pdb')){
+    if(!endsWith(as.character(xlink.df.pdb$pdb1[row_num]),'pdb')){
       #this means it is a pdb_match_vector
-      pdb1 <- strsplit(as.character(xlink.df$pdb1[row_num]),'_')[[1]][1]
-      pdb2 <- strsplit(as.character(xlink.df$pdb2[row_num]),'_')[[1]][1]
+      pdb1 <- strsplit(as.character(xlink.df.pdb$pdb1[row_num]),'_')[[1]][1]
+      pdb2 <- strsplit(as.character(xlink.df.pdb$pdb2[row_num]),'_')[[1]][1]
     } else {
-      pdb1 <- strsplit(as.character(xlink.df$pdb1[row_num]),'.pdb')[[1]]
-      pdb2 <- strsplit(as.character(xlink.df$pdb2[row_num]),'.pdb')[[1]]
+      pdb1 <- strsplit(as.character(xlink.df.pdb$pdb1[row_num]),'.pdb')[[1]]
+      pdb2 <- strsplit(as.character(xlink.df.pdb$pdb2[row_num]),'.pdb')[[1]]
     }
 
 
     #if grepl '___' get last character for the chain
     #otherwise use 'A'
 
-    pro_pos1 <- as.character(xlink.df$pro_pos1[row_num])
-    pro_pos2 <- as.character(xlink.df$pro_pos2[row_num])
+    pro_pos1 <- as.character(xlink.df.pdb$pro_pos1[row_num])
+    pro_pos2 <- as.character(xlink.df.pdb$pro_pos2[row_num])
 
     #if statement to select the right chain
 
@@ -261,7 +271,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
         selection_name_list[[chain_name]] <- chain
 
       } else if(is_pdb_match_vector == TRUE){
-        chain <- strsplit(as.character(xlink.df[[paste0('pdb',pdb_num_count)]][row_num]),'_')[[1]][2]
+        chain <- strsplit(as.character(xlink.df.pdb[[paste0('pdb',pdb_num_count)]][row_num]),'_')[[1]][2]
         selection_name_list[[chain_name]] <- chain
       }else {
 
@@ -430,7 +440,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
       if(both_pdbs_pass_sors){
 
         #do the code here
-        freq_color <- as.character(xlink.df$freq_color[row_num])
+        freq_color <- as.character(xlink.df.pdb$freq_color[row_num])
         py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
         pymol_lines <- c(pymol_lines,py_line)
         py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
@@ -449,7 +459,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
           dist_name <- paste('dist',mega_distance_count,sep='')
         }
 
-        freq_color <- as.character(xlink.df$freq_color[row_num])
+        freq_color <- as.character(xlink.df.pdb$freq_color[row_num])
         py_line <- paste('color ',freq_color,', ',dist_name,sep='')
         pymol_lines <- c(pymol_lines,py_line)
 
@@ -457,7 +467,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
 
     } else {#end if(!is.null(show_only_real_structures))
 
-      freq_color <- as.character(xlink.df$freq_color[row_num])
+      freq_color <- as.character(xlink.df.pdb$freq_color[row_num])
       py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
       pymol_lines <- c(pymol_lines,py_line)
       py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
@@ -476,13 +486,13 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
         dist_name <- paste('dist',mega_distance_count,sep='')
       }
 
-      freq_color <- as.character(xlink.df$freq_color[row_num])
+      freq_color <- as.character(xlink.df.pdb$freq_color[row_num])
       py_line <- paste('color ',freq_color,', ',dist_name,sep='')
       pymol_lines <- c(pymol_lines,py_line)
 
     }
     #color the amino acids
-    # freq_color <- as.character(xlink.df$freq_color[row_num])
+    # freq_color <- as.character(xlink.df.pdb$freq_color[row_num])
     # py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[1],sep='')
     # pymol_lines <- c(pymol_lines,py_line)
     # py_line <- paste('color ',freq_color,', ',amino_acid_selection_names[2],sep='')
@@ -500,7 +510,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
     #   dist_name <- paste('dist',row_num,sep='')
     # }
     #
-    # freq_color <- as.character(xlink.df$freq_color[row_num])
+    # freq_color <- as.character(xlink.df.pdb$freq_color[row_num])
     # py_line <- paste('color ',freq_color,', ',dist_name,sep='')
     # pymol_lines <- c(pymol_lines,py_line)
     #
@@ -522,7 +532,7 @@ ppi.pymol <- function(xlink.df,list_of_start_and_end_pdbs = NULL,show_only_real_
 
 
   if(write_file == TRUE){
-    write(paste(pymol_lines,collapse = '\n'),pymol_file_list_file_name)
+    write(paste(pymol_lines,collapse = '\n'),file.name)
   }
 
   return(pymol_lines)

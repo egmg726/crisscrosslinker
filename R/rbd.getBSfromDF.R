@@ -1,11 +1,15 @@
 #'RBD: Get binding sequences from Dataframe
 #'
-#'Function description
+#'Retrieves the binding sequences based on the information given in the dataframe
+#'and includes them as part of the output.
 #'
-#'@param rbd.df rbd.df
+#'@param rbd.df Data.frame containing the columns protID, trypticPeptide, and enzyme.
 #'@param fasta Name of fasta file or loaded fasta file by seqinr::read.fasta(). Defaults to NULL.
+#'@param cleave_offset Number of amino acids (AAs) that have to be between the AAs cut by the enzyme. Defaults to 4 as defined by the original RBDmap experiment.
+#'@return The original rbd.df with 3 columns added: the proteolytic fragment, the fragment start, and fragment end.
+#'@author Emma Gail
 #'@export
-rbd.getBSfromDF <- function(rbd.df,fasta = NULL, cleave_offset = 4){
+rbd.getBSfromDF <- function(rbd.df, fasta = NULL, cleave_offset = 4){
 
   #first check to make sure it has the 3 columns
   if(FALSE %in% (c('ProtID','enzyme','trypticPeptide') %in% colnames(rbd.df))){

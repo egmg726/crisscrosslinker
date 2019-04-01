@@ -16,7 +16,7 @@ ppi.matchPDB(xlink_df, fasta_file, pdb_numbering = FALSE,
 
 \item{fasta_file}{FASTA file as loaded by seqinr::read.fasta()}
 
-\item{pdb_numbering}{pdb_numbering}
+\item{pdb_numbering}{If TRUE, will number the}
 
 \item{pdb_directory}{pdb_directory}
 

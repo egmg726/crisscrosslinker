@@ -8,13 +8,13 @@ ppi.matchPDB2(xlink.df, fasta_file, alignIDs, uniprot2pdb = TRUE,
   dist.histogram = TRUE)
 }
 \arguments{
-\item{xlink.df}{xlink.df}
+\item{xlink.df}{A data.frame made by ppi.combineData()}
 
-\item{fasta_file}{fasta_file}
+\item{fasta_file}{Name of fasta file or loaded fasta file by seqinr::read.fasta().}
 
-\item{alignIDs}{alignIDs}
+\item{alignIDs}{A data.frame containing the columns "ProteinName", "UniProtID", and "PDB"}
 
-\item{uniprot2pdb}{uniprot2pdb}
+\item{uniprot2pdb}{If TRUE, will align to the UniProt sequence before aligning to the PDB. This parameter should be selected if the sequences used are not exactly UniProt (such as a slightly different N-terminal), but are relatively similar.}
 
 \item{dist.histogram}{dist.histogram}
 }

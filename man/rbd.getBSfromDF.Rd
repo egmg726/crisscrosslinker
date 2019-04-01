@@ -7,10 +7,19 @@
 rbd.getBSfromDF(rbd.df, fasta = NULL, cleave_offset = 4)
 }
 \arguments{
-\item{rbd.df}{rbd.df}
+\item{rbd.df}{Data.frame containing the columns protID, trypticPeptide, and enzyme.}
 
 \item{fasta}{Name of fasta file or loaded fasta file by seqinr::read.fasta(). Defaults to NULL.}
+
+\item{cleave_offset}{Number of amino acids (AAs) that have to be between the AAs cut by the enzyme. Defaults to 4 as defined by the original RBDmap experiment.}
+}
+\value{
+The original rbd.df with 3 columns added: the proteolytic fragment, the fragment start, and fragment end.
 }
 \description{
-Function description
+Retrieves the binding sequences based on the information given in the dataframe
+and includes them as part of the output.
+}
+\author{
+Emma Gail
 }

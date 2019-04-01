@@ -703,13 +703,6 @@ rbd.makeIETable <- function(sequence_hit_list,
 #'@author Emma Gail
 #'@export
 
-#should add in naming options for png plot output
-
-# panel.background = element_rect(fill = "#eaf2ff",
-#                                 colour = "#eaf2ff",
-#                                 size = 0.5, linetype = "solid"),
-# legend.key = element_rect(fill = "#eaf2ff")
-
 rbd.makeIEPlot <- function(input_eluate_table,
                            prefixes,
                            proteases = c("LysC",'ArgC'),
@@ -5560,7 +5553,7 @@ make_start_end_pdb_df_output2 <- function(generated_pdb_lists,
 #'@param xlink_viewer_csv_file_name String indicating file name of csv output if write_file = TRUE
 #'@export
 
-ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 'xlink_viewer', add_color = FALSE){
+ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 'xlink_viewer.csv', add_color = FALSE){
   #should have a conversion tool here that would convert between the
 
   xlink_viewer_csv <- list()
@@ -5575,6 +5568,8 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
   if('pro_pos1' %in% colnames(xlink_df)){
     xlink_pep_pos1 <- as.numeric(as.character(xlink_df$pro_pos1)) - as.numeric(as.character(xlink_df$pep_pos1)) +1
     xlink_pep_pos2 <- as.numeric(as.character(xlink_df$pro_pos2)) - as.numeric(as.character(xlink_df$pep_pos2)) +1
+    #xlink_pep_pos1 <- as.numeric(as.character(xlink_df$pro_pos1))
+    #xlink_pep_pos2 <- as.numeric(as.character(xlink_df$pro_pos2))
 
 
     # xlink_viewer_csv$PepPos1 <- xlink_df$pro_pos1
@@ -5608,6 +5603,8 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
   } else {
     xlink_pep_pos1 <- as.numeric(as.character(xlink_df[['Protein.Position.1']])) - as.numeric(as.character(xlink_df[['Peptide.Position.1']])) +1
     xlink_pep_pos2 <- as.numeric(as.character(xlink_df[['Protein.Position.2']])) - as.numeric(as.character(xlink_df[['Peptide.Position.2']])) +1
+    #xlink_pep_pos1 <- as.numeric(as.character(xlink_df[['Protein.Position.1']]))
+    #xlink_pep_pos2 <- as.numeric(as.character(xlink_df[['Protein.Position.2']]))
 
 
     # xlink_viewer_csv$PepPos1 <- xlink_df[['Protein.Position.1']]
@@ -5643,7 +5640,10 @@ ppi.xinet <- function(xlink_df, write_file = TRUE, xlink_viewer_csv_file_name = 
 
   if(write_file == TRUE){
 
-    write.csv(xlink_viewer_csv,paste0(xlink_viewer_csv_file_name,'.csv'))
+    if(!endsWith(xlink_viewer_csv_file_name,'csv')){
+      xlink_viewer_csv_file_name <- paste0(xlink_viewer_csv_file_name,'.csv')
+    }
+    write.csv(xlink_viewer_csv,xlink_viewer_csv_file_name)
   }
 
   return(xlink_viewer_csv)
@@ -6626,7 +6626,6 @@ filter_xlink_df_by_protein_names <- function(xl_dataframe,list_of_protein_names)
 }
 
 #-----Generate Random Lysine Distances in PDB----
-
 
 #what is the frequency vector?? need this info for documentation
 generate_random_lysine_distances_in_pdb <- function(pdb_id,frequency_vector,chains=NULL){

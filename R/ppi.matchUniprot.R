@@ -46,7 +46,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
     if('UniProtSeq' %in% colnames(protein_to_uniprot_id)){
       match_sequence <- as.character(protein_to_uniprot_id$UniProtSeq)
     }
-  }
+  } #end if(!is.null(protein_to_uniprot_id))
 
   #need to make sure the matches are checked so that every row isn't checked
 
@@ -214,7 +214,6 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
       pep_pro <- as.character(xlink_df_row[[pep_pro_name]])
       link_name <- paste('pep_pos',as.character(pep_num),sep='')
       linkpos <- as.character(xlink_df_row[[link_name]])
-
 
       uniprot_fasta_seq <- as.character(match_df[match_df$ProteinName == pep_pro,'UniProtSeq'])
 

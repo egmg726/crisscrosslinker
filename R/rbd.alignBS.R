@@ -14,6 +14,10 @@ rbd.alignBS <- function(rbd.df,alignIDs,
   #make it so that if uniprot2pdb is true, will match to the uniprot then to the pdb
   #for improved accuracy
 
+  #need to store the Uniprot sequence for future use so it doesn't get it multiple times
+
+  stored_uniprots <- list()
+
   #protID <- as.character(unique(rbd.df2$ProtID))
   binding_site_start_list <- c()
   binding_site_end_list <- c()
@@ -39,6 +43,7 @@ rbd.alignBS <- function(rbd.df,alignIDs,
     if(alignTo == 'pdb'){
       alignID <- as.character(alignIDs[alignIDs$protID==protID,'pdbID'])
 
+      #there is no false option for this --> need to fix
       if((uniprot2pdb == TRUE)){
 
         #if TRUE --> will align to uniprotseq first
@@ -52,20 +57,44 @@ rbd.alignBS <- function(rbd.df,alignIDs,
           #check
           #do str_locate_all
           if(!file.exists(paste0(uniprot_id,'.fasta'))){
-            uniprotSeq <- uniprot.fasta(uniprot_id = uniprot_id)
-          } else {
+
+            if(!(uniprot_id %in% names(stored_uniprots))){
+              uniprotSeq <- uniprot.fasta(uniprot_id = uniprot_id)
+              stored_uniprots[[uniprot_id]] <- uniprotSeq
+            } else {
+              uniprotSeq <- stored_uniprots[[uniprot_id]]
+            }
+
+          } else { #end if(!file.exists(paste0(uniprot_id,'.fasta'))){
             uniprotSeq <- paste0(toupper(read.fasta(paste0(uniprot_id,'.fasta'))[[1]]),collapse='')
-          }
+          } #end else to if(!file.exists(paste0(uniprot_id,'.fasta'))){
+
           start_end <- t(str_locate_all(uniprotSeq,proteolyticFragment)[[1]])[,1]
           fragmentStart <- start_end[1]
           fragmentStop <- start_end[2]
-        }
+        } #end if(!(uniprot_id == protID)){
+
         #fragmentStart and fragmentStop need to be matched to uniprot first
         #can check if protID == uniprotID
         #or if protID is a valid Uniprot ID by checking with the uniprot.fasta() function
 
-        pdb_positions <- c(uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStart,output='pdb'),
-                           uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStop,output='pdb'))
+
+
+        # pdb_positions <- c(uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStart,output='pdb'),
+        #                    uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStop,output='pdb'))
+
+
+        #need more flexibility for this part --> do the ppi.alignPDB here?
+        #or go through each of the chains
+        pdb_positions <- uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStart:fragmentStop,output='pdb')
+
+        if(NA %in% pdb_positions){
+          #if there is NA --> not a perfect match
+          warning('NA within uniprot.PDBmap range')
+          pdb_positions <- c(pdb_positions[1],pdb_positions[length(pdb_positions)])
+        } else {
+          pdb_positions <- c(pdb_positions[1],pdb_positions[length(pdb_positions)])
+        }
 
         #will need if(NA %in% pdb_positions) too
         #will exclude those matches if allowPartialBS == FALSE
@@ -95,6 +124,7 @@ rbd.alignBS <- function(rbd.df,alignIDs,
       } else { #end if(NA %in% pdb_positions){
         #there is a PDB position for both of the segments
         #can then save those positions into a table
+
 
         db <- "PDB"
         db_list <- c(db_list,db)

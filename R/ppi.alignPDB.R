@@ -8,13 +8,15 @@
 #'
 #' This functions aligns fasta file to PDB
 #'
-#' @param fasta_file fasta_file
-#' @param alignIDs alignIDs
-#' @param uniprot2pdb uniprot2pdb
+#' @param fasta_file Name of fasta file or loaded fasta file by seqinr::read.fasta().
+#' @param alignIDs A data.frame containing the columns "ProteinName", "UniProtID", and "PDB"
+#' @param uniprot2pdb If TRUE, will align to the UniProt sequence before aligning to the PDB. This parameter should be selected if the sequences used are not exactly UniProt (such as a slightly different N-terminal), but are relatively similar.
+#' @return A list containing vectors corresponding to the length of the FASTA file sequences. Containments alignments to UniProt and PDB with corresponding chain IDs.
+#' @author Emma Gail
 #'
 #' @export
 
-ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
+ppi.alignPDB <- function(fasta_file, alignIDs=NULL, uniprot2pdb=TRUE){
 
   pdb_vector_match_mega <- list()
   stored_pdbs <- list()
@@ -57,7 +59,17 @@ ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
 
     #pdb_file <- check_download_read_pdb(pdb_info$pdb_id)
 
-    uniprot_id <- pdb_anno[pdb_anno$chainId == chain,"db_id"]
+
+    #can update this so that if chain
+    if(is.na(chain)){
+      #if no chain --> will have to get uniprot_id from the alignIDs
+      uniprot_id <- as.character(alignIDs[alignIDs$ProteinName == protein_name,'UniProtID'])
+      uniprot_id <- strsplit(uniprot_id,'-')[[1]][1]
+    } else {
+      uniprot_id <- pdb_anno[pdb_anno$chainId == chain,"db_id"]
+    }
+
+
 
     if(uniprot2pdb == TRUE){
       uniprot_sequence <- uniprot.fasta(uniprot.id = uniprot_id)
@@ -70,10 +82,9 @@ ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
 
     #uniprot_sequence <-uniprot(uniprot_id)$sequence #taking a really long time?
 
-
+    #if chain is na --> will just use the chain selected as the chain matches
     chain_matches <- pdb_anno[pdb_anno$db_id == uniprot_id,"chainId"]
 
-    seqres <- a(firstup(pdb_file$seqres[names(pdb_file$seqres) == chain]))
 
 
     #check if seqres == uniprot_id
@@ -98,7 +109,6 @@ ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
 
     pwa_strings <- get_pwa_strings(pwa_results)
 
-    seqres <- a(firstup(pdb_file$seqres[names(pdb_file$seqres) == chain]))
     #length(get_pwa_strings(pwa_results)$pattern_string)
     pwa_ranges <- get_pwa_ranges(pwa_results) #use the start and end subject to get the range
 
@@ -109,7 +119,7 @@ ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
     #start with the position - 1 then +1 in the first iteration
 
     fasta_seq_alignment_vector <- c()
-    subject_start <- pwa_ranges$start_subject -1
+    subject_start <- pwa_ranges$start_subject - 1
     subject_string <- pwa_strings$subject_string
     for(subject_index in 1:length(subject_string)){
 
@@ -161,122 +171,9 @@ ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
     #uniprot_seq_alignment_vector <- 1:length(seqres)
     pdb_alignment_vector <- rep('-',length(uniprot_seq_alignment_vector))
     chain_alignment_vector <- rep('-',length(uniprot_seq_alignment_vector))
-    #account for the dashes that are present within the seqres
-
-    #length(get_pwa_strings(pwa_results)$pattern_string) == length(pwa_ranges$start_subject:pwa_ranges$end_subject)
 
 
-
-    #after QC check --> get the UniProt ID from the pdb_annotation
-    #do another QC check to make sure that the Uniprot sequence is the same as the seqres?
-
-
-    #pdb_anno <- pdb.annotate(pdb_info$pdb_id)
-    #uniprot_id <- pdb_anno[pdb_anno$chainId == chain,"db_id"]
-
-    chain_matches <- pdb_anno[pdb_anno$db_id == uniprot_id,"chainId"]
-    #
-    #check if the UniProt sequence and the seqres sequence are different?
-
-    #check to see if the seqres of the PDB file matches that of the uniprot sequence --> why would they be different?
-    # uniprot_sequence <-uniprot(uniprot_id)$sequence
-    # if(paste0(seqres,collapse = '') != uniprot_sequence){
-    #   #if they don't match --> need to account for this in the final code
-    #   #do sequence alignment of the 2?
-    #   #tell the user of the warning?
-    #   pwa_results <- pairwiseAlignment(paste0(seqres,collapse = ''),uniprot_sequence)
-    #
-    # }
-
-    #go through the chain matches? need to have some kind of prompt to see if the user wants to do that
-    #if length > 1
-
-    #load the XML data here
-
-    # for(chain_name in chain_matches){
-    #
-    #   #get the chain name
-    #   #
-    #   chain_name
-    #
-    # }
-
-    #
-
-    #length(fasta_file[[protein_name]])
-
-    #add additional option to use all chains for the menu
-
-
-    #pdb_file$seqres[names(pdb_file$seqres) == chain]
-    #get all of the chains that exist in the PDB file
-
-
-    # chain_mega_list <- c()
-    # chains <- unique(names(pdb_file$seqres))
-    # for(chain in unique(names(pdb_file$seqres))){
-    #
-    #   seqres <- paste0(a(firstup(pdb_file$seqres[names(pdb_file$seqres) == chain])),collapse='')
-    #   chain_mega_list <- c(chain_mega_list,seqres)
-    #   #check to see if any chains == each other
-    #   #if they do == each other, add the chain to the identifier?
-    #   #add to list of the seqres sequences
-    #   #pairwise align the resid to the seqres
-    #
-    #
-    #
-    # }
-
-
-
-    #pdb_id <- '6C23'
-    #pdb_anno <- pdb.annotate(pdb_info$pdb_id)
-
-    #pdb_anno$compound
-    #pdb_anno$chainId #will need all
-
-    # uniprot_chain_match <- list()
-    #
-    #
-    # #this can be used for a menu option
-    # for(uniprot_id in unique(pdb_anno[pdb_anno$db_name == "UniProt",'db_id'])){
-    #   #get all of the chains that correspond to this uniprot_id
-    #   #get the name of the compound
-    #   #put this into a menu option
-    #
-    #   uniprot_chain_match[[uniprot_id]] #or compound ID or both!
-    #   #will have all of the chains
-    #
-    #
-    # } #end for(uniprot_id in unique(pdb_anno[pdb_anno$db_name == "UniProt",'db_id']))
-
-    #get the chain IDs
-    #trying to measure the overlap??
-
-
-    #chain_matches <- c()
-    #get the uniprot IDs
-
-    # for(useqres in unique(chain_mega_list)){
-    #
-    #   chains[useqres == chain_mega_list]
-    #   #keep chain information somewhere??
-    #   #this should be integrated with the chain loop --> use seqres instead the actual sequence
-    #
-    #   #either do 1 by 1 or can do multiples
-    #
-    # }
-
-
-    #combine the chains together --> need to check how that was done before when combining chains together
-    #paste0(quick_resno_and_resid(pdb_file,'A')$resid,collapse='')
-
-    #xml_data <- xmlParse(paste0('https://www.rcsb.org/pdb/rest/das/pdb_uniprot_mapping/alignment?query=',pdb_id))
-
-
-    #can make this into its own function
-    #input --> pdb_id, optional input: chains and/or UniProt ID?
-
+    #change this to the new function?
     pdb_uniprot_mapping <- GET(paste0('https://www.rcsb.org/pdb/rest/das/pdb_uniprot_mapping/alignment?query=',pdb_id))
     xml_data <- xmlParse(pdb_uniprot_mapping)
     xml_data <- xmlToList(xml_data)
@@ -351,8 +248,19 @@ ppi.alignPDB <- function(fasta_file,alignIDs=NULL,uniprot2pdb=TRUE){
             pdb_alignment_vector[uniprot_start_index:uniprot_end_index] <- pdb_line_start:pdb_line_end
 
             pdb_line_fullid <- paste0(pdb_id,'_',pdb_line_chain)
-            #
-            chain_alignment_vector[uniprot_start_index:uniprot_end_index] <- rep(pdb_line_fullid,length(uniprot_line_start:uniprot_line_end))
+            #can have here that if chain is NA --> will do regardless
+            #will need to account for duplicates --> will need guide for how to do this
+            #have override option?
+
+            if(is.na(chain)){
+              chain_alignment_vector[uniprot_start_index:uniprot_end_index] <- rep(pdb_line_fullid,length(uniprot_line_start:uniprot_line_end))
+            } else {
+              #if there is a specific chain indicated --> will not do it unless it matches exactly
+              if(chain == pdb_line_chain){
+                chain_alignment_vector[uniprot_start_index:uniprot_end_index] <- rep(pdb_line_fullid,length(uniprot_line_start:uniprot_line_end))
+              }
+            }
+
 
             #source("https://bioconductor.org/biocLite.R")
             #biocLite('bio3d','Biostrings')

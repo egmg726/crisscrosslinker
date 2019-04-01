@@ -56,6 +56,8 @@ ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype 
                                   cat('Loaded as readline\n')
                                   return(readLines(file_name))})
 
+        #return(loaded_data)
+
         #instead of boolean, can just use typeof to see if it is
         #character => readLines
         #list => dataframe

@@ -4,29 +4,26 @@
 \alias{ppi.pymol}
 \title{Write PyMOL file for protein-protein interaction data}
 \usage{
-ppi.pymol(xlink.df, list_of_start_and_end_pdbs = NULL,
-  show_only_real_structures = NULL, write_file = FALSE,
-  custom.color = FALSE, colors = NULL, color_by = "freq",
-  write.df = FALSE, experiment_directory = NULL,
-  pdb_numbering = FALSE, pymol_file_list_file_name = "xlink.pml")
+ppi.pymol(xlink.df.pdb, list_of_start_and_end_pdbs = NULL,
+  show_only_real_structures = NULL, write_file = TRUE, colors = NULL,
+  color_by = "freq", experiment_directory = NULL,
+  pdb_numbering = FALSE, file.name = "xlink.pml")
 }
 \arguments{
-\item{xlink.df}{data.frame output from ppi.combineData()}
+\item{xlink.df.pdb}{data.frame output from ppi.matchPDB() or ppi.matchPDB2()}
 
 \item{list_of_start_and_end_pdbs}{list_of_start_and_end_pdbs}
 
 \item{show_only_real_structures}{show_only_real_structures}
 
-\item{write_file}{write_file}
+\item{write_file}{If TRUE, will write the produced .pml file.}
 
-\item{custom.color}{custom.color}
+\item{colors}{A list of colors as R names or hexcodes or a palette defined by RColorBrewer/viridis. If left blank, will use the colors that are in the column freq_color.}
 
-\item{colors}{colors}
+\item{color_by}{If colors is not NULL, choose either 'freq' or 'dist' for which variable should be colored.}
 
-\item{color_by}{color_by}
-
-\item{write.df}{write.df}
+\item{file.name}{File name for the exported PyMOL file. Should end in '.pml'}
 }
 \description{
-ppi.pymol description
+Generates a file for PyMOL based on the XL sites aligned to PDB structures.
 }

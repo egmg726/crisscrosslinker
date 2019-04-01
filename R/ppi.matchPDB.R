@@ -4,7 +4,7 @@
 #'
 #'@param xlink_df data.frame() as created by ppi.combineData()
 #'@param fasta_file FASTA file as loaded by seqinr::read.fasta()
-#'@param pdb_numbering pdb_numbering
+#'@param pdb_numbering If TRUE, will number the
 #'@param pdb_directory pdb_directory
 #'@param pdb_match_vector pdb_match_vector
 #'@param csv_pdb_input_file csv_pdb_input_file
@@ -88,7 +88,7 @@ ppi.matchPDB <- function(xlink_df, fasta_file, pdb_numbering = FALSE,
       #if option is selected yes --> can output as csv file
       make_start_end_pdb_df_output2(generated_pdb_lists = generated_pdb_lists)
       write.csv(make_start_end_pdb_df_output2(generated_pdb_lists = generated_pdb_lists),'pdb_start_stop.csv')
-    }
+    } #end else to if(pdb_numbering == TRUE){
 
   } else { #if someone has indicated a PDB file to be used
 
@@ -128,6 +128,7 @@ ppi.matchPDB <- function(xlink_df, fasta_file, pdb_numbering = FALSE,
         protein_pos_match <- match(protein_pos,pdb_match_vector[[protein_name]]$fasta)
         pdb_protein_pos <- as.numeric(pdb_match_vector[[protein_name]]$pdb[protein_pos_match])
         xlink_row[[paste0('pro_pos',pro_num)]] <- pdb_protein_pos
+        #xlink_df[[row_num,paste0('pro_pos',pro_num)]] <- pdb_protein_pos
         #protein_split_list[[index_num]][2] <- pdb_protein_pos
         #xlink_row
         on_this_pdb_structure <- pdb_match_vector[[protein_name]]$chain[protein_pos_match]
@@ -170,7 +171,7 @@ ppi.matchPDB <- function(xlink_df, fasta_file, pdb_numbering = FALSE,
     #pdb1_xlink_list <- c(pdb1_xlink_list,otps_list[1])
     #pdb2_xlink_list <- c(pdb2_xlink_list,otps_list[2])
 
-    xlink_df[row_num,paste0('pdb',pro_num)] <- on_this_pdb_structure
+    #xlink_df[row_num,paste0('pdb',pro_num)] <- on_this_pdb_structure
 
     # if(row_num == 5){
     #   return(otps_list)
@@ -250,48 +251,6 @@ ppi.matchPDB <- function(xlink_df, fasta_file, pdb_numbering = FALSE,
         #xyz_coords <- get_xyz_coordinates_pdb(pdb_read)
         protein_name <- as.character(xlink_row[[paste0('pro_name',otps_index)]])
         protein_pos <- as.character(xlink_row[[paste0('pro_pos',otps_index)]])
-        #if pdb_numbering == TRUE, this may need to be changed slightly
-        #pos_match <- match(protein_pos,pdb_read$atom$resno)
-
-
-
-        # if((row_num == 5) && (otps_index == 2)){
-        #   return(pos_match)
-        # }
-
-        # if(!is.na(pos_match)){ #checking if there is a true match
-        #   atom_match <- pdb_read$atom$elety[pos_match]
-        #   while(atom_match != 'CA'){ #can choose any atom here, can change to N later on
-        #     #make 'CA' as a variable when this is made into a function
-        #     #with 'CA' as potential default in function
-        #     pos_match <- pos_match + 1
-        #     atom_match <- pdb_read$atom$elety[pos_match]
-        #   }
-        #   if(pdb_read$atom$resno[pos_match] == protein_pos){
-        #
-        #     #should anything be done in here?
-        #     pos_match <- pos_match
-        #
-        #   } else {
-        #     #what to do if it has been overshot
-        #     cat('No match to chosen atom, reverting to first match')
-        #     pos_match <- match(protein_pos,pdb_read$atom$resno)
-        #
-        #   }
-        # } else {
-        #   #if it is NA and there is no match
-        #   warning("No match\n")
-        # }
-        #
-        #
-
-        # xyz_matches <- c()
-        # #make list of the xyz coordinates
-        # for(xyz_name in names(xyz_coords)){
-        #   #xyz1 <- xyz_coords[[xyz_name]][pos_match]
-        #   xyz_matches <- c(xyz_matches,xyz1)
-        # }
-        # xyz_coord_list[[otps_index]] <- xyz_matches
 
         pdb_read_chain <- pdb_read$atom[pdb_read$atom$resno == protein_pos,]
         xyz_matches <- as.numeric(pdb_read_chain[pdb_read_chain$elety == 'CA',][c('x','y','z')])
