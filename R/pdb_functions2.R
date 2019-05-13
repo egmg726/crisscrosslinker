@@ -556,7 +556,7 @@ rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
   for(file_name in list_of_files){
 
     #should join the file_name and experiment directory
-    if(!(is.null(experiment_directory)) && (is.null(files.list))){
+    if(!(is.null(experiment_directory))){
       file_name1 <- paste0(experiment_directory,'/',file_name)
     } else {
       file_name1 <- file_name
