@@ -522,6 +522,7 @@ rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
                                    cutoff_score = 20, RK.cleavage = TRUE,
                                     files.list = NULL){
 
+  protein_prefix <- names(fasta_file)
 
   if(is.null(files.list)){
 
@@ -529,7 +530,6 @@ rbd.makeSeqHitList <- function(fasta_file, experiment_directory = NULL,
       experiment_directory <- getwd()
     }
 
-    protein_prefix <- names(fasta_file)
 
     file_pattern <- paste('\\.',file_format,'$',sep='')
 
