@@ -3,8 +3,7 @@
 #'Generates a file for PyMOL based on the XL sites aligned to PDB structures.
 #'
 #'@param xlink.df.pdb data.frame output from ppi.matchPDB() or ppi.matchPDB2()
-#'@param list_of_start_and_end_pdbs list_of_start_and_end_pdbs
-#'@param show_only_real_structures show_only_real_structures
+#'@param show_only_real_structures A list of proteins to only show "real" structrures as opposed to 2D generated structures. Not relevant unless using generated structures.
 #'@param write_file If TRUE, will write the produced .pml file.
 #'@param colors A list of colors as R names or hexcodes or a palette defined by RColorBrewer/viridis. If left blank, will use the colors that are in the column freq_color.
 #'@param color_by If colors is not NULL, choose either 'freq' or 'dist' for which variable should be colored.

@@ -12,9 +12,7 @@ ppi.pymol(xlink.df.pdb, list_of_start_and_end_pdbs = NULL,
 \arguments{
 \item{xlink.df.pdb}{data.frame output from ppi.matchPDB() or ppi.matchPDB2()}
 
-\item{list_of_start_and_end_pdbs}{list_of_start_and_end_pdbs}
-
-\item{show_only_real_structures}{show_only_real_structures}
+\item{show_only_real_structures}{A list of proteins to only show "real" structrures as opposed to 2D generated structures. Not relevant unless using generated structures.}
 
 \item{write_file}{If TRUE, will write the produced .pml file.}
 

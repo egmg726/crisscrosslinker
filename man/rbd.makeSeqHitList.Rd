@@ -5,7 +5,8 @@
 \title{Make sequence hit list}
 \usage{
 rbd.makeSeqHitList(fasta_file, experiment_directory = NULL,
-  file_format = "csv", cutoff_score = 20, RK.cleavage = TRUE)
+  file_format = NULL, cutoff_score = 20, RK.cleavage = TRUE,
+  files.list = NULL)
 }
 \arguments{
 \item{fasta_file}{FASTA file as loaded by seqinr::read.fasta()}
@@ -15,6 +16,10 @@ rbd.makeSeqHitList(fasta_file, experiment_directory = NULL,
 \item{file_format}{Can be either 'csv' or 'xlsx', the suffix to the experiment files}
 
 \item{cutoff_score}{Cutoff for Andromeda score. Defaults to 20.}
+
+\item{RK.cleavage}{If TRUE, will make sure that the cleavage sites alternate between R and K.}
+
+\item{files.list}{If uploading a list of files directly instead of the directory, list the files with the appropriate paths.}
 }
 \description{
 This function creates a hit list of significant XL in UV XL-MS dataset

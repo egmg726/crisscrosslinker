@@ -8,16 +8,19 @@ rbd.alignBS(rbd.df, alignIDs, alignTo = c("pdb", "uniprot", "fasta"),
   uniprot2pdb = TRUE, allowPartialBS = FALSE)
 }
 \arguments{
-\item{rbd.df}{rbd.df}
+\item{rbd.df}{Output from rbd.getBSfromDF()}
 
-\item{alignIDs}{alignIDs}
+\item{alignIDs}{alignIDs containing columns of protein names, UniProt and/or PDB identifiers}
 
-\item{alignTo}{alignTo}
+\item{alignTo}{What the sequences should be aligned to. Choose between 'pdb' and 'uniprot'}
 
 \item{uniprot2pdb}{Boolean, defaults to TRUE. This will align to Uniprot sequence before PDB and using the uniprot.PDBmap function to improve alignment accuracy. Highly recommended for PDB alignments.}
 
-\item{allowpartialBS}{Boolean, defaults to FALSE.}
+\item{allowpartialBS}{Boolean, defaults to FALSE. will allow partial matches of binding sequences to PDB/UniProt sequences}
 }
 \description{
 This function aligns the
+}
+\author{
+Emma Gail
 }

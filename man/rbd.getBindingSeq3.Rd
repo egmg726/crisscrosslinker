@@ -2,20 +2,20 @@
 % Please edit documentation in R/rbd.getBindingSeq3.R
 \name{rbd.getBindingSeq3}
 \alias{rbd.getBindingSeq3}
-\title{RBD: Get Binding Sequence 3}
+\title{RBD: Get Binding Sequence - Casetello et. al 2016 Method}
 \usage{
 rbd.getBindingSeq3(trypticPeptide, enzyme, sourceSequence,
   cleave_offset = 4)
 }
 \arguments{
-\item{trypticPeptide}{trypticPeptide}
+\item{trypticPeptide}{trypticPeptide, peptide detected by RBDmap/MS method}
 
-\item{enzyme}{enzyme}
+\item{enzyme}{enzyme used: LysC or ArgC}
 
-\item{sourceSequence}{sourceSequence}
+\item{sourceSequence}{sourceSequence, used as the reference to locate the binding sequence}
 
-\item{cleave_offset}{cleave_offset}
+\item{cleave_offset}{Cleave offset for the sequence. Defaults to 4}
 }
 \description{
-This function gets the binding sequence
+This function gets the binding sequence using a similar method to Castello et. al 2016
 }

@@ -25,5 +25,5 @@ get_uniprot_info_from_proteins_api(uniprot_id,
 \item{output_xinet_domain_df}{output_xinet_domain_df}
 }
 \description{
-get uniprot info from proteins api
+function curreget uniprot info from proteins api
 }

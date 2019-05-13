@@ -1,9 +1,16 @@
-#should be able to use multiple resnos
-
-#chain should be optional
-#uniprot ID should also be an option to put in
-
-#pdb_positions <- uniprot.PDBmap('6C23',resno=100:101,output='pdb',uniprot_id = "Q15022")
+#'UniProt PDBmap
+#'
+#'This function is able to connect with the RCSB API to be able to match a residue number of either a PDB chain or UniProt canonical sequence to its match.
+#'
+#'@param pdb_id Valid ID of a PDB accession number within RCSB
+#'@param resno Residue number(s) to match against the PDB/UniProt number.
+#'@param chain Chain ID within the PDB to match. Needed if matching PDB residue number to UniProt ID. Defaults to NULL
+#'@param uniprot_id UniProt ID of protein. Needed if matching UniProt sequence to residue within PDB
+#'@param output Choose between 'pdb' or 'uniprot' for which ID the output residue number should correspond to
+#'
+#'@author Emma Gail
+#'
+#'@export
 
 uniprot.PDBmap <- function(pdb_id,resno,chain=NULL,uniprot_id=NULL,output=c('pdb','uniprot')){
 

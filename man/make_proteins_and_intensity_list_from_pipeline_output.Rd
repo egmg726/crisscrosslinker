@@ -20,5 +20,5 @@ make_proteins_and_intensity_list_from_pipeline_output(experiment_prefixes,
 \item{identifier_is_binding_seq}{identifier_is_binding_seq}
 }
 \description{
-Make Proteins and Intensities List
+Internal function used to make the intensities list
 }

@@ -1,6 +1,7 @@
-#' Get Binding Sequence from RBDmap Data
+#' Get Binding Sequence from RBDmap Data - Zhang et. al 2019 Method
 #'
-#' This funtion gets the binding sequence from RBDmap data
+#' This function gets the binding sequence from RBDmap data
+#'
 #' @param ms_sequence The input sequence from MS, should be loaded as a string
 #' @param protease The protease used for the experiment, either 'ArgC' or 'LysC'
 #' @param sequence_for_alignment The sequence to find the binding sequence in. The ms_sequence must be within the sequence_for_alignment or NULL will be returned.

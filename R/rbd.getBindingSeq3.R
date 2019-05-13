@@ -1,13 +1,14 @@
-#'RBD: Get Binding Sequence 3
+#'RBD: Get Binding Sequence - Casetello et. al 2016 Method
 #'
-#'This function gets the binding sequence
+#'This function gets the binding sequence using a similar method to Castello et. al 2016
 #'
-#'@param trypticPeptide trypticPeptide
-#'@param enzyme enzyme
-#'@param sourceSequence sourceSequence
-#'@param cleave_offset cleave_offset
+#'@param trypticPeptide trypticPeptide, peptide detected by RBDmap/MS method
+#'@param enzyme enzyme used: LysC or ArgC
+#'@param sourceSequence sourceSequence, used as the reference to locate the binding sequence
+#'@param cleave_offset Cleave offset for the sequence. Defaults to 4
 #'
 #'@export
+
 rbd.getBindingSeq3 <- function(trypticPeptide,enzyme,sourceSequence,
                                cleave_offset = 4){
   #include_ambiguous = FALSE, proteolytic_fragments = FALSE){

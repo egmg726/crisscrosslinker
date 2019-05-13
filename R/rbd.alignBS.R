@@ -2,11 +2,14 @@
 #'
 #'This function aligns the
 #'
-#'@param rbd.df rbd.df
-#'@param alignIDs alignIDs
-#'@param alignTo alignTo
+#'@param rbd.df Output from rbd.getBSfromDF()
+#'@param alignIDs alignIDs containing columns of protein names, UniProt and/or PDB identifiers
+#'@param alignTo What the sequences should be aligned to. Choose between 'pdb' and 'uniprot'
 #'@param uniprot2pdb Boolean, defaults to TRUE. This will align to Uniprot sequence before PDB and using the uniprot.PDBmap function to improve alignment accuracy. Highly recommended for PDB alignments.
-#'@param allowpartialBS Boolean, defaults to FALSE.
+#'@param allowpartialBS Boolean, defaults to FALSE. will allow partial matches of binding sequences to PDB/UniProt sequences
+#'
+#'@author Emma Gail
+#'
 #'@export
 rbd.alignBS <- function(rbd.df,alignIDs,
                         alignTo=c('pdb','uniprot','fasta'),
@@ -84,8 +87,7 @@ rbd.alignBS <- function(rbd.df,alignIDs,
         #                    uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStop,output='pdb'))
 
 
-        #need more flexibility for this part --> do the ppi.alignPDB here?
-        #or go through each of the chains
+
         pdb_positions <- uniprot.PDBmap(pdb_id,chain=chain,resno=fragmentStart:fragmentStop,output='pdb')
 
         if(NA %in% pdb_positions){
@@ -151,8 +153,6 @@ rbd.alignBS <- function(rbd.df,alignIDs,
 
 
   } #end for(row_num in 1:nrow(rbd.df)){
-
-
 
 
 
