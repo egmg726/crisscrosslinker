@@ -794,6 +794,8 @@ rbd.makeIEPlot <- function(input_eluate_table,
 
 
   #change to svg?
+
+
   png(pipeline_generated_plot_title, width = 480, height = 480)
 
   if(secondary_prefix == TRUE){
