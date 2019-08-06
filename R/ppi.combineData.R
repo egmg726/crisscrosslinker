@@ -10,12 +10,13 @@
 #'@param cutoff_cond Cutoff conditions. If you have values for both freq_cutoff and score_cutoff, this will determine if it will use an "and" or "or" statement.
 #'@param protein_alternative_names_dict data.frame() or string representing file name. If you have the same proteins represented by different names (NOT RECOMMENDED), you can use this to make sure they will all be combined successfully. Defaults to NULL.
 #'@param category_color_input_file data.frame() or string representing file name. If you have specific colors you would like to use, use this field.
+#'@param console_messages Will display console messages about if a match has been made. Primarily for debugging purposes.
 #'@export
 
 ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
                             score_cutoff = NA, cutoff_cond = c('and','or'),
                             protein_alternative_names_dict = NULL,
-                            category_color_input_file = NULL){
+                            category_color_input_file = NULL, console_messages = FALSE){
 
   if((!is.null(category_color_input_file)) && (typeof(category_color_input_file) == 'character')){
     category_color_input_file <- read.csv(category_color_input_file)
@@ -165,7 +166,10 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
         } else if(seq_xlink_list[pro_index] == seq_xlink){
           seq_index <- pro_index
         } else {
-          cat(paste('Index error for',seq_xlink,'and',pro_xlink))
+          if(console_messages == TRUE){
+            cat(paste('Index error for',seq_xlink,'and',pro_xlink))
+          }
+          warning((paste('Index error for',seq_xlink,'and',pro_xlink)))
         }
       }
 
@@ -280,9 +284,10 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
                     #change the protein name to the first column
                     #check to make sure that it's named
 
+                    if(console_messages == TRUE){
                     cat(paste(protein_name,'changed to',as.character(protein_alternative_names_dict[row_num,'original_name']),
                               'in output\n'))
-
+                    }
                     protein_name <- as.character(protein_alternative_names_dict[row_num,'original_name'])
                     #activate boolean?
                     #what to do if protein name does not show up in this list and does not have a
@@ -330,8 +335,10 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
             if((protein_name %in% names(fasta_file)) && (protein_name_has_been_changed == FALSE)){
               #if it's not in the protein dictionary, check if it is in the fasta file
 
+              if(console_messages == TRUE){
+                cat('Is in fasta file but protein name has not been changed yet\n')
+              }
 
-              cat('Is in fasta file but protein name has not been changed yet\n')
 
               #ask if the user wants to create a separate PDB file for it
 
@@ -342,8 +349,9 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
               #add the whole crosslinking site to a dataframe to be
               #outputted if the xl site does not meet the requirements
 
+              if(console_messages == TRUE){
               cat('Not in fasta file or in the dictionary\n')
-
+              }
 
             }
 
@@ -407,9 +415,11 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
                     #change the protein name to the first column
                     #check to make sure that it's named
 
+                    if(console_messages == TRUE){
                     cat(paste(protein_name,'changed to',as.character(protein_alternative_names_dict[row_num,'original_name']),
                               'in output\n'))
 
+                    }
                     protein_name <- as.character(protein_alternative_names_dict[row_num,'original_name'])
                     #activate boolean?
                     #what to do if protein name does not show up in this list and does not have a
@@ -458,7 +468,9 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
               #if it's not in the protein dictionary, check if it is in the fasta file
 
 
+              if(console_messages == TRUE){
               cat('Is in fasta file but protein name has not been changed yet\n')
+              }
 
               #ask if the user wants to create a separate PDB file for it
 
@@ -469,8 +481,9 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
               #add the whole crosslinking site to a dataframe to be
               #outputted if the xl site does not meet the requirements
 
+              if(console_messages == TRUE){
               cat('Not in fasta file or in the dictionary\n')
-
+              }
 
             }
 
@@ -660,7 +673,9 @@ ppi.combineData <- function(xlink_mega_list, fasta_file, freq_cutoff = NA,
     xlink_mega_df <- xlink_mega_df[(score_bool),]
 
   } else {
+    if(console_messages == TRUE){
     cat('Nothing filtered\n')
+    }
   }
 
 

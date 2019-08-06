@@ -8689,10 +8689,47 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'
 "pymol_color_table"
 
+#'Processed PRC2 PPI Data aligned to Uniprot
+#'
+#'Processed PRC2 PPI Data aligned to Uniprot
+#'
+#'@docType data
+#'
+#'@usage data(xlink.df.uniprot)
+#'
+"xlink.df.uniprot"
 
 
+#'Processed PRC2 PPI Data aligned to PDB
+#'
+#'Processed PRC2 PPI Data aligned to PDB
+#'
+#'@docType data
+#'
+#'@usage data(xlink.df.filt.pdb)
+#'
+"xlink.df.filt.pdb"
 
-#add in pymol wiki info, etc. for the sake of documentation
+#'Processed PRC2 RBDmap Data aligned to PDB
+#'
+#'Processed PRC2 RDBmap Data aligned to PDB
+#'
+#'@docType data
+#'
+#'@usage data(bs_output_repeats_pdb)
+#'
+"bs_output_repeats_pdb"
+
+#'Processed PRC2 RBDmap Data aligned to Uniprot
+#'
+#'Processed PRC2 RDBmap Data aligned to Uniprot
+#'
+#'@docType data
+#'
+#'@usage data(bs_output_repeats_uniprot)
+#'
+"bs_output_repeats_uniprot"
+
 
 #first save the data to
 #need to also include rbdmap data and protein-protein interaction data
