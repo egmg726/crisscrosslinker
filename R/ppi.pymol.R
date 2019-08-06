@@ -136,7 +136,7 @@ ppi.pymol <- function(xlink.df.pdb,list_of_start_and_end_pdbs = NULL,show_only_r
     #return(pdbs_in_df)
     pdbs_in_df <- unique(unlist(strsplit(pdbs_in_df,'_'))[c(T,F)])
     for(pdb_name in pdbs_in_df){
-      py_line <- paste0('fetch ',pdb_name,",async=0")
+      py_line <- paste0('fetch ',pdb_name,", async=0")
       pymol_lines <- c(pymol_lines,py_line)
     }
   } else { #end if(!(grepl('\\.pdb',paste0(pdbs_in_df,'|',collapse = '')))){
