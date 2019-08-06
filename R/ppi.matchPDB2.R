@@ -24,7 +24,7 @@
 
 #'PPI Match PDB 2
 #'
-#'This function is the newer version
+#'This function is the newer version of ppi.matchPDB()
 #'
 #'@param xlink.df A data.frame made by ppi.combineData()
 #'@param fasta_file Name of fasta file or loaded fasta file by seqinr::read.fasta().

@@ -4,7 +4,7 @@
 #should also accept protein_dict --> but will need to account for the multiple chains
 #user should also be able to just put in the PDB ID with no chain --> will have to do a grepl check to see if '_' exists in string
 
-#' PPI ALign PDB
+#' PPI Align PDB
 #'
 #' This functions aligns fasta file to PDB
 #'
@@ -21,6 +21,7 @@ ppi.alignPDB <- function(fasta_file, alignIDs=NULL, uniprot2pdb=TRUE){
   pdb_vector_match_mega <- list()
   stored_pdbs <- list()
   stored_annos <- list()
+  stored_sequences <- list()
 
   for(protein_name in names(fasta_file)){
 
@@ -72,7 +73,14 @@ ppi.alignPDB <- function(fasta_file, alignIDs=NULL, uniprot2pdb=TRUE){
 
 
     if(uniprot2pdb == TRUE){
-      uniprot_sequence <- uniprot.fasta(uniprot.id = uniprot_id)
+
+      if(uniprot_id %in% names(stored_sequences)){
+        uniprot_sequence <- stored_sequences[[uniprot_id]]
+      } else {
+        uniprot_sequence <- uniprot.fasta(uniprot.id = uniprot_id)
+        stored_sequences[[uniprot_id]] <- uniprot_sequence
+      }
+
 
     } else { #end if(uniprot2pdb == TRUE){
       uniprot_sequence <- toupper(paste0(fasta_file[[protein_name]],collapse=''))
