@@ -7,7 +7,7 @@
 ppi.combineData(xlink_mega_list, fasta_file, freq_cutoff = NA,
   score_cutoff = NA, cutoff_cond = c("and", "or"),
   protein_alternative_names_dict = NULL,
-  category_color_input_file = NULL)
+  category_color_input_file = NULL, console_messages = FALSE)
 }
 \arguments{
 \item{xlink_mega_list}{List made by ppi.loadData()}
@@ -23,6 +23,8 @@ ppi.combineData(xlink_mega_list, fasta_file, freq_cutoff = NA,
 \item{protein_alternative_names_dict}{data.frame() or string representing file name. If you have the same proteins represented by different names (NOT RECOMMENDED), you can use this to make sure they will all be combined successfully. Defaults to NULL.}
 
 \item{category_color_input_file}{data.frame() or string representing file name. If you have specific colors you would like to use, use this field.}
+
+\item{console_messages}{Will display console messages about if a match has been made. Primarily for debugging purposes.}
 }
 \description{
 This function combines data and lets you set specifications for how you would like to filter
