@@ -54,7 +54,7 @@ ppi.loadData <- function(xldata, fasta_file, file_directory = getwd(), datatype 
         loaded_data <- tryCatch(read.csv(paste0(file_directory,'/',file_name)),
                                 error = function(err){
                                   cat('Loaded as readline\n')
-                                  return(readLines(file_directory,'/',file_name))})
+                                  return(readLines(paste0(file_directory,'/',file_name)))})
 
         #return(loaded_data)
 
