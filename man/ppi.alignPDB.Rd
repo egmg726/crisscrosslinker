@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppi.alignPDB.R
 \name{ppi.alignPDB}
 \alias{ppi.alignPDB}
-\title{PPI ALign PDB}
+\title{PPI Align PDB}
 \usage{
 ppi.alignPDB(fasta_file, alignIDs = NULL, uniprot2pdb = TRUE)
 }

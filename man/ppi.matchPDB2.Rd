@@ -19,5 +19,5 @@ ppi.matchPDB2(xlink.df, fasta_file, alignIDs, uniprot2pdb = TRUE,
 \item{dist.histogram}{dist.histogram}
 }
 \description{
-This function is the newer version
+This function is the newer version of ppi.matchPDB()
 }
