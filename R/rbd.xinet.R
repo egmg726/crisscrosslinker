@@ -10,7 +10,7 @@
 
 rbd.xinet <- function(bs.output,colors=c('#d0d0d0','#2f5ac6','#e50000'),write.file=TRUE,file.name='rbd_xinet.csv'){
   
-  bs_freqVector <- rbd.freqVector(bs.output,heatmap = FALSE)
+  bs_output_repeats_uniprot_freqvector <- rbd.freqVector(bs.output,heatmap = FALSE)
   
   viridis_colors <- c("magma","inferno","plasma","viridis","cividis")
   
