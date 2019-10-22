@@ -19,7 +19,8 @@ Imports:
 	xml2,
 	grDevices,
 	XML,
-	RCurl
+	RCurl,
+	httr
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
