@@ -78,9 +78,13 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
     #return(list(vars=bsfv_vars,colors = colors,gray0 = gray0))
 
 
+    if(length(colors) != length(bsfv_vars)){
+      colors <- colorRampPalette(colors = colors)(length(bsfv_vars))
+    }
     pymol_cc <- color.pymol(bsfv_vars, colors = colors, png.name = 'freqvector_legend_test.svg', gray0 = gray0, print.legend = write.file)
 
 
+    #return(pymol_cc)
 
     #return(pymol_cc)
     bs_freqVector2 <- rbd.freqVector(bs_output = bs_output, name_by = 'db_id',heatmap = heatmap, db_selection = 'PDB', colors = pymol_cc$hexcodes)

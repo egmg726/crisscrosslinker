@@ -14,10 +14,6 @@
 
 rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_selection = NULL, colors = c('#d0d0d0','#2f5ac6','#e50000'),save_plot=TRUE){
 
-  #will only work if the data is all Uniprot or FASTA
-  #will be a list
-  #if((length(levels(bs_output$db))) == 1 && ((levels(bs_output$db) == 'Uniprot') || (levels(bs_output$db) == 'FASTA'))
-
 
   #could theoretically do just PDB as well as long as length(levels()) == 1
   if(is.null(db_selection)){
@@ -27,7 +23,7 @@ rbd.freqVector <- function(bs_output, name_by = 'pro_name', heatmap = TRUE, db_s
 
       #if the levels do not match either of these
       #function cannot proceed
-      warning('All rows in database must belong to only 1 value')
+      #warning('All rows in database must belong to only 1 value')
 
 
       menu_selection <- menu(choices = levels(bs_output$db), title = 'Choose a database type for your numbering')
