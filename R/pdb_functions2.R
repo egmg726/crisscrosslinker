@@ -24,17 +24,18 @@
 
 #-----firstup-----
 
+#need a reference here to the stackoverflow page
 
 #' Capitalize first letter
 #'
 #' This function allows you to capitalize the first letter of a string and returns all other characters as lower case.
-#' From https://stackoverflow.com/questions/18509527/first-letter-to-upper-case/18509816
 #' @param x A string
 #' @keywords capitalize
 #' @export
 #' @examples
 #' string <- 'AAA'
 #' firstup(string)
+#' [1] Aaa
 
 
 firstup <- function(x) {
@@ -1627,15 +1628,14 @@ make_binding_site_df <- function(pdb_info,
 #' @param colors List of either PyMol colors, hexcodes, or standard colors in R. Will also accept color palette names from RColorBrewer and viridis. If left as NULL, will use standard PyMOL tint colors.
 #' @param png.name Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.
 #' @param gray0 If TRUE, will shift color palette and replace 1st color as gray (corresponds 0 if using frequency). Defaults to FALSE.
-#' @param print.legend If TRUE, will print a legend of the colors corresponding to the vars inputted.
+#' @param start.num Starting number for custom color, change if additional custom colors are being used
 #' @author Emma Gail
 #' @export
 
 #zero indices as a parameter?
 #have vars as a number? can have boolean that overrides if it is a number
 #change png.name to something more general to indicate that it can output different picture file formats
-color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg',
-                        gray0 = FALSE, print.legend = TRUE){
+color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg', gray0 = FALSE, print.legend = TRUE, start.num = 1){
 
   num <- length(vars)
 
@@ -1804,7 +1804,7 @@ color.pymol <- function(vars, colors = NULL, png.name = 'pymol_legend%03d.svg',
       #paste(rbg_row,collapse=', ')
 
       #if()
-      custom_color_name <- paste0('custom_color_',row_num)
+      custom_color_name <- paste0('custom_color_',(row_num+(start.num-1)))
       set_color_line <- paste0("cmd.set_color('",custom_color_name,"', (",paste(rbg_row,collapse=', '),"))")
 
       load_colors <- c(load_colors,set_color_line)
@@ -5979,7 +5979,7 @@ strcount <- function(x, pattern, split){
 
 #split_proteins <- 'PHF19_Q5T6S3(25)-PHF19_Q5T6S3(32)'
 
-extract_protein_name_and_peptide_num <- function(split_proteins,list_of_protein_names){
+extract_protein_name_and_peptide_num <- function(split_proteins,list_of_protein_names, console_messages=FALSE){
 
   pro_pos_list <- c()
   matched_pro_list <- c()
@@ -6161,10 +6161,17 @@ extract_protein_name_and_peptide_num <- function(split_proteins,list_of_protein_
 
   if(nrow(pro_sort_df) == 0){ #nothing in the dataframe
 
-    cat('Neither sequence in fasta file or dictionary - sending to unused file\n')
+    if(console_messages == TRUE){
+      cat('Neither sequence in fasta file or dictionary - sending to unused file\n')
+    }
+
     return(NULL)
   } else if (nrow(pro_sort_df) == 1){
+
+    if(console_messages == TRUE){
     cat('Only 1 protein found in fasta file and/or dictionary - sending to unused file\n')
+    }
+
     return(NULL)
   }
 
@@ -6658,8 +6665,8 @@ filter_xlink_df_by_protein_names <- function(xl_dataframe,list_of_protein_names)
 #what is the frequency vector?? need this info for documentation
 generate_random_lysine_distances_in_pdb <- function(pdb_id,frequency_vector,chains=NULL){
 
-  #pdb_6c23 <- check_download_read_pdb(pdb_id = pdb_id)
-  pdb_6c23 <- read.pdb2(pdb_id)
+  pdb_6c23 <- check_download_read_pdb(pdb_id = pdb_id)
+  #pdb_6c23 <- read.pdb2(pdb_id)
 
   pdb_6c23_atom_filtered <- pdb_6c23$atom[pdb_6c23$atom$elety == 'CA',]
   pdb_6c23_atom_filtered <- pdb_6c23_atom_filtered[pdb_6c23_atom_filtered$resid == 'LYS',]
@@ -8732,17 +8739,14 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 "bs_output_repeats_uniprot"
 
 
-#first save the data to
-#need to also include rbdmap data and protein-protein interaction data
-#will the code be able to handle pre-loaded data? --> should do this for the getSeqHitList function as well
-#may need a different code
 
 
 #save(pymol_color_table,file='data/pymol_color_table.RData')
 
-#setwd('/Users/emmagail/Documents/monash/project.functions')
-#setwd('/Users/emmagail/Documents/crisscrosslinker')
+#setwd('~/Documents/monash/project.functions')
+#setwd('~/Documents/crisscrosslinker')
 
+#
 #roxygen2::roxygenise()
 #requireNamespace("crisscrosslinker")
 

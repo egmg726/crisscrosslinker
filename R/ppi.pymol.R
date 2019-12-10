@@ -8,11 +8,12 @@
 #'@param colors A list of colors as R names or hexcodes or a palette defined by RColorBrewer/viridis. If left blank, will use the colors that are in the column freq_color.
 #'@param color_by If colors is not NULL, choose either 'freq' or 'dist' for which variable should be colored.
 #'@param file.name File name for the exported PyMOL file. Should end in '.pml'
+#'@param start.num Starting number for custom color, change if additional custom colors are being used
 #'@export
 
 ppi.pymol <- function(xlink.df.pdb,list_of_start_and_end_pdbs = NULL,show_only_real_structures = NULL, write_file = TRUE,
                       colors = NULL, color_by = 'freq', experiment_directory = NULL,
-                      pdb_numbering = FALSE,file.name='xlink.pml'){
+                      pdb_numbering = FALSE,file.name='xlink.pml',start.num = 1){
   #rename the columns to the original column names for easier integration to the rest of
   #the function
 
@@ -79,8 +80,13 @@ ppi.pymol <- function(xlink.df.pdb,list_of_start_and_end_pdbs = NULL,show_only_r
 
   if((custom.color == TRUE) && color_by != 'dist'){
 
+    bsfv_vars <- sort(unique(xlink.df.pdb[[color_by]]))
 
-      pymol_cc <- color.pymol(sort(unique(xlink.df.pdb[[color_by]])), colors = colors)
+    if(length(colors) != length(bsfv_vars)){
+      colors <- colorRampPalette(colors = colors)(length(bsfv_vars))
+    }
+
+    pymol_cc <- color.pymol(sort(unique(xlink.df.pdb[[color_by]])), colors = colors, start.num = start.num)
 
 
     #pymol_cc$vars
