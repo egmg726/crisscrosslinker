@@ -76,11 +76,14 @@ rbd.pymol <- function(bs_output, color_by = 'binding_sequence',
 
     #return(bsfv_vars)
     #return(list(vars=bsfv_vars,colors = colors,gray0 = gray0))
+    
+    viridis_colors <- c("magma","inferno","plasma","viridis","cividis")
 
 
-    if(length(colors) != length(bsfv_vars)){
+    if((length(colors) != length(bsfv_vars)) && !((colors %in% rownames(brewer.pal.info)) || (colors %in% viridis_colors))){
       colors <- colorRampPalette(colors = colors)(length(bsfv_vars))
     }
+    
     pymol_cc <- color.pymol(bsfv_vars, colors = colors, png.name = 'freqvector_legend_test.svg', gray0 = gray0, print.legend = write.file)
 
 
