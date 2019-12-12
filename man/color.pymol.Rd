@@ -4,8 +4,14 @@
 \alias{color.pymol}
 \title{Color PyMol}
 \usage{
-color.pymol(vars, colors = NULL, png.name = "pymol_legend\%03d.svg",
-  gray0 = FALSE, print.legend = TRUE)
+color.pymol(
+  vars,
+  colors = NULL,
+  png.name = "pymol_legend\%03d.svg",
+  gray0 = FALSE,
+  print.legend = TRUE,
+  start.num = 1
+)
 }
 \arguments{
 \item{vars}{List of variables to be used}
@@ -15,6 +21,8 @@ color.pymol(vars, colors = NULL, png.name = "pymol_legend\%03d.svg",
 \item{png.name}{Name of the legend output. Defaults to "pymol_legend.jpg" unless otherwise specified.}
 
 \item{gray0}{If TRUE, will shift color palette and replace 1st color as gray (corresponds 0 if using frequency). Defaults to FALSE.}
+
+\item{start.num}{Starting number for custom color, change if additional custom colors are being used}
 }
 \description{
 Generate colors to be used when generating a PyMol script

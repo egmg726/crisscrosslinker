@@ -4,12 +4,18 @@
 \alias{ppi.matchPDB}
 \title{PPI: Match PDB}
 \usage{
-ppi.matchPDB(xlink_df, fasta_file, pdb_numbering = FALSE,
-  pdb_directory = NULL, pdb_match_vector = NULL,
+ppi.matchPDB(
+  xlink_df,
+  fasta_file,
+  pdb_numbering = FALSE,
+  pdb_directory = NULL,
+  pdb_match_vector = NULL,
   csv_pdb_input_file = NULL,
   fasta_names_to_generate_all_2d_structures = NULL,
-  protein_alternative_names_dict = NULL, download_pdb = TRUE,
-  file_type_2d = "single_dot")
+  protein_alternative_names_dict = NULL,
+  download_pdb = TRUE,
+  file_type_2d = "single_dot"
+)
 }
 \arguments{
 \item{xlink_df}{data.frame() as created by ppi.combineData()}

@@ -4,8 +4,12 @@
 \alias{uniprot.fasta}
 \title{Fetch FASTA sequence from Uniprot}
 \usage{
-uniprot.fasta(uniprot.id, download.fasta = FALSE,
-  console.message = TRUE, fasta.directory = getwd())
+uniprot.fasta(
+  uniprot.id,
+  download.fasta = FALSE,
+  console.message = TRUE,
+  fasta.directory = getwd()
+)
 }
 \arguments{
 \item{uniprot.id}{Uniprot ID of sequence wanted in the form "ID-isoform". Leave out isoform if using the canonical sequence.}

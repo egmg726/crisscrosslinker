@@ -4,9 +4,14 @@
 \alias{rbd.makeSeqHitList}
 \title{Make sequence hit list}
 \usage{
-rbd.makeSeqHitList(fasta_file, experiment_directory = NULL,
-  file_format = NULL, cutoff_score = 20, RK.cleavage = TRUE,
-  files.list = NULL)
+rbd.makeSeqHitList(
+  fasta_file,
+  experiment_directory = NULL,
+  file_format = NULL,
+  cutoff_score = 20,
+  RK.cleavage = TRUE,
+  files.list = NULL
+)
 }
 \arguments{
 \item{fasta_file}{FASTA file as loaded by seqinr::read.fasta()}

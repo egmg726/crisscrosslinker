@@ -4,8 +4,7 @@
 \alias{ppi.loadData}
 \title{PPI: Load Data}
 \usage{
-ppi.loadData(xldata, fasta_file, file_directory = getwd(),
-  datatype = NULL)
+ppi.loadData(xldata, fasta_file, file_directory = getwd(), datatype = NULL)
 }
 \arguments{
 \item{xldata}{Name of files or loaded data.frames. If using pLink2 data, it is recommended to use the name of file.}

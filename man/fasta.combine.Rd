@@ -4,9 +4,12 @@
 \alias{fasta.combine}
 \title{Combine FASTA files}
 \usage{
-fasta.combine(fasta_file_names, experiment_directory = NULL,
+fasta.combine(
+  fasta_file_names,
+  experiment_directory = NULL,
   fasta_file_directory = NULL,
-  fasta_file_in_different_directory = FALSE)
+  fasta_file_in_different_directory = FALSE
+)
 }
 \arguments{
 \item{fasta_file_names}{List of file names}

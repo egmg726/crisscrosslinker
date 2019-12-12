@@ -4,8 +4,7 @@
 \alias{rbd.getBindingSeq3}
 \title{RBD: Get Binding Sequence - Casetello et. al 2016 Method}
 \usage{
-rbd.getBindingSeq3(trypticPeptide, enzyme, sourceSequence,
-  cleave_offset = 4)
+rbd.getBindingSeq3(trypticPeptide, enzyme, sourceSequence, cleave_offset = 4)
 }
 \arguments{
 \item{trypticPeptide}{trypticPeptide, peptide detected by RBDmap/MS method}

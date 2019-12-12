@@ -4,8 +4,7 @@
 \alias{rbd.menuDBSearch}
 \title{Menu DB Search}
 \usage{
-rbd.menuDBSearch(input_sequence, fasta_file, protein_name,
-  pdb_info = NULL)
+rbd.menuDBSearch(input_sequence, fasta_file, protein_name, pdb_info = NULL)
 }
 \arguments{
 \item{input_sequence}{input_sequence}

@@ -4,10 +4,18 @@
 \alias{ppi.pymol}
 \title{Write PyMOL file for protein-protein interaction data}
 \usage{
-ppi.pymol(xlink.df.pdb, list_of_start_and_end_pdbs = NULL,
-  show_only_real_structures = NULL, write_file = TRUE, colors = NULL,
-  color_by = "freq", experiment_directory = NULL,
-  pdb_numbering = FALSE, file.name = "xlink.pml")
+ppi.pymol(
+  xlink.df.pdb,
+  list_of_start_and_end_pdbs = NULL,
+  show_only_real_structures = NULL,
+  write_file = TRUE,
+  colors = NULL,
+  color_by = "freq",
+  experiment_directory = NULL,
+  pdb_numbering = FALSE,
+  file.name = "xlink.pml",
+  start.num = 1
+)
 }
 \arguments{
 \item{xlink.df.pdb}{data.frame output from ppi.matchPDB() or ppi.matchPDB2()}
@@ -21,6 +29,8 @@ ppi.pymol(xlink.df.pdb, list_of_start_and_end_pdbs = NULL,
 \item{color_by}{If colors is not NULL, choose either 'freq' or 'dist' for which variable should be colored.}
 
 \item{file.name}{File name for the exported PyMOL file. Should end in '.pml'}
+
+\item{start.num}{Starting number for custom color, change if additional custom colors are being used}
 }
 \description{
 Generates a file for PyMOL based on the XL sites aligned to PDB structures.

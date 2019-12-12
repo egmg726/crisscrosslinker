@@ -4,9 +4,13 @@
 \alias{rbd.makeIETable}
 \title{Make input and eluate table}
 \usage{
-rbd.makeIETable(sequence_hit_list, prefixes, proteases = c("ArgC",
-  "LysC"), output_file_name = "pipeline_output_file.csv",
-  experiment_directory = NULL)
+rbd.makeIETable(
+  sequence_hit_list,
+  prefixes,
+  proteases = c("ArgC", "LysC"),
+  output_file_name = "pipeline_output_file.csv",
+  experiment_directory = NULL
+)
 }
 \arguments{
 \item{sequence_hit_list}{Output from rbd.makeSeqHitList() function}

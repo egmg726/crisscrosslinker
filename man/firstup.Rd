@@ -15,6 +15,5 @@ This function allows you to capitalize the first letter of a string and returns 
 \examples{
 string <- 'AAA'
 firstup(string)
-[1] Aaa
 }
 \keyword{capitalize}

@@ -4,8 +4,13 @@
 \alias{ppi.matchPDB2}
 \title{PPI Match PDB 2}
 \usage{
-ppi.matchPDB2(xlink.df, fasta_file, alignIDs, uniprot2pdb = TRUE,
-  dist.histogram = TRUE)
+ppi.matchPDB2(
+  xlink.df,
+  fasta_file,
+  alignIDs,
+  uniprot2pdb = TRUE,
+  dist.histogram = TRUE
+)
 }
 \arguments{
 \item{xlink.df}{A data.frame made by ppi.combineData()}

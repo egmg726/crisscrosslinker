@@ -4,8 +4,13 @@
 \alias{rbd.alignBS}
 \title{RBD: Align Binding Sequences to Uniprot and PDB}
 \usage{
-rbd.alignBS(rbd.df, alignIDs, alignTo = c("pdb", "uniprot", "fasta"),
-  uniprot2pdb = TRUE, allowPartialBS = FALSE)
+rbd.alignBS(
+  rbd.df,
+  alignIDs,
+  alignTo = c("pdb", "uniprot", "fasta"),
+  uniprot2pdb = TRUE,
+  allowPartialBS = FALSE
+)
 }
 \arguments{
 \item{rbd.df}{Output from rbd.getBSfromDF()}

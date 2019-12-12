@@ -4,8 +4,12 @@
 \alias{quick_pwa_from_pdb}
 \title{Quick PWA from PDB}
 \usage{
-quick_pwa_from_pdb(query_sequence, pdb_read, chain,
-  use_resid_and_resno = FALSE)
+quick_pwa_from_pdb(
+  query_sequence,
+  pdb_read,
+  chain,
+  use_resid_and_resno = FALSE
+)
 }
 \arguments{
 \item{query_sequence}{Sequence to match the PDB sequence against}

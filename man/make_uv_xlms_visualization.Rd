@@ -4,8 +4,10 @@
 \alias{make_uv_xlms_visualization}
 \title{Make UV XLMS Visualization}
 \usage{
-make_uv_xlms_visualization(uniprot_fasta_file_numeric,
-  output_type = c("xinet", "pymol"))
+make_uv_xlms_visualization(
+  uniprot_fasta_file_numeric,
+  output_type = c("xinet", "pymol")
+)
 }
 \arguments{
 \item{uniprot_fasta_file_numeric}{uniprot_fasta_file_numeric}

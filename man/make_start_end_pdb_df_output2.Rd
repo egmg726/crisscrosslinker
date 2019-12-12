@@ -4,8 +4,10 @@
 \alias{make_start_end_pdb_df_output2}
 \title{Make start and end csv file for make_diff_analysis function}
 \usage{
-make_start_end_pdb_df_output2(generated_pdb_lists,
-  output_file_name = "start_and_end")
+make_start_end_pdb_df_output2(
+  generated_pdb_lists,
+  output_file_name = "start_and_end"
+)
 }
 \arguments{
 \item{generated_pdb_lists}{list() generated from generate_pdb_lists_and_files_from_fasta() or generate_pdb_lists_and_files_pdb_csv()}

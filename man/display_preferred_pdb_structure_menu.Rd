@@ -4,8 +4,12 @@
 \alias{display_preferred_pdb_structure_menu}
 \title{Display Preferred PDB Structure Menu}
 \usage{
-display_preferred_pdb_structure_menu(protein_name, fasta_file,
-  pwa_score_threshold = 500, peptide_sequence = NULL)
+display_preferred_pdb_structure_menu(
+  protein_name,
+  fasta_file,
+  pwa_score_threshold = 500,
+  peptide_sequence = NULL
+)
 }
 \arguments{
 \item{protein_name}{Protein name that corresponds to name in fasta_file to extract sequence}

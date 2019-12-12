@@ -4,17 +4,27 @@
 \alias{generate_2d_pdb_file}
 \title{Generate 2D PDB File}
 \usage{
-generate_2d_pdb_file(amino_acid_fragments, start_residue,
-  x_coord = 82.998, y_coord = -5.76, z_coord = -20.345)
+generate_2d_pdb_file(
+  amino_acid_fragments,
+  start_residue,
+  x_coord = 82.998,
+  y_coord = -5.76,
+  z_coord = -20.345
+)
 }
 \arguments{
 \item{amino_acid_fragments}{A vector containing an amino acid sequence.}
+
+\item{start_residue}{Start residue}
+
+\item{x_coord}{X coordinate}
+
+\item{y_coord}{Y coordinate}
+
+\item{Z}{coordinate}
 }
 \description{
 This function allows you to turn a list of amino acids into a 2D PDB file that can be downloaded.
-}
-\examples{
-new_pdb_file <- generate_2d_pdb_file(amino_acid_fragments)
 }
 \author{
 Emma Gail

@@ -4,8 +4,7 @@
 \alias{split_sequences}
 \title{Split Sequences}
 \usage{
-split_sequences(xlink_string, proteins = TRUE,
-  split_by_parenthesis = FALSE)
+split_sequences(xlink_string, proteins = TRUE, split_by_parenthesis = FALSE)
 }
 \description{
 Split Sequences

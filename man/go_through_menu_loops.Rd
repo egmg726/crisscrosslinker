@@ -4,8 +4,7 @@
 \alias{go_through_menu_loops}
 \title{BLAST sequence and go through menu loops}
 \usage{
-go_through_menu_loops(fasta_sequence_vector, database = "pdb",
-  time_out = NULL)
+go_through_menu_loops(fasta_sequence_vector, database = "pdb", time_out = NULL)
 }
 \arguments{
 \item{fasta_sequence_vector}{Sequence as a vector to be used to BLAST against}

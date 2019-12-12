@@ -4,8 +4,12 @@
 \alias{ppi.xinet}
 \title{Makes file for xiNET input}
 \usage{
-ppi.xinet(xlink_df, write_file = TRUE,
-  xlink_viewer_csv_file_name = "xlink_viewer.csv", add_color = FALSE)
+ppi.xinet(
+  xlink_df,
+  write_file = TRUE,
+  xlink_viewer_csv_file_name = "xlink_viewer.csv",
+  add_color = FALSE
+)
 }
 \arguments{
 \item{xlink_df}{Dataframe created by make_diff_analysis function}

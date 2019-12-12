@@ -4,17 +4,25 @@
 \alias{ppi.analyze}
 \title{BS3 Differential Analysis Inclusive Function}
 \usage{
-ppi.analyze(list_of_files, fasta_file, file_type_2d = c("single_dot",
-  "linear", "curved"), fasta_names_to_generate_all_2d_structures = NULL,
-  csv_pdb_input_file = NULL, category_color_input_file = NULL,
+ppi.analyze(
+  list_of_files,
+  fasta_file,
+  file_type_2d = c("single_dot", "linear", "curved"),
+  fasta_names_to_generate_all_2d_structures = NULL,
+  csv_pdb_input_file = NULL,
+  category_color_input_file = NULL,
   show_only_real_structures = NULL,
   distance_histogram_name = "distance_histogram.png",
   pymol_file_list_file_name = "pymol_ts_output.pml",
   xlink_df_name = "xlink_dataframe.csv",
-  xlink_view_file_name = "xlink_view_df.csv", no_pdb_files = FALSE,
-  protein_alternative_names_dict = NULL, pdb_directory = NULL,
-  data_input_type = "plink", pdb_numbering = FALSE,
-  pdb_match_vector = NULL)
+  xlink_view_file_name = "xlink_view_df.csv",
+  no_pdb_files = FALSE,
+  protein_alternative_names_dict = NULL,
+  pdb_directory = NULL,
+  data_input_type = "plink",
+  pdb_numbering = FALSE,
+  pdb_match_vector = NULL
+)
 }
 \arguments{
 \item{list_of_files}{A list of file names containing pLink data to be used for the analysis}

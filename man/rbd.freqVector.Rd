@@ -4,9 +4,14 @@
 \alias{rbd.freqVector}
 \title{Get Frequency Vector for RBDmap Data}
 \usage{
-rbd.freqVector(bs_output, name_by = "pro_name", heatmap = TRUE,
-  db_selection = NULL, colors = c("#d0d0d0", "#2f5ac6", "#e50000"),
-  save_plot = TRUE)
+rbd.freqVector(
+  bs_output,
+  name_by = "pro_name",
+  heatmap = TRUE,
+  db_selection = NULL,
+  colors = c("#d0d0d0", "#2f5ac6", "#e50000"),
+  save_plot = TRUE
+)
 }
 \arguments{
 \item{bs_output}{data.frame() output from rbd.getBSfromIET() or rbd.getBSfromDF()}

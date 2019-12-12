@@ -4,8 +4,13 @@
 \alias{rbd.alignBS2}
 \title{RBD: Align Binding Sequences to Uniprot and PDB}
 \usage{
-rbd.alignBS2(bs.output, alignIDs, alignTo = c("pdb", "uniprot", "fasta"),
-  uniprot2pdb = TRUE, allowPartialBS = FALSE)
+rbd.alignBS2(
+  bs.output,
+  alignIDs,
+  alignTo = c("pdb", "uniprot", "fasta"),
+  uniprot2pdb = TRUE,
+  allowPartialBS = FALSE
+)
 }
 \arguments{
 \item{bs.output}{Output from rbd.getBSfromIET()}

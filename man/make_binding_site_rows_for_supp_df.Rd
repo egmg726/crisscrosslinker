@@ -4,8 +4,10 @@
 \alias{make_binding_site_rows_for_supp_df}
 \title{make_binding_site_rows_for_supp_df}
 \usage{
-make_binding_site_rows_for_supp_df(proteins_and_intensity_list,
-  identifier_is_binding_seq = FALSE)
+make_binding_site_rows_for_supp_df(
+  proteins_and_intensity_list,
+  identifier_is_binding_seq = FALSE
+)
 }
 \arguments{
 \item{proteins_and_intensity_list}{proteins_and_intensity_list}

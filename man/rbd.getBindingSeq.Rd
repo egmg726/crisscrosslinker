@@ -4,10 +4,18 @@
 \alias{rbd.getBindingSeq}
 \title{Get Binding Sequence from RBDmap Data - Zhang et. al 2019 Method}
 \usage{
-rbd.getBindingSeq(ms_sequence, protease, sequence_for_alignment,
-  protein_name = NULL, database_name = NULL, database_id = NULL,
-  cleave_offset = 0, last_aa = NULL, include_ambiguous = FALSE,
-  proteolytic_fragments = FALSE)
+rbd.getBindingSeq(
+  ms_sequence,
+  protease,
+  sequence_for_alignment,
+  protein_name = NULL,
+  database_name = NULL,
+  database_id = NULL,
+  cleave_offset = 0,
+  last_aa = NULL,
+  include_ambiguous = FALSE,
+  proteolytic_fragments = FALSE
+)
 }
 \arguments{
 \item{ms_sequence}{The input sequence from MS, should be loaded as a string}

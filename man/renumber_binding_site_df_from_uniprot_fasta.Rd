@@ -4,9 +4,13 @@
 \alias{renumber_binding_site_df_from_uniprot_fasta}
 \title{Renumber binding site df from uniprot fasta}
 \usage{
-renumber_binding_site_df_from_uniprot_fasta(binding_site_df,
-  protein_to_uniprot_id, fasta_file, fasta_file_directory = NULL,
-  use_pipeline_output_df = FALSE)
+renumber_binding_site_df_from_uniprot_fasta(
+  binding_site_df,
+  protein_to_uniprot_id,
+  fasta_file,
+  fasta_file_directory = NULL,
+  use_pipeline_output_df = FALSE
+)
 }
 \arguments{
 \item{binding_site_df}{binding_site_df}

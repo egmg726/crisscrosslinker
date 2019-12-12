@@ -4,9 +4,13 @@
 \alias{make_proteins_and_intensity_list_from_pipeline_output}
 \title{Make Proteins and Intensities List}
 \usage{
-make_proteins_and_intensity_list_from_pipeline_output(experiment_prefixes,
-  protein_to_uniprot_id, fasta_file, fasta_file_directory,
-  identifier_is_binding_seq = FALSE)
+make_proteins_and_intensity_list_from_pipeline_output(
+  experiment_prefixes,
+  protein_to_uniprot_id,
+  fasta_file,
+  fasta_file_directory,
+  identifier_is_binding_seq = FALSE
+)
 }
 \arguments{
 \item{experiment_prefixes}{experiment_prefixes}

@@ -4,10 +4,16 @@
 \alias{ppi.combineData}
 \title{PPI: Combine Data}
 \usage{
-ppi.combineData(xlink_mega_list, fasta_file, freq_cutoff = NA,
-  score_cutoff = NA, cutoff_cond = c("and", "or"),
+ppi.combineData(
+  xlink_mega_list,
+  fasta_file,
+  freq_cutoff = NA,
+  score_cutoff = NA,
+  cutoff_cond = c("and", "or"),
   protein_alternative_names_dict = NULL,
-  category_color_input_file = NULL, console_messages = FALSE)
+  category_color_input_file = NULL,
+  console_messages = FALSE
+)
 }
 \arguments{
 \item{xlink_mega_list}{List made by ppi.loadData()}

@@ -4,8 +4,13 @@
 \alias{uniprot.PDBmap}
 \title{UniProt PDBmap}
 \usage{
-uniprot.PDBmap(pdb_id, resno, chain = NULL, uniprot_id = NULL,
-  output = c("pdb", "uniprot"))
+uniprot.PDBmap(
+  pdb_id,
+  resno,
+  chain = NULL,
+  uniprot_id = NULL,
+  output = c("pdb", "uniprot")
+)
 }
 \arguments{
 \item{pdb_id}{Valid ID of a PDB accession number within RCSB}

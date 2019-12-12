@@ -4,9 +4,12 @@
 \alias{make_plink2_master_list}
 \title{Make pLink2 master list}
 \usage{
-make_plink2_master_list(plink2_peptides, list_of_protein_names,
+make_plink2_master_list(
+  plink2_peptides,
+  list_of_protein_names,
   plink2_type_of_file = c("cross-linked", "loop-linked"),
-  master_list_index = 0)
+  master_list_index = 0
+)
 }
 \description{
 This function creates the list of

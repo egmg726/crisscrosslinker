@@ -4,13 +4,20 @@
 \alias{rbd.xinet}
 \title{RBDmap: xiNET Output}
 \usage{
-rbd.xinet(bs.output, colors = c("#d0d0d0", "#2f5ac6", "#e50000"),
-  write.file = TRUE, file.name = "rbd_xinet.csv")
+rbd.xinet(
+  bs.output,
+  colors = c("#d0d0d0", "#2f5ac6", "#e50000"),
+  database = "UniProt",
+  write.file = TRUE,
+  file.name = "rbd_xinet.csv"
+)
 }
 \arguments{
 \item{bs.output}{Output from function rbd.getBSfromIET()}
 
 \item{colors}{Colors to be used for the annotation file. Can be an RColorBrewer palette name, virdis palette name, or list of hexcodes.}
+
+\item{database}{Database to be used for the visualization. Can choose betwen "PDB", "UniProt", or "FASTA". Defaults to UniProt.}
 
 \item{write.file}{If TRUE, will write to a .csv file}
 

@@ -4,9 +4,15 @@
 \alias{do_sr_chain_loop}
 \title{Match query sequence to chain in PDB file}
 \usage{
-do_sr_chain_loop(protein_name, fasta_seq, pdb_read, pdb_rl,
-  pwa_score_threshold = 500, peptide_sequence = NULL,
-  fasta_file = NULL)
+do_sr_chain_loop(
+  protein_name,
+  fasta_seq,
+  pdb_read,
+  pdb_rl,
+  pwa_score_threshold = 500,
+  peptide_sequence = NULL,
+  fasta_file = NULL
+)
 }
 \arguments{
 \item{protein_name}{Protein name that will be used for the console output}

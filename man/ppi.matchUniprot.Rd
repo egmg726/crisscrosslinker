@@ -4,10 +4,17 @@
 \alias{ppi.matchUniprot}
 \title{PPI: Match Protein Sequences to UniProt}
 \usage{
-ppi.matchUniprot(xlink_df, fasta_file, protein_to_uniprot_id = NULL,
-  fasta_directory = NULL, download_fasta = FALSE,
-  export_matches = FALSE, remove_na = FALSE, time_out = NULL,
-  canonical = FALSE)
+ppi.matchUniprot(
+  xlink_df,
+  fasta_file,
+  protein_to_uniprot_id = NULL,
+  fasta_directory = NULL,
+  download_fasta = FALSE,
+  export_matches = FALSE,
+  remove_na = FALSE,
+  time_out = NULL,
+  canonical = FALSE
+)
 }
 \arguments{
 \item{xlink_df}{data.frame() as created by ppi.combineData()}

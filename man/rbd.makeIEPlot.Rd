@@ -4,10 +4,17 @@
 \alias{rbd.makeIEPlot}
 \title{Make input/eluate plot}
 \usage{
-rbd.makeIEPlot(input_eluate_table, prefixes, proteases = c("LysC",
-  "ArgC"), title = "Eluate vs. Input", palette = "Dark2",
-  fill = "#eaf2ff", colour = "#eaf2ff", size = 0.5,
-  pipeline_generated_plot_title = "pipeline_generated_plot.png")
+rbd.makeIEPlot(
+  input_eluate_table,
+  prefixes,
+  proteases = c("LysC", "ArgC"),
+  title = "Eluate vs. Input",
+  palette = "Dark2",
+  fill = "#eaf2ff",
+  colour = "#eaf2ff",
+  size = 0.5,
+  pipeline_generated_plot_title = "pipeline_generated_plot.png"
+)
 }
 \arguments{
 \item{input_eluate_table}{Output from make_input_eluate_table()}
