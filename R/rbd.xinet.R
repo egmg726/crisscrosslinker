@@ -4,17 +4,23 @@
 #'
 #'@param bs.output Output from function rbd.getBSfromIET()
 #'@param colors Colors to be used for the annotation file. Can be an RColorBrewer palette name, virdis palette name, or list of hexcodes.
+#'@param database Database to be used for the visualization. Can choose betwen "PDB", "UniProt", or "FASTA". Defaults to UniProt.
 #'@param write.file If TRUE, will write to a .csv file
 #'@param file.name File name for the written out file.
 #'@export
 
-rbd.xinet <- function(bs.output,colors=c('#d0d0d0','#2f5ac6','#e50000'),write.file=TRUE,file.name='rbd_xinet.csv'){
+
+rbd.xinet <- function(bs.output,colors=c('#d0d0d0','#2f5ac6','#e50000'),
+                      database='UniProt',
+                      write.file=TRUE,file.name='rbd_xinet.csv'){
   
-  bs_output_repeats_uniprot_freqvector <- rbd.freqVector(bs.output,heatmap = FALSE)
-  bs_freqVector <- bs_output_repeats_uniprot_freqvector
+  #needs to be all the same source, choose a resource
+  #still need to write in resource
+  #will send out a warning message if not 
   
+  bs.output2 <- bs.output[bs.output$db == database,]
+  bs_freqVector <- rbd.freqVector(bs.output2,heatmap = FALSE)
   viridis_colors <- c("magma","inferno","plasma","viridis","cividis")
-  
   
   if((colors %in% rownames(brewer.pal.info)) || (colors %in% viridis_colors)){
     freq_vars <- sort(unique(unlist(bs_freqVector)))
@@ -26,56 +32,45 @@ rbd.xinet <- function(bs.output,colors=c('#d0d0d0','#2f5ac6','#e50000'),write.fi
   
   color.list <- hm.palette(length(unique(unlist(bs_freqVector))))
   
-  fvl_si_df <- data.frame()
-  for(protein_name in names(bs_output_repeats_uniprot_freqvector)){
-    freq_vector_list <- bs_output_repeats_uniprot_freqvector[[protein_name]]
-    for(n_repeats in sort(unique(freq_vector_list))){
+  anno.df <- data.frame()
+  
+  for(protein_name in names(bs_freqVector)){
+    
+    freq_vector <- bs_freqVector[[protein_name]]
+    unique_nums <- as.numeric(unique(freq_vector))
+    
+    for(unum in unique_nums){
       
-      fvl_sub_ind <-(1:length(freq_vector_list))[freq_vector_list == n_repeats]
-      fvl_si <- c()
-      #fvl_si_df <- data.frame()
-      for(i in 1:length(fvl_sub_ind)){
-        fvl_si <- c(fvl_si,fvl_sub_ind[i])
-        if(is.sequential(fvl_si) == TRUE){
-          next #if still sequentil, no break yet
-        } else {
-          fvl_si <- head(fvl_si,-1)
-          fvl_si_min <- min(fvl_si) #get start
-          fvl_si_max <- max(fvl_si) #get end
-          #fvl_si_df <- rbind(fvl_si_df,data.frame(min=fvl_si_min,max=fvl_si_max,num=1))
-          fvl_si_df <- rbind(fvl_si_df,data.frame(ProteinId=protein_name,AnnotName=paste0('Num of Repeats: ',as.character(n_repeats)),StartRes=fvl_si_min,EndRes=fvl_si_max,Color=color.list[n_repeats+1]))
-          fvl_si <- c(fvl_sub_ind[i]) #reset the list 
-        } #end else to if(is.sequential(fvl_si) == TRUE){
-      } #end for(i in 1:length(fvl_sub_ind)){
+      freq_vector2 <- (1:length(freq_vector))[freq_vector == unum]
+      list_ranges <- tapply(freq_vector2, cumsum(c(TRUE, diff(freq_vector2) > 2)), range)
       
-      #repeat to get the last list 
-      fvl_si_min <- min(fvl_si)
-      fvl_si_max <- max(fvl_si)
-      
-      #what to do about the annotation name? (just the number of repeats)   
-      fvl_si_df <- rbind(fvl_si_df,data.frame(ProteinId=protein_name,AnnotName=paste0('Num of Repeats: ',as.character(n_repeats)),StartRes=fvl_si_min,EndRes=fvl_si_max,Color=color.list[n_repeats+1]))
-      
-    } #end for(num_repeats in sort(unique(freq_vector_list))){
-  } #end for(protein_name in names(bs_output_repeats_uniprot_freqvector)){
+      for(lr_num in 1:length(list_ranges)){
+        start_end <- list_ranges[[lr_num]]
+        lr_start <- start_end[1]
+        lr_end <- start_end[2]
+        
+        anno_list <- list(ProteinId=protein_name,
+                          AnnotName=paste0('Number of Repeats: ',unum), #string here establishing the number of repeats
+                          StartRes=lr_start,
+                          EndRes=lr_end,
+                          Color=color.list[unum+1]) 
+        
+        anno.df <- rbind(anno.df,(data.frame(anno_list)))
+        
+      } #end for(lr_num in 1:length(list_ranges)){
+    } #end for(unum in unique_nums){
+  } #end for(protein_name in names(bs_freqVector)){
+  
   
   if(write.file == TRUE){
-    write.csv(fvl_si_df, file = file.name)
+    write.csv(anno.df,file.name,row.names=FALSE) #need to make sure that the number column is removed?
+  } else {
+    return(anno.df)
   }
   
-  return(fvl_si_df)
+  #make sure the write.csv function works
   
   
-} #end function xinet
+} #end function rbd.xinet
 
 
-#'Is Sequential
-#'
-#'Shows TRUE/FALSE if list contains sequential values
-#'
-#'@param x List of values to be checked.
-#'@export
-
-
-is.sequential <- function(x){
-  all(abs(diff(x)) == 1)
-} 

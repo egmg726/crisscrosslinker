@@ -2,11 +2,13 @@
 #'
 #' This function allows you to turn a list of amino acids into a 2D PDB file that can be downloaded.
 #' @param amino_acid_fragments A vector containing an amino acid sequence.
+#' @param start_residue Start residue
+#' @param x_coord X coordinate
+#' @param y_coord Y coordinate
+#' @param Z coordinate
 #' @keywords pdb
 #' @author Emma Gail
 #' @export
-#' @examples
-#' new_pdb_file <- generate_2d_pdb_file(amino_acid_fragments)
 
 generate_2d_pdb_file <- function(amino_acid_fragments,start_residue,
                                  x_coord = 82.998, y_coord = -5.760,

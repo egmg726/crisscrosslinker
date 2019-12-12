@@ -14,11 +14,7 @@
 # library(XML)
 # library(RCurl)
 
-#need to do importFrom for these packages so that only certain ones are taken out of the
-#packages --> no name conflicts
 
-
-#only import the svg function into the final version
 
 
 
@@ -35,7 +31,6 @@
 #' @examples
 #' string <- 'AAA'
 #' firstup(string)
-#' [1] Aaa
 
 
 firstup <- function(x) {
@@ -8726,7 +8721,7 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'
 #'@usage data(bs_output_repeats_pdb)
 #'
-"bs_output_repeats_pdb"
+"bs_output_repeats_pdb2"
 
 #'Processed PRC2 RBDmap Data aligned to Uniprot
 #'
@@ -8738,18 +8733,4 @@ rbd.menuDBSearch <- function(input_sequence,fasta_file,protein_name,pdb_info = N
 #'
 "bs_output_repeats_uniprot"
 
-
-
-
-#save(pymol_color_table,file='data/pymol_color_table.RData')
-
-#setwd('~/Documents/monash/project.functions')
-#setwd('~/Documents/crisscrosslinker')
-
-#
-#roxygen2::roxygenise()
-#requireNamespace("crisscrosslinker")
-
-#build manual
-#system("R CMD Rd2pdf ~/Documents/monash/project.functions")
 
