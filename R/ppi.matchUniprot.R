@@ -98,15 +98,22 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
           uniprot_id2 <- strsplit(uniprot_id2,'-')[[1]][1]
         }
 
-        uniprot_fasta <- strsplit(getURL(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta')),'\n')[[1]]
-        if(TRUE %in% grepl('</html>',uniprot_fasta)){
-          #if TRUE --> there is some kind of error in here because it's just a generic error page
-          warning('Error page detected --> NA substituted')
-          uniprot_fasta_seq <- NA
-        } else {
-          cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
-          uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
-        }
+        # uniprot_fasta <- strsplit(getURL(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta')),'\n')[[1]]
+        # if(TRUE %in% grepl('</html>',uniprot_fasta)){
+        #   #if TRUE --> there is some kind of error in here because it's just a generic error page
+        #   warning('Error page detected --> NA substituted')
+        #   uniprot_fasta_seq <- NA
+        # } else {
+        #   cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
+        #   uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
+        # }
+        
+        cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
+        uniprot_fasta_seq <- tryCatch(readLines(curl(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta'))),
+                                      error = function(err){
+                                        cat('Error page detected --> NA substituted\n')
+                                        return(NA)
+                                      })
 
         #cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
         if(length(uniprot_fasta) == 0){
@@ -162,16 +169,23 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
         } else { #end if(file.exists(paste0(fasta_directory,uniprot_id,'.fasta'))){
           #if FALSE --> file does not exist, will need to fetch the fasta sequence from Uniprot
 
-          uniprot_fasta <- strsplit(getURL(paste0('https://www.uniprot.org/uniprot/',uniprot_id,'.fasta')),'\n')[[1]]
-          if(TRUE %in% grepl('</html>',uniprot_fasta)){
-            #if TRUE --> there is some kind of error in here because it's just a generic error page
-            warning('Error page detected --> NA substituted')
-            uniprot_fasta_seq <- NA
-          } else {
-            cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
-            uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
-
-          }
+          # uniprot_fasta <- strsplit(getURL(paste0('https://www.uniprot.org/uniprot/',uniprot_id,'.fasta')),'\n')[[1]]
+          # if(TRUE %in% grepl('</html>',uniprot_fasta)){
+          #   #if TRUE --> there is some kind of error in here because it's just a generic error page
+          #   warning('Error page detected --> NA substituted')
+          #   uniprot_fasta_seq <- NA
+          # } else {
+          #   cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
+          #   uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
+          # 
+          # }
+          
+          cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
+          uniprot_fasta_seq <- tryCatch(readLines(curl(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta'))),
+                                        error = function(err){
+                                          cat('Error page detected --> NA substituted\n')
+                                          return(NA)
+                                        })
 
           match_sequence <- c(match_sequence,uniprot_fasta_seq)
 
