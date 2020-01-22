@@ -108,7 +108,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
         #   uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
         # }
         
-        cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
+        cat(paste('Getting sequence from Uniprot:',uniprot_id2,'\n'))
         uniprot_fasta_seq <- tryCatch(readLines(curl(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta'))),
                                       error = function(err){
                                         cat('Error page detected --> NA substituted\n')
@@ -180,7 +180,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
           # 
           # }
           
-          cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
+          cat(paste('Getting sequence from Uniprot:',uniprot_id2,'\n'))
           uniprot_fasta_seq <- tryCatch(readLines(curl(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta'))),
                                         error = function(err){
                                           cat('Error page detected --> NA substituted\n')
