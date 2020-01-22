@@ -23,7 +23,8 @@ Imports:
 	httr,
 	stats,
 	graphics,
-	utils
+	utils,
+	curl
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
