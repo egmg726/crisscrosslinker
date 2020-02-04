@@ -1,5 +1,5 @@
 Package: crisscrosslinker
-Title: Protein Interaction Analysis
+Title: An R package for protein interaction analysis
 Version: 0.9
 Authors@R: person("Emma","Gail",email="emma.gail@monash.edu",role=c("aut","cre"))
 Description: Can do analysis of XL-MS and RBDmap data
