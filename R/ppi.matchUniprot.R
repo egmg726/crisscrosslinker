@@ -187,7 +187,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
                                           return(NA)
                                         })
 
-          match_sequence <- c(match_sequence,paste0(uniprot_fasta_seq[2:length(uniprot_fasta_seq)]))
+          match_sequence <- c(match_sequence,paste0(uniprot_fasta_seq[2:length(uniprot_fasta_seq)],collapse=''))
 
           if(download_fasta == TRUE && !is.na(uniprot_fasta_seq)){
             write(uniprot_fasta,paste0(fasta_directory,'/',uniprot_id,'.fasta'))
