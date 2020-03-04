@@ -116,7 +116,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
                                       })
 
         #cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
-        if(length(uniprot_fasta) == 0){
+        if(length(uniprot_fasta_seq) == 0){
           #if TRUE --> blank
           #go through loops again?
           #can put within a while loop
@@ -181,13 +181,13 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
           # }
           
           #cat(paste('Getting sequence from Uniprot:',uniprot_id2,'\n'))
-          uniprot_fasta_seq <- tryCatch(readLines(curl(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta'))),
+          uniprot_fasta_seq <- tryCatch(readLines(curl(paste0('https://www.uniprot.org/uniprot/',uniprot_id,'.fasta'))),
                                         error = function(err){
-                                          cat('Error page detected --> NA substituted\n')
+                                          cat('Error page detected --> NA substituted (2)\n')
                                           return(NA)
                                         })
 
-          match_sequence <- c(match_sequence,uniprot_fasta_seq)
+          match_sequence <- c(match_sequence,paste0(uniprot_fasta_seq[2:length(uniprot_fasta_seq)]))
 
           if(download_fasta == TRUE && !is.na(uniprot_fasta_seq)){
             write(uniprot_fasta,paste0(fasta_directory,'/',uniprot_id,'.fasta'))
