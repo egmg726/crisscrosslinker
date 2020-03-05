@@ -156,17 +156,17 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
       #can also use the str_locate within the segment before/after the binding sequence
     }
 
-    fasta_seq <- paste(toupper(fasta_file$`EZH2_Q15910-2`),collapse='')
-    list_of_cleaves <- str_locate_all(fasta_seq,'K')[[1]][,1]
+    #fasta_seq <- paste(toupper(fasta_file$`EZH2_Q15910-2`),collapse='')
+    #list_of_cleaves <- str_locate_all(fasta_seq,'K')[[1]][,1]
     #find the next one depending on the start/end of the binding sequence
     #can also expand this for originally finding the binding sequence
 
-    start_pattern <- 40
-    end_pattern <- 80
+    #start_pattern <- 40
+    #end_pattern <- 80
 
-    list_of_cleaves_sub <- list_of_cleaves[start_pattern > list_of_cleaves]
-    tail(list_of_cleaves_sub,n=1) #last integer
-    tail(list_of_cleaves_sub,n=2)[1] #second to last integer
+    #list_of_cleaves_sub <- list_of_cleaves[start_pattern > list_of_cleaves]
+    #tail(list_of_cleaves_sub,n=1) #last integer
+    #tail(list_of_cleaves_sub,n=2)[1] #second to last integer
     #will have to deal with errors as well --> is.na() probably
 
 
@@ -286,6 +286,15 @@ rbd.getBindingSeq <- function(ms_sequence,protease,sequence_for_alignment,
 
   }
 
+  
+  if(binding_site_end_in_pdb > nchar(as.character(sequence_for_alignment))){
+    binding_site_end_in_pdb <- nchar(as.character(sequence_for_alignment))
+    warning('Binding site detected is beyond limits of sequence, switching to last amino acid\n')
+  } else if(binding_site_start_in_pdb < 1){
+    
+    binding_site_end_in_pdb <- 1
+    warning('Binding site detected is less than 1, switching to first amino acid in sequence\n')
+  }
 
   binding_site_ouput <- list(binding_site_start=binding_site_start_in_pdb,
                              binding_site_end=binding_site_end_in_pdb,
