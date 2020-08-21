@@ -30,6 +30,11 @@ uniprot.fasta <- function(uniprot.id, download.fasta = FALSE, console.message = 
                               cat('Error page detected --> NA substituted\n')
                               return(NA)
                             })
+  
+  if(length(uniprot_fasta) == 0){
+    cat('Error page detected --> NA substituted\n')
+    return(NA)
+    }
 
   if(!is.na(uniprot_fasta)){
     uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
