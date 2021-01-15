@@ -19,37 +19,37 @@
 ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
                              fasta_directory=NULL,download_fasta=FALSE,export_matches=FALSE,
                              remove_na = FALSE, time_out = NULL,canonical=FALSE){
-
+  
   if((!is.null(fasta_directory)) && endsWith(fasta_directory,'/')){
     fasta_directory <- paste0(fasta_directory,'/')
   }
-
+  
   if(typeof(protein_to_uniprot_id) == 'character'){
     protein_to_uniprot_id <- read.csv(protein_to_uniprot_id)
   }
-
+  
   fasta_file <- fasta_file[names(fasta_file) %in% unique(c(as.character(xlink_df$pro_name1),as.character(xlink_df$pro_name2)))]
-
+  
   #have list of the matches for those don't match
   match_protein <- c()
   match_uniprot <- c()
   match_sequence <- c()
   #can turn into a list and save if needed as a csv file
-
+  
   if(!is.null(protein_to_uniprot_id)){
-
+    
     protein_to_uniprot_id <- protein_to_uniprot_id[protein_to_uniprot_id$ProteinName %in% names(fasta_file),]
     protein_to_uniprot_id <- protein_to_uniprot_id[match(names(fasta_file),protein_to_uniprot_id$ProteinName),]
-
+    
     match_protein <- as.character(protein_to_uniprot_id$ProteinName)
     match_uniprot <- as.character(protein_to_uniprot_id$UniProtID)
     if('UniProtSeq' %in% colnames(protein_to_uniprot_id)){
       match_sequence <- as.character(protein_to_uniprot_id$UniProtSeq)
     }
   } #end if(!is.null(protein_to_uniprot_id))
-
+  
   #need to make sure the matches are checked so that every row isn't checked
-
+  
   #move all of the FASTA stuff up here so that each one doesn't have to be checked multiple times?
   #may be better for error checking
   for(pep_pro in names(fasta_file)){
@@ -57,7 +57,7 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
       if(pep_pro %in% match_protein){
         uniprot_fasta_seq <- match_sequence[match(pep_pro,match_protein)]
         #if within the while loop --> can break out of it here
-
+        
       } else { #end if(pep_pro %in% match_protein){
         #if FALSE --> no match has been found so need to go through the menu loops cycle
         # if(!(pep_pro %in% names(fasta_file))){
@@ -71,33 +71,31 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
           #if NULL --> no results have been found
           #what to do if this occurs?
           seq_info
-
+          
           #add NA to both the match_uniprot and match_sequence?
-
+          
         } else {#else if(is.null(seq_info)){
-
-
-
+          
         }
-
+        
         uniprot_id <- seq_info$pdb_id
         uniprot_id2 <- gsub('\\.','-',uniprot_id)
-
+        
         match_protein <- c(match_protein,pep_pro)
         match_uniprot <- c(match_uniprot,uniprot_id2)
-
-
+        
+        
         #read out the first line, then condense all of the rest of the lines and read as
         #just 1 sequence paste+collapse lines 2-end
-
+        
         #create a separate function for this and enclose in a while loop
         #while is.na(uniprot_fasta_seq)
-
+        
         #should turn this into a function to be used
         if(canonical == TRUE){
           uniprot_id2 <- strsplit(uniprot_id2,'-')[[1]][1]
         }
-
+        
         # uniprot_fasta <- strsplit(getURL(paste0('https://www.uniprot.org/uniprot/',uniprot_id2,'.fasta')),'\n')[[1]]
         # if(TRUE %in% grepl('</html>',uniprot_fasta)){
         #   #if TRUE --> there is some kind of error in here because it's just a generic error page
@@ -114,19 +112,19 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
                                         cat('Error page detected --> NA substituted\n')
                                         return(NA)
                                       })
-
+        
         #cat(paste('Getting sequence from Uniprot:',uniprot_fasta[1],'\n'))
         if(length(uniprot_fasta_seq) == 0){
           #if TRUE --> blank
           #go through loops again?
           #can put within a while loop
-
+          
           warning(paste('Protein name not found on Uniprot: ',pep_pro))
           uniprot_fasta_seq <- NA
         } else {#end if(length(uniprot_fasta) == 0)
           uniprot_fasta_seq <- paste0(uniprot_fasta[2:length(uniprot_fasta)],collapse = '')
         } #end else to #end if(length(uniprot_fasta) == 0)
-
+        
         #can have a while loop here so that if  uniprot_fasta_seq is NA
         #can try to go through the menu loops
         # while(is.na(uniprot_fasta_seq)){
@@ -135,40 +133,40 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
         #
         #
         # }
-
+        
         match_sequence <- c(match_sequence,uniprot_fasta_seq)
         #match_protein <- c(match_protein,pep_pro)
-
+        
         if(download_fasta == TRUE){
           write(uniprot_fasta,paste0(fasta_directory,'/',uniprot_id2,'.fasta'))
         } #end if(download_fasta == TRUE){
-
+        
       } #end else to if(pep_pro %in% match_protein){
-
+      
     } else { #end if(is.null(protein_to_uniprot_id)){
-
+      
       #if not NULL --> can just use the table that was inputted
       #uniprot_id <- as.character(protein_to_uniprot_id[protein_to_uniprot_id$protein_id == pep_pro,'uniprot_id'])
       #accept either uppercase "p" or lowercase "P"?
-
+      
       if(!('UniProtSeq' %in% colnames(protein_to_uniprot_id))){
-
+        
         uniprot_id <- as.character(protein_to_uniprot_id[protein_to_uniprot_id$ProteinName == pep_pro,'UniProtID'])
         #check if the FASTA file exists
         #should also check if there exists the third column that contains the sequence
-
+        
         #should it be able to handle just 1 FASTA file that contains multiple sequences?
-
-
+        
+        
         uniprot_file <- paste0(fasta_directory,uniprot_id,'.fasta')
         if(file.exists(uniprot_file)){
           #if TRUE --> file does exist, get for the analysis
           uniprot_fasta_seq <-paste0(toupper(seqinr::read.fasta(uniprot_file)[[1]]),collapse='')
           #fasta_file
-
+          
         } else { #end if(file.exists(paste0(fasta_directory,uniprot_id,'.fasta'))){
           #if FALSE --> file does not exist, will need to fetch the fasta sequence from Uniprot
-
+          
           # uniprot_fasta <- strsplit(getURL(paste0('https://www.uniprot.org/uniprot/',uniprot_id,'.fasta')),'\n')[[1]]
           # if(TRUE %in% grepl('</html>',uniprot_fasta)){
           #   #if TRUE --> there is some kind of error in here because it's just a generic error page
@@ -186,36 +184,36 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
                                           cat('Error page detected --> NA substituted (2)\n')
                                           return(NA)
                                         })
-
+          
           match_sequence <- c(match_sequence,paste0(uniprot_fasta_seq[2:length(uniprot_fasta_seq)],collapse=''))
-
+          
           if(download_fasta == TRUE && !is.na(uniprot_fasta_seq)){
-            write(uniprot_fasta,paste0(fasta_directory,'/',uniprot_id,'.fasta'))
+            write(uniprot_fasta_seq,paste0(fasta_directory,'/',uniprot_id,'.fasta'))
           } #end if(download_fasta == TRUE){
-
+          
         } #end else to if(file.exists(paste0(fasta_directory,uniprot_id,'.fasta'))){
-
-
+        
+        
       } #end if(!('UniProtSeq' %in% colnames(protein_to_uniprot_id))){
-
+      
     } #end else to if(is.null(protein_to_uniprot_id)){
-
-
+    
+    
   } #end for(protein_name in names(fasta_file)){
-
-
-
-
+  
+  
+  
+  
   match_df <- (data.frame(ProteinName = match_protein,
-                               UniProtID = match_uniprot,
-                               UniProtSeq = match_sequence))
-
+                          UniProtID = match_uniprot,
+                          UniProtSeq = match_sequence))
+  
   #return(match_df)
-
+  
   # if(!is.null(protein_to_uniprot_id)){
   #   match_df <- protein_to_uniprot_id
   # }
-
+  
   for(row_num in 1:nrow(xlink_df)){
     #cat(row_num)
     xlink_df_row <- xlink_df[row_num,]
@@ -228,11 +226,11 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
       pep_pro <- as.character(xlink_df_row[[pep_pro_name]])
       link_name <- paste('pep_pos',as.character(pep_num),sep='')
       linkpos <- as.character(xlink_df_row[[link_name]])
-
+      
       uniprot_fasta_seq <- as.character(match_df[match_df$ProteinName == pep_pro,'UniProtSeq'])
-
+      
       #uniprot_fasta_seq <- toupper(paste(uniprot_fasta[[names(uniprot_fasta)]],collapse=''))
-
+      
       pepstring_location <- NULL
       if(!is.na(uniprot_fasta_seq)){
         pepstring_location <- str_locate_all(uniprot_fasta_seq,pepstring)[[1]]
@@ -241,33 +239,36 @@ ppi.matchUniprot <- function(xlink_df,fasta_file,protein_to_uniprot_id=NULL,
         } else { #end if(length(pepstring_location) == 0){
           pepstring_location_start <- pepstring_location[1]
           new_peppos1 <- pepstring_location_start + as.numeric(linkpos)-1
-          levels(xlink_df[[peppos_name]]) <- c(levels(xlink_df[[peppos_name]]),new_peppos1)
+          
+          if(!(new_peppos1 %in% levels(xlink_df[[peppos_name]]))){
+            levels(xlink_df[[peppos_name]]) <- c(levels(xlink_df[[peppos_name]]),new_peppos1)
+          }
           xlink_df[row_num,][[peppos_name]] <- new_peppos1
         } #end else to if(length(pepstring_location) == 0){
-
+        
         #should have an else here to the is.na --> since will give misleading results if not
         #removed?
       } else {#end if(!is.na(uniprot_fasta_seq)){
         #if TRUE --> uniprot_fasta_seq is NA
         xlink_df[row_num,][[peppos_name]] <- NA
-
+        
       } #end else to (!is.na(uniprot_fasta_seq)){
-
+      
     } #end for(pep_num in 1:2)
   } #end for(row_num in 1:nrow(xlink_df))
-
-
+  
+  
   #be able to customize the output file name?
   if(export_matches == TRUE){
     #export the matches as a table
     write.csv(match_df,'uniprot_matches.csv')
-
+    
   }
-
+  
   if(remove_na == TRUE){
     xlink_df <- na.omit(xlink_df)
   }
-
+  
   return(xlink_df)
-
+  
 } #end function renumber_xinet_from_uniprot_fasta()
